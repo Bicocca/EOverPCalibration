@@ -8,13 +8,10 @@
 #include "CalibrationUtils.h"
 
 
-
-int main (int argc, char ** argv) 
-{
+int main (int argc, char ** argv) {
     
   ///Check if all nedeed arguments to parse are there
-  if(argc != 2)
-  {
+  if(argc != 2){
     std::cerr << ">>>>> FastCalibrator::usage: " << argv[0] << " configFileName" << std::endl ;
     return 1;
   }
@@ -22,71 +19,137 @@ int main (int argc, char ** argv)
   /// Parse the config file
   parseConfigFile (argv[1]) ;
  
-  //std::string inputFile       = gConfigParser -> readStringOption("Input::inputFile");
+  // txt file with the list of input root files
   std::string inputList = gConfigParser -> readStringOption("Input::inputList");
-  std::string inputTree = gConfigParser -> readStringOption("Input::inputTree");
-  
+
+  // input tree name 
+  std::string inputTree = "NULL";
+  try{ inputTree = gConfigParser -> readStringOption("Input::inputTree");}
+  catch(char const* exceptionString ){ inputTree = "simpleNtupleEoverP/SimpleNtupleEoverP";}
+
+  // input dead xtal name --> switch off by hand 
   std::string inputFileDeadXtal = "NULL";
-  try
-  {
-    inputFileDeadXtal = gConfigParser -> readStringOption("Input::inputFileDeadXtal");
-  }
-  catch( char const* exceptionString )
-  {
-    std::cerr << " exception = " << exceptionString << std::endl;
-  }
+  try{ inputFileDeadXtal = gConfigParser -> readStringOption("Input::inputFileDeadXtal");}
+  catch( char const* exceptionString ){ std::cerr << " exception = " << exceptionString << std::endl;}
   
-  std::string jsonFileName = gConfigParser -> readStringOption("Input::jsonFileName");  
+  // jsonFileName  
+  std::string jsonFileName ="NULL";
+  try{  jsonFileName  = gConfigParser -> readStringOption("Input::jsonFileName");}
+  catch( char const* exceptionString ){ jsonFileName = "json/Cert_190456-196531_8TeV_13Jul2012ReReco_Collisions12_JSON_v2.txt";}
+
   std::map<int, std::vector<std::pair<int, int> > > jsonMap;
   jsonMap = readJSONFile(jsonFileName);
   
-  bool isMiscalib = gConfigParser -> readBoolOption("Input::isMiscalib");
-  bool isSaveEPDistribution = gConfigParser -> readBoolOption("Input::isSaveEPDistribution");
+  // Miscalibration --> scalib 5%
+  bool isMiscalib ;
+  try{isMiscalib = gConfigParser -> readBoolOption("Input::isMiscalib");}
+  catch( char const* exceptionString ){ isMiscalib = false;}
 
-  bool isEPselection = gConfigParser -> readBoolOption("Input::isEPselection");
+  // Save EoverP distribution
+  bool isSaveEPDistribution ;
+  try{ isSaveEPDistribution = gConfigParser -> readBoolOption("Input::isSaveEPDistribution");}
+  catch( char const* exceptionString ){ isSaveEPDistribution = false; }
 
-  bool isPtCut = gConfigParser -> readBoolOption("Input::isPtCut");
-  float PtMin = gConfigParser -> readFloatOption("Input::PtMin");
-
-  bool isfbrem = gConfigParser -> readBoolOption("Input::isfbrem");
-  float fbremMax = gConfigParser -> readFloatOption("Input::fbremMax");
-
-  bool isR9selection = gConfigParser -> readBoolOption("Input::isR9selection");
-  float R9Min = gConfigParser -> readFloatOption("Input::R9Min");
-
-  bool isMCTruth = gConfigParser -> readBoolOption("Input::isMCTruth");
-  std::string inputMomentumScale =  gConfigParser -> readStringOption("Input::inputMomentumScale");
+  // Do the E/P selection
+  bool isEPselection ;
+  try{ isEPselection = gConfigParser -> readBoolOption("Input::isEPselection");}
+  catch( char const* exceptionString ){ isEPselection = false; }
   
-  std::string typeEB = gConfigParser -> readStringOption("Input::typeEB");
-  std::string typeEE = gConfigParser -> readStringOption("Input::typeEE");
+  // Pt treshold bool and cut
+  bool isPtCut ;
+  try{ isPtCut = gConfigParser -> readBoolOption("Input::isPtCut"); }
+  catch( char const* exceptionString ){ isPtCut = false;}
+
+  float PtMin ;
+  try{ isPtCut = gConfigParser -> readBoolOption("Input::isPtCut");}
+  catch( char const* exceptionString ){ PtMin = 0.;}
+ 
+  // fbrem treshold bool and cut
+  bool isfbrem ;
+  try { isfbrem = gConfigParser -> readBoolOption("Input::isfbrem"); }
+  catch( char const* exceptionString ){ isfbrem = false;}
+ 
+  float fbremMax ;
+  try { fbremMax = gConfigParser -> readFloatOption("Input::fbremMax"); }
+  catch( char const* exceptionString ){ fbremMax = 100.;}
+
+  // R9 treshold bool and cut
+  bool isR9selection ;
+  try{ isR9selection = gConfigParser -> readBoolOption("Input::isR9selection");}
+  catch( char const* exceptionString ){ isR9selection = false; }
+
+  float R9Min ;
+  try{ isR9selection = gConfigParser -> readFloatOption("Input::R9Min");}
+  catch( char const* exceptionString ){ R9Min = 0.; }
+
+  // Run Calibration on E/Etrue instead of E/P --> MC only
+  bool isMCTruth ;
+  try { isMCTruth = gConfigParser -> readBoolOption("Input::isMCTruth"); }
+  catch( char const* exceptionString ){ isMCTruth = false; }
+
+  // Momentum scale file
+  std::string inputMomentumScale ;
+  try{ inputMomentumScale =  gConfigParser -> readStringOption("Input::inputMomentumScale"); }
+  catch( char const* exceptionString ) { inputMomentumScale = "output/MomentumCalibrationCombined_2011AB-2012ABC.root";}
+
+  std::string typeEB ;
+  try{ typeEB = gConfigParser -> readStringOption("Input::typeEB"); }
+  catch( char const* exceptionString ) { typeEB = "none" ; }
+
+  std::string typeEE ;
+  try{ typeEE = gConfigParser -> readStringOption("Input::typeEE"); }
+  catch( char const* exceptionString ) { typeEE = "none" ; }
+  
   int nRegionsEB = GetNRegionsEB(typeEB);
   
-  std::string outputFile = gConfigParser -> readStringOption("Output::outputFile");
+  // Name of the output calib file
+  std::string outputFile ;
+  try{ system(std::string("mkdir -p output/outputEPCalibration").c_str());
+       outputFile = gConfigParser -> readStringOption("Output::outputFile"); }
+  catch( char const* exceptionString ) { 
+    outputFile = "output/outputEPCalibration" ;
+    system(std::string("mkdir -p output/outputEPCalibration").c_str());
+  }
   
-  int numberOfEvents = gConfigParser -> readIntOption("Options::numberOfEvents");
-  int useZ = gConfigParser -> readIntOption("Options::useZ");
-  int useW = gConfigParser -> readIntOption("Options::useW");
-  int splitStat = gConfigParser -> readIntOption("Options::splitStat");
-  int nLoops = gConfigParser -> readIntOption("Options::nLoops");
+  
+  // Other options for the L3 algo
+  int numberOfEvents ;
+  try { numberOfEvents = gConfigParser -> readIntOption("Options::numberOfEvents"); }
+  catch( char const* exceptionString ) { numberOfEvents = -1 ; }
+
+  int useZ ;
+  try { useZ = gConfigParser -> readIntOption("Options::useZ"); }
+  catch( char const* exceptionString ) { useZ = 1 ; }
+
+  int useW ;
+  try{ useW = gConfigParser -> readIntOption("Options::useW"); }
+  catch( char const* exceptionString ) { useW = 1 ; }
+
+  int splitStat ;
+  try{ splitStat = gConfigParser -> readIntOption("Options::splitStat"); }
+  catch( char const* exceptionString ) { splitStat = 0 ; }
+
+  int nLoops ;
+  try{ nLoops = gConfigParser -> readIntOption("Options::nLoops"); }
+  catch( char const* exceptionString ) { nLoops = 20 ; }
+  
   
   /// open ntupla of data or MC
-  TChain * albero = new TChain (inputTree.c_str());
-  FillChain(*albero,inputList); 
+  TChain * tree = new TChain (inputTree.c_str());
+  FillChain(*tree,inputList); 
 
   /// open calibration momentum graph
-  TFile* f4 = new TFile((inputMomentumScale+"_"+typeEB+"_"+typeEE+".root").c_str());
+  TFile* momentumscale = new TFile((inputMomentumScale+"_"+typeEB+"_"+typeEE+".root").c_str());
   std::vector<TGraphErrors*> g_EoC_EB;
   
-  for(int i = 0; i < nRegionsEB; ++i)
-  {
+  for(int i = 0; i < nRegionsEB; ++i){
     TString Name = Form("g_EoC_EB_%d",i);
-    g_EoC_EB.push_back( (TGraphErrors*)(f4->Get(Name)) );
+    g_EoC_EB.push_back( (TGraphErrors*)(momentumscale->Get(Name)) );
   }
   
   ///Use the whole sample statistics if numberOfEvents < 0
-  if ( numberOfEvents < 0 ) numberOfEvents = albero->GetEntries(); 
+  if ( numberOfEvents < 0 ) numberOfEvents = tree->GetEntries(); 
   
-
   /// run in normal mode: full statistics
   if ( splitStat == 0 ) {
    
@@ -119,27 +182,25 @@ int main (int argc, char ** argv)
     if(isMiscalib == false && useZ == 0 && isEPselection ==false && isR9selection==false && isPtCut ==false && isfbrem ==false ) name_tmp =Form ("%s_W_noEP_EB",outputFile.c_str());
     
     name = Form("%s.root",name_tmp.Data());
-    TFile *f1 = new TFile(name,"RECREATE");
+    TFile *outputName = new TFile(name,"RECREATE");
 
     TString outEPDistribution = "Weight_"+name;
     
     TString DeadXtal = Form("%s",inputFileDeadXtal.c_str());    
 
-    if(isSaveEPDistribution == true)
-    {
-      FastCalibratorEB analyzer(albero, g_EoC_EB, typeEB, outEPDistribution);
+    if(isSaveEPDistribution == true){
+      FastCalibratorEB analyzer(tree, g_EoC_EB, typeEB, outEPDistribution);
       analyzer.bookHistos(nLoops);
       analyzer.AcquireDeadXtal(DeadXtal);
       analyzer.Loop(numberOfEvents, useZ, useW, splitStat, nLoops, isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
-      analyzer.saveHistos(f1);
+      analyzer.saveHistos(outputName);
     }
-    else
-    {
-      FastCalibratorEB analyzer(albero, g_EoC_EB, typeEB);
+    else{
+      FastCalibratorEB analyzer(tree, g_EoC_EB, typeEB);
       analyzer.bookHistos(nLoops);
       analyzer.AcquireDeadXtal(DeadXtal);
       analyzer.Loop(numberOfEvents, useZ, useW, splitStat, nLoops, isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
-      analyzer.saveHistos(f1);
+      analyzer.saveHistos(outputName);
     }
    
   }
@@ -243,27 +304,27 @@ int main (int argc, char ** argv)
       name2 = Form ("%s_W_noEP_EB_odd.root", outputFile.c_str());
     }
 
-    TFile *f1 = new TFile(name,"RECREATE");
-    TFile *f2 = new TFile(name2,"RECREATE");
+    TFile *outputName1 = new TFile(name,"RECREATE");
+    TFile *outputName2 = new TFile(name2,"RECREATE");
 
     TString DeadXtal = Form("%s",inputFileDeadXtal.c_str());
      
     /// Run on odd
-    FastCalibratorEB analyzer_even(albero, g_EoC_EB, typeEB);
+    FastCalibratorEB analyzer_even(tree, g_EoC_EB, typeEB);
     analyzer_even.bookHistos(nLoops);
     analyzer_even.AcquireDeadXtal(DeadXtal);
     analyzer_even.Loop(numberOfEvents, useZ, useW, splitStat, nLoops,isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
-    analyzer_even.saveHistos(f1);
+    analyzer_even.saveHistos(outputName1);
   
     /// Run on even
-    FastCalibratorEB analyzer_odd(albero, g_EoC_EB, typeEB);
+    FastCalibratorEB analyzer_odd(tree, g_EoC_EB, typeEB);
     analyzer_odd.bookHistos(nLoops);
     analyzer_odd.AcquireDeadXtal(DeadXtal);
     analyzer_odd.Loop(numberOfEvents, useZ, useW, splitStat*(-1), nLoops,isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
-    analyzer_odd.saveHistos(f2);
+    analyzer_odd.saveHistos(outputName2);
     
   }
 
-  delete albero;
+  delete tree;
   return 0;
 }
