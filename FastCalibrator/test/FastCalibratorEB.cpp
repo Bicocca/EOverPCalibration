@@ -30,7 +30,7 @@ int main (int argc, char ** argv) {
   // input dead xtal name --> switch off by hand 
   std::string inputFileDeadXtal = "NULL";
   try{ inputFileDeadXtal = gConfigParser -> readStringOption("Input::inputFileDeadXtal");}
-  catch( char const* exceptionString ){ std::cerr << " exception = " << exceptionString << std::endl;}
+  catch( char const* exceptionString ){ inputFileDeadXtal = "NULL"; }
   
   // jsonFileName  
   std::string jsonFileName ="NULL";
@@ -61,7 +61,7 @@ int main (int argc, char ** argv) {
   catch( char const* exceptionString ){ isPtCut = false;}
 
   float PtMin ;
-  try{ isPtCut = gConfigParser -> readBoolOption("Input::isPtCut");}
+  try{ PtMin = gConfigParser -> readFloatOption("Input::PtMin");}
   catch( char const* exceptionString ){ PtMin = 0.;}
  
   // fbrem treshold bool and cut
@@ -79,7 +79,7 @@ int main (int argc, char ** argv) {
   catch( char const* exceptionString ){ isR9selection = false; }
 
   float R9Min ;
-  try{ isR9selection = gConfigParser -> readFloatOption("Input::R9Min");}
+  try{ R9Min = gConfigParser -> readFloatOption("Input::R9Min");}
   catch( char const* exceptionString ){ R9Min = 0.; }
 
   // Run Calibration on E/Etrue instead of E/P --> MC only
@@ -103,14 +103,17 @@ int main (int argc, char ** argv) {
   int nRegionsEB = GetNRegionsEB(typeEB);
   
   // Name of the output calib file
-  std::string outputFile ;
-  try{ system(std::string("mkdir -p output/outputEPCalibration").c_str());
-       outputFile = gConfigParser -> readStringOption("Output::outputFile"); }
-  catch( char const* exceptionString ) { 
-    outputFile = "output/outputEPCalibration" ;
-    system(std::string("mkdir -p output/outputEPCalibration").c_str());
+  std::string outputPath;
+  try{ outputPath = gConfigParser -> readStringOption("Output::outputPath");
+       system(("mkdir -p "+outputPath).c_str());}
+  catch( char const* exceptionString ) { outputPath = "output/Oct22_Run2012ABC_Cal_Dic2012/";
+                                         system(("mkdir -p "+outputPath).c_str());
   }
   
+  std::string outputFile ;
+  try{ outputFile = gConfigParser -> readStringOption("Output::outputFile"); }
+  catch( char const* exceptionString ) { outputFile = "FastCalibrator_Oct22_Run2012ABC_Cal_Dic2012" ;
+  }
   
   // Other options for the L3 algo
   int numberOfEvents ;
@@ -137,7 +140,7 @@ int main (int argc, char ** argv) {
   /// open ntupla of data or MC
   TChain * tree = new TChain (inputTree.c_str());
   FillChain(*tree,inputList); 
-
+  
   /// open calibration momentum graph
   TFile* momentumscale = new TFile((inputMomentumScale+"_"+typeEB+"_"+typeEE+".root").c_str());
   std::vector<TGraphErrors*> g_EoC_EB;
@@ -155,35 +158,55 @@ int main (int argc, char ** argv) {
    
     TString name ;
     TString name_tmp;
-    if(isMiscalib == true && useZ == 1 && isR9selection ==true ) name_tmp = Form ("%s_WZ_R9_miscalib_EB",outputFile.c_str());
-    if(isMiscalib == true && useZ == 1 && isfbrem ==true ) name_tmp = Form ("%s_WZ_Fbrem_miscalib_EB",outputFile.c_str());
-    if(isMiscalib == true && useZ == 1 && isPtCut ==true ) name_tmp = Form ("%s_WZ_PT_miscalib_EB",outputFile.c_str());
-    if(isMiscalib == true && useZ == 1 && isEPselection ==true ) name_tmp = Form ("%s_WZ_EP_miscalib_EB",outputFile.c_str());
-    if(isMiscalib == true && useZ == 1 && isEPselection ==false && isR9selection==false && isPtCut ==false && isfbrem ==false  ) name_tmp =Form ("%s_WZ_noEP_miscalib_EB",outputFile.c_str());
-    
-    if(isMiscalib == false && useZ == 1 && isR9selection ==true ) name_tmp = Form ("%s_WZ_R9_EB",outputFile.c_str());
-    if(isMiscalib == false && useZ == 1 && isfbrem ==true ) name_tmp = Form ("%s_WZ_Fbrem_EB",outputFile.c_str());
-    if(isMiscalib == false && useZ == 1 && isPtCut ==true ) name_tmp = Form ("%s_WZ_PT_EB",outputFile.c_str());
-    if(isMiscalib == false && useZ == 1 && isEPselection ==true ) name_tmp = Form ("%s_WZ_EP_EB",outputFile.c_str());
-    if(isMiscalib == false && useZ == 1 && isEPselection ==false && isR9selection==false && isPtCut ==false && isfbrem ==false  ) name_tmp =Form ("%s_WZ_noEP_EB",outputFile.c_str());
-    
 
-    if(isMiscalib == true && useZ == 0 && isR9selection ==true ) name_tmp = Form ("%s_W_R9_miscalib_EB",outputFile.c_str());
-    if(isMiscalib == true && useZ == 0 && isEPselection ==true ) name_tmp = Form ("%s_W_EP_miscalib_EB",outputFile.c_str());
-    if(isMiscalib == true && useZ == 0 && isPtCut ==true ) name_tmp = Form ("%s_W_PT_miscalib_EB",outputFile.c_str());
-    if(isMiscalib == true && useZ == 0 && isEPselection ==true ) name_tmp = Form ("%s_W_EP_miscalib_EB",outputFile.c_str());
-    if(isMiscalib == true && useZ == 0 && isEPselection ==false && isR9selection==false &&  isPtCut ==false && isfbrem ==false  ) name_tmp =Form ("%s_W_noEP_miscalib_EB",outputFile.c_str());
-    
-    
-    if(isMiscalib == false && useZ == 0 && isR9selection ==true ) name_tmp = Form ("%s_W_R9_EB",outputFile.c_str());
-    if(isMiscalib == false && useZ == 0 && isEPselection ==true ) name_tmp = Form ("%s_W_EP_EB",outputFile.c_str());
-    if(isMiscalib == false && useZ == 0 && isPtCut ==true ) name_tmp = Form ("%s_W_PT_EB",outputFile.c_str());
-    if(isMiscalib == false && useZ == 0 && isEPselection ==true ) name_tmp = Form ("%s_W_EP_EB",outputFile.c_str());
-    if(isMiscalib == false && useZ == 0 && isEPselection ==false && isR9selection==false && isPtCut ==false && isfbrem ==false ) name_tmp =Form ("%s_W_noEP_EB",outputFile.c_str());
-    
-    name = Form("%s.root",name_tmp.Data());
+    if(isMiscalib == true && useZ == 1 && isR9selection ==true && isEPselection == false && isfbrem == false && isPtCut ==false ) 
+     name_tmp = Form ("%s_WZ_R9_miscalib_EB",outputFile.c_str());
+    else if(isMiscalib == true && useZ == 1 && isR9selection ==false && isEPselection == false && isfbrem == true && isPtCut ==false ) 
+     name_tmp = Form ("%s_WZ_Fbrem_miscalib_EB",outputFile.c_str());
+    else if(isMiscalib == true && useZ == 1 && isR9selection ==true && isEPselection == false && isfbrem == false && isPtCut ==true ) 
+     name_tmp = Form ("%s_WZ_PT_miscalib_EB",outputFile.c_str());
+    else if(isMiscalib == true && useZ == 1 && isR9selection ==true && isEPselection == true && isfbrem == false && isPtCut ==false ) 
+     name_tmp = Form ("%s_WZ_EP_miscalib_EB",outputFile.c_str());
+    else if(isMiscalib == true && useZ == 1 && isEPselection ==false && isR9selection==false && isPtCut ==false && isfbrem ==false  ) 
+     name_tmp =Form ("%s_WZ_noEP_miscalib_EB",outputFile.c_str());
+
+    else if(isMiscalib == false && useZ == 1 && isR9selection ==true && isEPselection == false && isfbrem == false && isPtCut ==false ) 
+     name_tmp = Form ("%s_WZ_R9_EB",outputFile.c_str());
+    else if(isMiscalib == false && useZ == 1 && isR9selection ==false && isEPselection == false && isfbrem == true && isPtCut ==false ) 
+     name_tmp = Form ("%s_WZ_Fbrem_EB",outputFile.c_str());
+    else if(isMiscalib == false && useZ == 1 && isR9selection ==true && isEPselection == false && isfbrem == false && isPtCut ==true ) 
+     name_tmp = Form ("%s_WZ_PT_EB",outputFile.c_str());
+    else if(isMiscalib == false && useZ == 1 && isR9selection ==true && isEPselection == true && isfbrem == false && isPtCut ==false ) 
+     name_tmp = Form ("%s_WZ_EP_EB",outputFile.c_str());
+    else if(isMiscalib == false && useZ == 1 && isEPselection ==false && isR9selection==false && isPtCut ==false && isfbrem ==false  ) 
+     name_tmp =Form ("%s_WZ_noEP_EB",outputFile.c_str());
+
+    else if(isMiscalib == true && useZ == 0 && isR9selection ==true && isEPselection == false && isfbrem == false && isPtCut ==false ) 
+     name_tmp = Form ("%s_W_R9_miscalib_EB",outputFile.c_str());
+    else if(isMiscalib == true && useZ == 0 && isR9selection ==false && isEPselection == false && isfbrem == true && isPtCut ==false ) 
+     name_tmp = Form ("%s_W_Fbrem_miscalib_EB",outputFile.c_str());
+    else if(isMiscalib == true && useZ == 0 && isR9selection ==true && isEPselection == false && isfbrem == false && isPtCut ==true ) 
+     name_tmp = Form ("%s_W_PT_miscalib_EB",outputFile.c_str());
+    else if(isMiscalib == true && useZ == 0 && isR9selection ==true && isEPselection == true && isfbrem == false && isPtCut ==false ) 
+     name_tmp = Form ("%s_W_EP_miscalib_EB",outputFile.c_str());
+    else if(isMiscalib == true && useZ == 0 && isEPselection ==false && isR9selection==false && isPtCut ==false && isfbrem ==false  ) 
+     name_tmp =Form ("%s_W_noEP_miscalib_EB",outputFile.c_str());
+
+    else if(isMiscalib == false && useZ == 0 && isR9selection ==true && isEPselection == false && isfbrem == false && isPtCut ==false ) 
+     name_tmp = Form ("%s_WZ_R9_EB",outputFile.c_str());
+    else if(isMiscalib == false && useZ == 0 && isR9selection ==false && isEPselection == false && isfbrem == true && isPtCut ==false ) 
+     name_tmp = Form ("%s_W_Fbrem_EB",outputFile.c_str());
+    else if(isMiscalib == false && useZ == 0 && isR9selection ==true && isEPselection == false && isfbrem == false && isPtCut ==true ) 
+     name_tmp = Form ("%s_W_PT_EB",outputFile.c_str());
+    else if(isMiscalib == false && useZ == 0 && isR9selection ==true && isEPselection == true && isfbrem == false && isPtCut ==false ) 
+     name_tmp = Form ("%s_W_EP_EB",outputFile.c_str());
+    else if(isMiscalib == false && useZ == 0 && isEPselection ==false && isR9selection==false && isPtCut ==false && isfbrem ==false  ) 
+     name_tmp =Form ("%s_W_noEP_EB",outputFile.c_str());
+    else { std::cout<<" Option not considered --> exit "<<std::endl; return -1 ;}
+
+    name = Form("%s%s.root",outputPath.c_str(),name_tmp.Data());
     TFile *outputName = new TFile(name,"RECREATE");
-
+    
     TString outEPDistribution = "Weight_"+name;
     
     TString DeadXtal = Form("%s",inputFileDeadXtal.c_str());    
@@ -202,9 +225,9 @@ int main (int argc, char ** argv) {
       analyzer.Loop(numberOfEvents, useZ, useW, splitStat, nLoops, isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
       analyzer.saveHistos(outputName);
     }
-   
+    
   }
-
+  
   /// run in even-odd mode: half statistics
   else if ( splitStat == 1 ) {
     
@@ -212,100 +235,103 @@ int main (int argc, char ** argv) {
     TString name;
     TString name2;
     
-    if(isMiscalib == true && useZ == 1 && isR9selection==true)
-    { name  = Form ("%s_WZ_R9_miscalib_EB_even.root",outputFile.c_str());
+    if(isMiscalib == true && useZ == 1 && isR9selection==true && isEPselection==false && isfbrem ==false && isPtCut==false){
+      name  = Form ("%s_WZ_R9_miscalib_EB_even.root",outputFile.c_str());
       name2 = Form ("%s_WZ_R9_miscalib_EB_odd.root", outputFile.c_str());
     }
-    
-    if(isMiscalib == true && useZ == 1 && isEPselection==true)
-    { name  = Form ("%s_WZ_EP_miscalib_EB_even.root",outputFile.c_str());
+    else if(isMiscalib == true && useZ == 1 && isR9selection==false && isEPselection==true && isfbrem ==false && isPtCut==false){
+      name  = Form ("%s_WZ_EP_miscalib_EB_even.root",outputFile.c_str());
       name2 = Form ("%s_WZ_EP_miscalib_EB_odd.root", outputFile.c_str());
     }
-    if(isMiscalib == true && useZ == 1 && isfbrem ==true)
-    { name  = Form ("%s_WZ_Fbrem_miscalib_EB_even.root",outputFile.c_str());
+    else if(isMiscalib == true && useZ == 1 && isR9selection==true && isEPselection==false && isfbrem ==true && isPtCut==false){ 
+      name  = Form ("%s_WZ_Fbrem_miscalib_EB_even.root",outputFile.c_str());
       name2 = Form ("%s_WZ_Fbrem_miscalib_EB_odd.root", outputFile.c_str());
     }
-    if(isMiscalib == true && useZ == 1 && isPtCut==true)
-    { name  = Form ("%s_WZ_PT_miscalib_EB_even.root",outputFile.c_str());
+    else if(isMiscalib == true && useZ == 1 && isR9selection==true && isEPselection==false && isfbrem ==false && isPtCut==true){
+      name  = Form ("%s_WZ_PT_miscalib_EB_even.root",outputFile.c_str());
       name2 = Form ("%s_WZ_PT_miscalib_EB_odd.root", outputFile.c_str());
     }
-    if(isMiscalib == true && useZ == 1 && isR9selection==false && isEPselection==false && isfbrem ==false && isPtCut==false)
-    { name  = Form ("%s_WZ_noEP_miscalib_EB_even.root",outputFile.c_str());
+    else if(isMiscalib == true && useZ == 1 && isR9selection==false && isEPselection==false && isfbrem ==false && isPtCut==false){
+      name  = Form ("%s_WZ_noEP_miscalib_EB_even.root",outputFile.c_str());
       name2 = Form ("%s_WZ_noEP_miscalib_EB_odd.root", outputFile.c_str());
     }
 
 
 
-    if(isMiscalib == false && useZ == 1 && isR9selection==true)
-    { name  = Form ("%s_WZ_R9_EB_even.root",outputFile.c_str());
+    else if(isMiscalib == false && useZ == 1 && isR9selection==true && isEPselection==false && isfbrem ==false && isPtCut==false){
+      name  = Form ("%s_WZ_R9_EB_even.root",outputFile.c_str());
       name2 = Form ("%s_WZ_R9_EB_odd.root", outputFile.c_str());
     }
-    
-    if(isMiscalib == false && useZ == 1 && isEPselection==true)
-    { name  = Form ("%s_WZ_EP_EB_even.root",outputFile.c_str());
+    else if(isMiscalib == false && useZ == 1 && isR9selection==false && isEPselection==true && isfbrem ==false && isPtCut==false){
+      name  = Form ("%s_WZ_EP_EB_even.root",outputFile.c_str());
       name2 = Form ("%s_WZ_EP_EB_odd.root", outputFile.c_str());
     }
-    if(isMiscalib == false && useZ == 1 && isfbrem ==true)
-    { name  = Form ("%s_WZ_Fbrem_EB_even.root",outputFile.c_str());
+    else if(isMiscalib == false && useZ == 1 && isR9selection==false && isEPselection==false && isfbrem ==true && isPtCut==false){
+      name  = Form ("%s_WZ_Fbrem_EB_even.root",outputFile.c_str());
       name2 = Form ("%s_WZ_Fbrem_EB_odd.root", outputFile.c_str());
     }
-    if(isMiscalib == false && useZ == 1 && isPtCut==true)
-    { name  = Form ("%s_WZ_PT_EB_even.root",outputFile.c_str());
+    else if(isMiscalib == false && useZ == 1 && isR9selection==false && isEPselection==false && isfbrem ==false && isPtCut==true){
+      name  = Form ("%s_WZ_PT_EB_even.root",outputFile.c_str());
       name2 = Form ("%s_WZ_PT_EB_odd.root", outputFile.c_str());
     }
-    if(isMiscalib == false && useZ == 1 && isR9selection==false && isEPselection==false && isfbrem ==false && isPtCut==false)
-    { name  = Form ("%s_WZ_noEP_EB_even.root",outputFile.c_str());
+    else if(isMiscalib == false && useZ == 1 && isR9selection==false && isEPselection==false && isfbrem ==false && isPtCut==false){
+      name  = Form ("%s_WZ_noEP_EB_even.root",outputFile.c_str());
       name2 = Form ("%s_WZ_noEP_EB_odd.root", outputFile.c_str());
     }
     
 
-    if(isMiscalib == true && useZ == 0 && isR9selection==true)
-    { name  = Form ("%s_W_R9_miscalib_EB_even.root",outputFile.c_str());
+    else if(isMiscalib == true && useZ == 0 && isR9selection==true && isEPselection==false && isfbrem ==false && isPtCut==false){
+      name  = Form ("%s_W_R9_miscalib_EB_even.root",outputFile.c_str());
       name2 = Form ("%s_W_R9_miscalib_EB_odd.root", outputFile.c_str());
     }
     
-    if(isMiscalib == true && useZ == 0 && isEPselection==true)
-    { name  = Form ("%s_W_EP_miscalib_EB_even.root",outputFile.c_str());
+    else if(isMiscalib == true && useZ == 0 && isR9selection==false && isEPselection==true && isfbrem ==false && isPtCut==false){
+      name  = Form ("%s_W_EP_miscalib_EB_even.root",outputFile.c_str());
       name2 = Form ("%s_W_EP_miscalib_EB_odd.root", outputFile.c_str());
     }
-    if(isMiscalib == true && useZ == 0 && isfbrem ==true)
-    { name  = Form ("%s_WZ_Fbrem_miscalib_EB_even.root",outputFile.c_str());
-      name2 = Form ("%s_WZ_Fbrem_miscalib_EB_odd.root", outputFile.c_str());
+    else if(isMiscalib == true && useZ == 0 && isR9selection==false && isEPselection==false && isfbrem ==true && isPtCut==false){
+      name  = Form ("%s_W_Fbrem_miscalib_EB_even.root",outputFile.c_str());
+      name2 = Form ("%s_W_Fbrem_miscalib_EB_odd.root", outputFile.c_str());
     }
-    if(isMiscalib == true && useZ == 0 && isPtCut==true)
-    { name  = Form ("%s_WZ_PT_miscalib_EB_even.root",outputFile.c_str());
-      name2 = Form ("%s_WZ_PT_miscalib_EB_odd.root", outputFile.c_str());
+    else if(isMiscalib == true && useZ == 0 && isR9selection==false && isEPselection==false && isfbrem ==false && isPtCut==true){
+      name  = Form ("%s_W_PT_miscalib_EB_even.root",outputFile.c_str());
+      name2 = Form ("%s_W_PT_miscalib_EB_odd.root", outputFile.c_str());
     }
-    if(isMiscalib == true && useZ == 0 && isR9selection==false && isEPselection==false && isfbrem ==false && isPtCut==false)
-    { name  = Form ("%s_W_noEP_miscalib_EB_even.root",outputFile.c_str());
+    else if(isMiscalib == true && useZ == 0 && isR9selection==false && isEPselection==false && isfbrem ==false && isPtCut==false){
+      name  = Form ("%s_W_noEP_miscalib_EB_even.root",outputFile.c_str());
       name2 = Form ("%s_W_noEP_miscalib_EB_odd.root", outputFile.c_str());
     }
 
-    
-    if(isMiscalib == false && useZ == 0 && isR9selection==true)
-    { name  = Form ("%s_W_R9_EB_even.root",outputFile.c_str());
+    else if(isMiscalib == false && useZ == 0 && isR9selection==true && isEPselection==false && isfbrem ==false && isPtCut==false){
+      name  = Form ("%s_W_R9_EB_even.root",outputFile.c_str());
       name2 = Form ("%s_W_R9_EB_odd.root", outputFile.c_str());
     }
+
     
-    if(isMiscalib == false && useZ == 0 && isEPselection==true)
-    { name  = Form ("%s_EP_EB_even.root",outputFile.c_str());
-      name2 = Form ("%s_EP_EB_odd.root", outputFile.c_str());
-    }
-    if(isMiscalib == false && useZ == 0 && isEPselection==true)
-    { name  = Form ("%s_W_EP_EB_even.root",outputFile.c_str());
+    else if(isMiscalib == false && useZ == 0 && isR9selection==true && isEPselection==false && isfbrem ==false && isPtCut==false){
+      name  = Form ("%s_W_EP_EB_even.root",outputFile.c_str());
       name2 = Form ("%s_W_EP_EB_odd.root", outputFile.c_str());
     }
-    if(isMiscalib == false && useZ == 0 && isfbrem ==true)
-    { name  = Form ("%s_WZ_Fbrem_EB_even.root",outputFile.c_str());
-      name2 = Form ("%s_WZ_Fbrem_EB_odd.root", outputFile.c_str());
+    else if(isMiscalib == false && useZ == 0 && isR9selection==false && isEPselection==true && isfbrem ==false && isPtCut==false){
+       name  = Form ("%s_W_EP_EB_even.root",outputFile.c_str());
+       name2 = Form ("%s_W_EP_EB_odd.root", outputFile.c_str());
     }
-    if(isMiscalib == false && useZ == 0 && isR9selection==false && isEPselection==false)
-    { name  = Form ("%s_W_noEP_EB_even.root",outputFile.c_str());
+    else if(isMiscalib == false && useZ == 0 && isR9selection==false && isEPselection==false && isfbrem ==true && isPtCut==false){
+      name  = Form ("%s_W_Fbrem_EB_even.root",outputFile.c_str());
+      name2 = Form ("%s_W_Fbrem_EB_odd.root", outputFile.c_str());
+    }
+    else if(isMiscalib == false && useZ == 0 && isR9selection==false && isEPselection==false && isfbrem ==false && isPtCut==true){
+      name  = Form ("%s_W_PT_EB_even.root",outputFile.c_str());
+      name2 = Form ("%s_W_PT_EB_odd.root", outputFile.c_str());
+    }
+    else if(isMiscalib == false && useZ == 0 && isR9selection==true && isEPselection==false && isfbrem ==false && isPtCut==false){
+      name  = Form ("%s_W_noEP_EB_even.root",outputFile.c_str());
       name2 = Form ("%s_W_noEP_EB_odd.root", outputFile.c_str());
     }
+    else { std::cout<<" Option not considered --> exit "<<std::endl; return -1 ;}
 
-    TFile *outputName1 = new TFile(name,"RECREATE");
-    TFile *outputName2 = new TFile(name2,"RECREATE");
+    TFile *outputName1 = new TFile(outputPath+name,"RECREATE");
+    TFile *outputName2 = new TFile(outputPath+name2,"RECREATE");
 
     TString DeadXtal = Form("%s",inputFileDeadXtal.c_str());
      
@@ -324,7 +350,7 @@ int main (int argc, char ** argv) {
     analyzer_odd.saveHistos(outputName2);
     
   }
-
+  
   delete tree;
   return 0;
 }
