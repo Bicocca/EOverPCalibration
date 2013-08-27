@@ -27,14 +27,45 @@
 #include "readJSONFile.h"
 
 class FastCalibratorEB {
+
   public :
+
+   ///! List of class methods
+   
+    FastCalibratorEB(TTree *tree, std::vector<TGraphErrors*> & inputMomentumScale, const std::string& typeEB, TString outEPDistribution="NULL");
+   
+    virtual ~FastCalibratorEB();
+    
+    virtual void     bookHistos(int);
+    
+    virtual void     saveHistos(TFile *f1);
+        
+    virtual Int_t    GetEntry(Long64_t entry);
+    
+    virtual Long64_t LoadTree(Long64_t entry);
+    
+    virtual void     Init(TTree *tree);
+    
+    virtual void     Loop(int, int, int, int, int,bool,bool,bool,bool,float,bool,float,bool,float,bool,std::map<int, std::vector<std::pair<int, int> > >);
+        
+    virtual void     BuildEoPeta_ele(int,int,int,int,std::vector<float>,bool,bool,float,bool,float,bool,float,bool);
+
+    virtual void     saveEoPeta(TFile * f2);
+    
+    virtual void     AcquireDeadXtal(TString imputDeadXtal);
+    
+    virtual bool     CheckDeadXtal(const int & iEta, const int & iPhi);
+
+
+    // Public Variables
+
     std::vector<TGraphErrors*> myMomentumScale;
     std::string myTypeEB;
     
     TTree          *fChain;   //!pointer to the analyzed TTree or TChain
     Int_t           fCurrent; //!current Tree number in a TChain
 
-   ///! Declaration of leaf types
+    ///! Declaration of leaf types
     
     Int_t           runId;
     Int_t           lumiId;
@@ -42,7 +73,7 @@ class FastCalibratorEB {
     Int_t           isW;
     Int_t           isZ;
     
-   ///! Ele 1 variables
+    ///! Ele 1 variables
     
     std::vector<float>   *ele1_recHit_E;
     std::vector<int>     *ele1_recHit_hashedIndex;
@@ -71,10 +102,8 @@ class FastCalibratorEB {
     Float_t         ele1_DR;
     Float_t         ele1_scE_regression;
     Float_t         ele1_scERaw_PUcleaned;
- 
-//     Float_t         ele1_charge;
 
-   ///! Ele 2 variables
+    ///! Ele 2 variables
     
     std::vector<float>   *ele2_recHit_E;
     std::vector<int>     *ele2_recHit_hashedIndex;
@@ -104,9 +133,7 @@ class FastCalibratorEB {
     Float_t         ele2_scE_regression;
     Float_t         ele2_scERaw_PUcleaned;
 
-//     Float_t         ele2_charge;
-
-   ///! List of input branches from ntu
+    ///! List of input branches from ntu
     
     TBranch        *b_runId;   //!
     TBranch        *b_lumiId;  //!
@@ -173,36 +200,6 @@ class FastCalibratorEB {
     TBranch        *b_ele2_isEEDeeGap;   //!
     TBranch        *b_ele2_isEERingGap;   //!
 
-   ///! List of class methods
-   
-    FastCalibratorEB(TTree *tree, std::vector<TGraphErrors*> & inputMomentumScale, const std::string& typeEB, TString outEPDistribution="NULL");
-   
-    virtual ~FastCalibratorEB();
-    
-    virtual void     bookHistos(int);
-    
-    virtual void     saveHistos(TFile *f1);
-    
-    virtual Int_t    Cut(Long64_t entry);
-    
-    virtual Int_t    GetEntry(Long64_t entry);
-    
-    virtual Long64_t LoadTree(Long64_t entry);
-    
-    virtual void     Init(TTree *tree);
-    
-    virtual void     Loop(int, int, int, int, int,bool,bool,bool,bool,float,bool,float,bool,float,bool,std::map<int, std::vector<std::pair<int, int> > >);
-    virtual Bool_t   Notify();
-    
-    virtual void     Show(Long64_t entry = -1);
-    
-    virtual void     BuildEoPeta_ele(int,int,int,int,std::vector<float>,bool,bool,float,bool,float,bool,float,bool);
-
-    virtual void     saveEoPeta(TFile * f2);
-    
-    virtual void     AcquireDeadXtal(TString imputDeadXtal);
-    
-    virtual bool     CheckDeadXtal(const int & iEta, const int & iPhi);
 
     ///! Output information 
     
