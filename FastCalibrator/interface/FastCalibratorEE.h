@@ -27,9 +27,35 @@
 #include "readJSONFile.h"
 #include "TEndcapRings.h"
 
-class FastCalibratorEE
-{
+class FastCalibratorEE{
+
   public :
+
+    ///! Class methods
+    FastCalibratorEE(TTree *tree, std::vector<TGraphErrors*> & inputMomentumScale, const std::string& typeEE, TString outEPDistribution="NULL");
+
+    virtual ~FastCalibratorEE();
+
+    virtual void     bookHistos(int);
+    
+    virtual void     saveHistos(TFile *f1);
+        
+    virtual Int_t    GetEntry(Long64_t entry);
+    
+    virtual Long64_t LoadTree(Long64_t entry);
+    
+    virtual void     Init(TTree *tree);
+
+    virtual void     Loop(int, int, int, int, int, bool,bool,bool,bool,float,bool,float,bool,float,bool,std::map<int, std::vector<std::pair<int, int> > >);
+    virtual void     BuildEoPeta_ele(int,int,int,int,std::vector<float> ,bool,bool,float,bool,float,bool,float,bool);
+    
+    virtual void     saveEoPeta(TFile * f2);
+    
+    virtual void     AcquireDeadXtal(TString imputDeadXtal);
+    
+    virtual bool     CheckDeadXtal(const int & iX, const int & iY, const int & iZ);
+
+
     std::vector<TGraphErrors*> myMomentumScale;
     std::string myTypeEE;
     
@@ -170,36 +196,8 @@ class FastCalibratorEE
     TBranch        *b_ele2_scE_regression;
     TBranch        *b_ele2_scERaw_PUcleaned;
 
-    ///! Class methods
-    FastCalibratorEE(TTree *tree, std::vector<TGraphErrors*> & inputMomentumScale, const std::string& typeEE, TString outEPDistribution="NULL");
 
-    virtual ~FastCalibratorEE();
-
-    virtual void     bookHistos(int);
-    
-    virtual void     saveHistos(TFile *f1);
-    
-    virtual Int_t    Cut(Long64_t entry);
-    
-    virtual Int_t    GetEntry(Long64_t entry);
-    
-    virtual Long64_t LoadTree(Long64_t entry);
-    
-    virtual void     Init(TTree *tree);
-
-    virtual void     Loop(int, int, int, int, int, bool,bool,bool,bool,float,bool,float,bool,float,bool,std::map<int, std::vector<std::pair<int, int> > >);
-    virtual void     BuildEoPeta_ele(int,int,int,int,std::vector<float> ,bool,bool,float,bool,float,bool,float,bool);
-    virtual Bool_t   Notify();
-    
-    virtual void     Show(Long64_t entry = -1);
-    
-    virtual void     saveEoPeta(TFile * f2);
-    
-    virtual void     AcquireDeadXtal(TString imputDeadXtal);
-    
-    virtual bool     CheckDeadXtal(const int & iX, const int & iY, const int & iZ);
-
-   /// Output informations
+    /// Output informations
     hChain     *hC_EoP_ir_ele;
    
     TH1F       *h_scale_hashedIndex_EE;
@@ -253,11 +251,7 @@ class FastCalibratorEE
 
     TH2F       *h_map_Dead_Channels_EEP ;
     TH2F       *h_map_Dead_Channels_EEM ;
- 
-
-   
-    
-    
+            
   private :
   
     TString outEPDistribution_p;
