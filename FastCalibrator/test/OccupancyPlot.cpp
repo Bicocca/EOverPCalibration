@@ -32,17 +32,35 @@ double etaringEE=0.0325;
 // Acquisition of input file
 TChain* treeDATA = new TChain("simpleNtupleEoverP/SimpleNtupleEoverP");
 
-treeDATA->Add("/gwteray/users/gerosa/ECALNTUPLES/22Jan2013_HLT_Rate_Study/SingleElectron_Run2012A-22Jan2013-v1_HLT.root");
-treeDATA->Add("/gwteray/users/gerosa/ECALNTUPLES/22Jan2013_HLT_Rate_Study/SingleElectron_Run2012B-22Jan2013-v1_HLT.root");
-//  treeDATA_HLT->Add("/gwteray/users/gerosa/ECALNTUPLES/22Jan2013_HLT_Rate_Study/SingleElectron_Run2012C-22Jan2013-v1_HLT.root");                                                             
-treeDATA->Add("/gwteray/users/gerosa/ECALNTUPLES/22Jan2013_HLT_Rate_Study/SingleElectron_Run2012D-22Jan2013-v1_HLT.root");
+treeDATA->Add("/gwteray/users/gerosa/ECALNTUPLES/22JanReReco/SingleElectron_RUN2012D_22Jan2013-v1.root");
 
 
 treeReader *fReader = new treeReader((TTree*)(treeDATA), false);
+treeDATA->SetBranchStatus("*",0);
+treeDATA->SetBranchStatus("isW",1);
+treeDATA->SetBranchStatus("isZ",1);
+treeDATA->SetBranchStatus("ele1_seedZside",1);
+treeDATA->SetBranchStatus("ele1_seedIx",1);
+treeDATA->SetBranchStatus("ele1_seedIy",1);
+treeDATA->SetBranchStatus("ele1_seedIphi",1);
+treeDATA->SetBranchStatus("ele1_seedIeta",1);
+treeDATA->SetBranchStatus("ele1_e3x3",1);
+treeDATA->SetBranchStatus("ele1_scEta",1);
+treeDATA->SetBranchStatus("ele1_scERaw",1);
+
+treeDATA->SetBranchStatus("ele2_seedZside",1);
+treeDATA->SetBranchStatus("ele2_seedIx",1);
+treeDATA->SetBranchStatus("ele2_seedIy",1);
+treeDATA->SetBranchStatus("ele2_seedIphi",1);
+treeDATA->SetBranchStatus("ele2_seedIeta",1);
+treeDATA->SetBranchStatus("ele2_e3x3",1);
+treeDATA->SetBranchStatus("ele2_scEta",1);
+treeDATA->SetBranchStatus("ele2_scERaw",1);
 
 // Set Single Electron Trigger Names
-//std::vector<std::pair<std::string,std::pair<int,int> > > WHLTPathNames;
-//SetWHLTPathNames(WHLTPathNames);
+
+std::vector<std::pair<std::string,std::pair<int,int> > > WHLTPathNames;
+SetWHLTPathNames(WHLTPathNames);
 
 TH2F* h_OccupancyEB = new TH2F("h_OccupancyEB","h_OccupancyEB",360,1,361,171,-85,86);
 TH2F* h_OccupancyEB2 = new TH2F("h_OccupancyEB2","h_OccupancyEB",360,1,361,171,-85,86);
@@ -63,9 +81,9 @@ for(int entry = 0; entry < treeDATA->GetEntries(); ++entry) {
   if( entry%100000 == 0 ) std::cout << "reading saved entry " << entry << "\r" << std::flush;
   treeDATA->GetEntry(entry);
 
-  if(fReader->getInt("isHLTEle27")[0] != 1 || fReader->getInt("isGood")[0] !=1 ) continue;
+  //if(fReader->getInt("isHLTEle27")[0] != 1 || fReader->getInt("isGood")[0] !=1 ) continue;
 
- /*  bool skipEvent = true;
+  bool skipEvent = true;
   bool isWHLT = false;
 
   // W triggers                                         
@@ -73,7 +91,7 @@ for(int entry = 0; entry < treeDATA->GetEntries(); ++entry) {
      
     if( fReader->getInt("runId")[0] < ((WHLTPathNames.at(HLTIt)).second).first )  continue;
     if( fReader->getInt("runId")[0] > ((WHLTPathNames.at(HLTIt)).second).second ) continue;
-
+     
     for(unsigned int iHLTIt = 0; iHLTIt < fReader->GetString("HLT_Names")->size(); ++iHLTIt){
        if( (fReader->GetString("HLT_Names")->at(iHLTIt) == WHLTPathNames.at(HLTIt).first) && (fReader->GetInt("HLT_Accept")->at(iHLTIt) == 1) ) isWHLT = true;
     }
@@ -83,53 +101,53 @@ for(int entry = 0; entry < treeDATA->GetEntries(); ++entry) {
 
   
   if(skipEvent == true) continue ;
-  */
+   
 
-  /*  if(fReader->getInt("isW")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==0) h_OccupancyEB->Fill(fReader->getInt("ele1_seedIphi")[0],fReader->getInt("ele1_seedIeta")[0]);
+  if(fReader->getInt("isW")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==0) h_OccupancyEB->Fill(fReader->getInt("ele1_seedIphi")[0],fReader->getInt("ele1_seedIeta")[0]);
   if(fReader->getInt("isW")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==1) h_OccupancyEE[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
   if(fReader->getInt("isW")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==-1) h_OccupancyEE[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
-  */
+  
+  
+//   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==0 && fReader->getInt("isZ")[0] ==0)
+//     h_OccupancyEB->Fill(fReader->getInt("ele1_seedIphi")[0],fReader->getInt("ele1_seedIeta")[0]); 
+//   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==1 && fReader->getInt("isZ")[0] ==0) 
+//     h_OccupancyEE[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
+//   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==-1 && fReader->getInt("isZ")[0] ==0) 
+//     h_OccupancyEE[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
 
-   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==0 && fReader->getInt("isZ")[0] ==0)
-     h_OccupancyEB->Fill(fReader->getInt("ele1_seedIphi")[0],fReader->getInt("ele1_seedIeta")[0]); 
-   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==1 && fReader->getInt("isZ")[0] ==0) 
-     h_OccupancyEE[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
-   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==-1 && fReader->getInt("isZ")[0] ==0) 
-     h_OccupancyEE[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
+//   if(category == "Default"){
+//      if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==0 && fReader->getInt("isZ")[0] ==0)
+//        h_OccupancyEB2->Fill(fReader->getInt("ele1_seedIphi")[0],fReader->getInt("ele1_seedIeta")[0]);
+//   }
 
-   if(category == "Default"){
-      if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==0 && fReader->getInt("isZ")[0] ==0)
-        h_OccupancyEB2->Fill(fReader->getInt("ele1_seedIphi")[0],fReader->getInt("ele1_seedIeta")[0]);
-   }
-
-  if(category == "R9"){
-   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==0 && fReader->getInt("isZ")[0] ==0 && fReader->getFloat("ele1_r9")[0]>0.94) 
-    h_OccupancyEB2->Fill(fReader->getInt("ele1_seedIphi")[0],fReader->getInt("ele1_seedIeta")[0]);
-   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==1 && fReader->getInt("isZ")[0] ==0 && fReader->getFloat("ele1_r9")[0]>0.94) 
-    h_OccupancyEE2[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
-   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==-1 && fReader->getInt("isZ")[0] ==0 && fReader->getFloat("ele1_r9")[0]>0.94) 
-    h_OccupancyEE2[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
-  }
+//  if(category == "R9"){
+//   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==0 && fReader->getInt("isZ")[0] ==0 && fReader->getFloat("ele1_r9")[0]>0.94) 
+//    h_OccupancyEB2->Fill(fReader->getInt("ele1_seedIphi")[0],fReader->getInt("ele1_seedIeta")[0]);
+//   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==1 && fReader->getInt("isZ")[0] ==0 && fReader->getFloat("ele1_r9")[0]>0.94) 
+//    h_OccupancyEE2[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
+//   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==-1 && fReader->getInt("isZ")[0] ==0 && fReader->getFloat("ele1_r9")[0]>0.94) 
+//    h_OccupancyEE2[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
+//  }
  
-  if(category == "fbrem") {
-   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==0 && fReader->getInt("isZ")[0] ==0 && fabs(fReader->getFloat("ele1_fbrem")[0])<0.5) 
-     h_OccupancyEB2->Fill(fReader->getInt("ele1_seedIphi")[0],fReader->getInt("ele1_seedIeta")[0]);
-   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==1 && fReader->getInt("isZ")[0] ==0 && fabs(fReader->getFloat("ele1_fbrem")[0])<0.5) 
-     h_OccupancyEE2[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
-   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==-1 && fReader->getInt("isZ")[0] ==0 && fabs(fReader->getFloat("ele1_fbrem")[0])<0.5) 
-     h_OccupancyEE2[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
-  }
+//  if(category == "fbrem") {
+//   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==0 && fReader->getInt("isZ")[0] ==0 && fabs(fReader->getFloat("ele1_fbrem")[0])<0.5) 
+//     h_OccupancyEB2->Fill(fReader->getInt("ele1_seedIphi")[0],fReader->getInt("ele1_seedIeta")[0]);
+//   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==1 && fReader->getInt("isZ")[0] ==0 && fabs(fReader->getFloat("ele1_fbrem")[0])<0.5) 
+//     h_OccupancyEE2[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
+//   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==-1 && fReader->getInt("isZ")[0] ==0 && fabs(fReader->getFloat("ele1_fbrem")[0])<0.5) 
+//     h_OccupancyEE2[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
+//  }
 
-  if(category == "Pt"){
-   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==0 && fReader->getInt("isZ")[0] ==0 && fReader->getFloat("ele1_pt")[0]>50) 
-    h_OccupancyEB2->Fill(fReader->getInt("ele1_seedIphi")[0],fReader->getInt("ele1_seedIeta")[0]);
-   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==1 && fReader->getInt("isZ")[0] ==0 && fReader->getFloat("ele1_pt")[0]>50) 
-    h_OccupancyEE2[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
-   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==-1 && fReader->getInt("isZ")[0] ==0 && fReader->getFloat("ele1_pt")[0]>50) 
-    h_OccupancyEE2[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
-  }
-
-  /*  if(fReader->getInt("isW")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==1 ){
+//  if(category == "Pt"){
+//   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==0 && fReader->getInt("isZ")[0] ==0 && fReader->getFloat("ele1_pt")[0]>50) 
+//    h_OccupancyEB2->Fill(fReader->getInt("ele1_seedIphi")[0],fReader->getInt("ele1_seedIeta")[0]);
+//   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==1 && fReader->getInt("isZ")[0] ==0 && fReader->getFloat("ele1_pt")[0]>50) 
+//    h_OccupancyEE2[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
+//   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==-1 && fReader->getInt("isZ")[0] ==0 && fReader->getFloat("ele1_pt")[0]>50) 
+//    h_OccupancyEE2[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
+//  }
+  
+  if(fReader->getInt("isW")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==1 ){
     if(fabs(fReader->getFloat("ele1_scEta")[0])<1.75 && fReader->getFloat("ele1_e3x3")[0]/fReader->getFloat("ele1_scERaw")[0]>0.8) 
           h_OccupancyEE2[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
                                   
@@ -142,26 +160,26 @@ for(int entry = 0; entry < treeDATA->GetEntries(); ++entry) {
     if(fabs(fReader->getFloat("ele1_scEta")[0])>=2.15 && fReader->getFloat("ele1_e3x3")[0]/fReader->getFloat("ele1_scERaw")[0]>0.94)
           h_OccupancyEE2[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
   }
-  */
-
-  if(category=="Default"){
-  if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==1 && fReader->getInt("isZ")[0] ==0){
-    if(fabs(fReader->getFloat("ele1_scEta")[0])<1.75 && fReader->getFloat("ele1_r9")[0]>0.8) 
-          h_OccupancyEE2[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
+  
+ 
+//  if(category=="Default"){
+//  if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==1 && fReader->getInt("isZ")[0] ==0){
+//    if(fabs(fReader->getFloat("ele1_scEta")[0])<1.75 && fReader->getFloat("ele1_r9")[0]>0.8) 
+//          h_OccupancyEE2[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
                                   
-    if(fabs(fReader->getFloat("ele1_scEta")[0])>=1.75 && fabs(fReader->getFloat("ele1_scEta")[0])<2. && fReader->getFloat("ele1_r9")[0]>0.88) 
-          h_OccupancyEE2[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
+//    if(fabs(fReader->getFloat("ele1_scEta")[0])>=1.75 && fabs(fReader->getFloat("ele1_scEta")[0])<2. && fReader->getFloat("ele1_r9")[0]>0.88) 
+//          h_OccupancyEE2[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
      
-    if(fabs(fReader->getFloat("ele1_scEta")[0])>=2. && fabs(fReader->getFloat("ele1_scEta")[0])<2.15 && fReader->getFloat("ele1_r9")[0]>0.92) 
-          h_OccupancyEE2[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
+//    if(fabs(fReader->getFloat("ele1_scEta")[0])>=2. && fabs(fReader->getFloat("ele1_scEta")[0])<2.15 && fReader->getFloat("ele1_r9")[0]>0.92) 
+//          h_OccupancyEE2[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
                                   
-    if(fabs(fReader->getFloat("ele1_scEta")[0])>=2.15 && fReader->getFloat("ele1_r9")[0]>0.94)
-          h_OccupancyEE2[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
-  }
- }
+//    if(fabs(fReader->getFloat("ele1_scEta")[0])>=2.15 && fReader->getFloat("ele1_r9")[0]>0.94)
+//          h_OccupancyEE2[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
+//  }
+// }
 
-
-  /*  if(fReader->getInt("isW")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==-1){
+  
+   if(fReader->getInt("isW")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==-1){
 
     if(fabs(fReader->getFloat("ele1_scEta")[0])<1.75 && fReader->getFloat("ele1_e3x3")[0]/fReader->getFloat("ele1_scERaw")[0]>0.8)
       h_OccupancyEE2[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]); 
@@ -175,28 +193,28 @@ for(int entry = 0; entry < treeDATA->GetEntries(); ++entry) {
     if(fabs(fReader->getFloat("ele1_scEta")[0])>=2.15 && fReader->getFloat("ele1_e3x3")[0]/fReader->getFloat("ele1_scERaw")[0]>0.94) 
       h_OccupancyEE2[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
   }
-  */
+   
  
-  if(category == "Default"){
+//  if(category == "Default"){
 
-   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==-1 && fReader->getInt("isZ")[0] ==0){
+//   if(fReader->getInt("isGood")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==-1 && fReader->getInt("isZ")[0] ==0){
 
-    if(fabs(fReader->getFloat("ele1_scEta")[0])<1.75 && fReader->getFloat("ele1_r9")[0]>0.8)
-      h_OccupancyEE2[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]); 
+//    if(fabs(fReader->getFloat("ele1_scEta")[0])<1.75 && fReader->getFloat("ele1_r9")[0]>0.8)
+//      h_OccupancyEE2[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]); 
 
-    if(fabs(fReader->getFloat("ele1_scEta")[0])>=1.75 && fabs(fReader->getFloat("ele1_scEta")[0])<2. && fReader->getFloat("ele1_r9")[0]>0.88)
-      h_OccupancyEE2[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
+//    if(fabs(fReader->getFloat("ele1_scEta")[0])>=1.75 && fabs(fReader->getFloat("ele1_scEta")[0])<2. && fReader->getFloat("ele1_r9")[0]>0.88)
+//      h_OccupancyEE2[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
        
-    if(fabs(fReader->getFloat("ele1_scEta")[0])>=2. && fabs(fReader->getFloat("ele1_scEta")[0])<2.15 && fReader->getFloat("ele1_r9")[0]>0.92)
-      h_OccupancyEE2[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
+//    if(fabs(fReader->getFloat("ele1_scEta")[0])>=2. && fabs(fReader->getFloat("ele1_scEta")[0])<2.15 && fReader->getFloat("ele1_r9")[0]>0.92)
+//      h_OccupancyEE2[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
                         
-    if(fabs(fReader->getFloat("ele1_scEta")[0])>=2.15 && fReader->getFloat("ele1_r9")[0]>0.94) 
-      h_OccupancyEE2[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
-   }
-  }
+//    if(fabs(fReader->getFloat("ele1_scEta")[0])>=2.15 && fReader->getFloat("ele1_r9")[0]>0.94) 
+//      h_OccupancyEE2[0]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
+//   }
+//  }
+   
 
-
-    /*nt("isZ")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==0) h_OccupancyEB->Fill(fReader->getInt("ele1_seedIphi")[0],fReader->getInt("ele1_seedIeta")[0]);
+  if(fReader->getInt("isZ")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==0) h_OccupancyEB->Fill(fReader->getInt("ele1_seedIphi")[0],fReader->getInt("ele1_seedIeta")[0]);
   if(fReader->getInt("isZ")[0] ==1 && fReader->getInt("ele2_seedZside")[0]==0) h_OccupancyEB->Fill(fReader->getInt("ele2_seedIphi")[0],fReader->getInt("ele2_seedIeta")[0]);
 
   if(fReader->getInt("isZ")[0] ==1 && fReader->getInt("ele1_seedZside")[0]==1) h_OccupancyEE[1]->Fill(fReader->getInt("ele1_seedIx")[0],fReader->getInt("ele1_seedIy")[0]);
@@ -268,7 +286,7 @@ for(int entry = 0; entry < treeDATA->GetEntries(); ++entry) {
       h_OccupancyEE2[0]->Fill(fReader->getInt("ele2_seedIx")[0],fReader->getInt("ele2_seedIy")[0]);
   
   }
-  */
+  
  
 }
 
@@ -298,50 +316,36 @@ for(int iEta =0; iEta<h_OccupancyEB->GetNbinsY() ;iEta++){
   
               OccupancyAll->SetPoint(nPointAll,-(85-iEta)*xtalWidth,sumHit/(nHit*luminosity));
               OccupancyAll->SetPointError(nPointAll,0.,(sumHit/(nHit*luminosity))/sqrt(nHit*luminosity));
-	      /*OccupancyAll2->SetPoint(nPointAll2,-(85-iEta)*xtalWidth,sumHit/(nHit*luminosity));
-		OccupancyAll2->SetPointError(nPointAll2,0.,(sumHit/(nHit*luminosity))/sqrt(nHit*luminosity));*/
               }
 
  if(iEta<85 && sumHit==0 && nHit==0 ){OccupancyEB_vs_Eta->SetPoint(nPoint,-(85-iEta)*xtalWidth,0.);
               OccupancyEB_vs_Eta->SetPointError(nPoint,0.,0.);
               OccupancyAll->SetPoint(nPointAll,-(85-iEta)*xtalWidth,0.);
               OccupancyAll->SetPointError(nPointAll,0.,0.);
-	      /*OccupancyAll2->SetPoint(nPointAll2,-(85-iEta)*xtalWidth,0.);
-              OccupancyAll2->SetPointError(nPointAll2,0.,0.);*/
 }
 
  if(iEta==85 && sumHit!=0 && nHit!=0){ OccupancyEB_vs_Eta->SetPoint(nPoint,0.,sumHit/(nHit*luminosity));
                OccupancyEB_vs_Eta->SetPointError(nPoint,0.,(sumHit/(nHit*luminosity))/sqrt(nHit*luminosity));
                OccupancyAll->SetPoint(nPointAll,0.,sumHit/(nHit*luminosity));
                OccupancyAll->SetPoint(nPointAll,0.,sumHit/(nHit*luminosity));
-	       /*               OccupancyAll2->SetPointError(nPointAll2,0.,(sumHit/(nHit*luminosity))/sqrt(nHit*luminosity));
-				OccupancyAll2->SetPointError(nPointAll2,0.,(sumHit/(nHit*luminosity))/sqrt(nHit*luminosity));*/
-       
               }
 
  if(iEta==85 && sumHit==0 && nHit==0 ){OccupancyEB_vs_Eta->SetPoint(nPoint,0.,0.);
               OccupancyEB_vs_Eta->SetPointError(nPoint,0.,0.);
               OccupancyAll->SetPoint(nPointAll,0.,0.);
               OccupancyAll->SetPointError(nPointAll,0.,0.);
-	      /* OccupancyAll2->SetPoint(nPointAll2,0.,0.);
-		 OccupancyAll2->SetPointError(nPointAll2,0.,0.);*/
 }
 
  if(iEta>85 && sumHit!=0 && nHit!=0){  OccupancyEB_vs_Eta->SetPoint(nPoint,(iEta-85)*xtalWidth,sumHit/(nHit*luminosity));
                OccupancyEB_vs_Eta->SetPointError(nPoint,0.,(sumHit/(nHit*luminosity))/sqrt(nHit*luminosity));
                OccupancyAll->SetPoint(nPointAll,(iEta-85)*xtalWidth,sumHit/(nHit*luminosity));
                OccupancyAll->SetPointError(nPointAll,0.,(sumHit/(nHit*luminosity))/sqrt(nHit*luminosity));
-	       /*               OccupancyAll2->SetPoint(nPointAll2,(iEta-85)*xtalWidth,sumHit/(nHit*luminosity));
-				OccupancyAll2->SetPointError(nPointAll2,0.,(sumHit/(nHit*luminosity))/sqrt(nHit*luminosity));*/
-              
               }
 
  if(iEta<85 && sumHit==0 && nHit==0 ){OccupancyEB_vs_Eta->SetPoint(nPoint,(iEta-85)*xtalWidth,0.);
               OccupancyEB_vs_Eta->SetPointError(nPoint,0.,0.);
               OccupancyAll->SetPoint(nPointAll,(iEta-85)*xtalWidth,0.);
               OccupancyAll->SetPointError(nPointAll,0.,0.);
-	      /*              OccupancyAll2->SetPoint(nPointAll2,(iEta-85)*xtalWidth,0.);
-			      OccupancyAll2->SetPointError(nPointAll2,0.,0.);*/
 }
 
  nPoint++;nPointAll++;nPointAll2++;
@@ -543,18 +547,16 @@ gStyle->SetTitleXOffset(0.8);
 gStyle->SetTitleYOffset(1.1);
 gROOT->ForceStyle();
 
+TFile *th = new TFile("output/Occupancy.root","RECREATE");
+th->cd();
 
 // Final plots
-/*TCanvas *cEB = new TCanvas ("EB occupancy","EB occupancy");
+TCanvas *cEB = new TCanvas ("EB occupancy","EB occupancy");
 cEB->cd();
 cEB->SetGridx();
 cEB->SetGridy();
-OccupancyEB_vs_Eta->SetMarkerStyle(20);
-OccupancyEB_vs_Eta->SetMarkerColor(kGreen+2);
-OccupancyEB_vs_Eta->GetHistogram()->GetXaxis()-> SetRangeUser(-1.5,1.5);
-OccupancyEB_vs_Eta->GetHistogram()->GetYaxis()-> SetTitle("Single xtal Event / fb^{-1}");
-OccupancyEB_vs_Eta->GetHistogram()->GetXaxis()-> SetTitle("#eta");
-OccupancyEB_vs_Eta->Draw("ap");
+h_OccupancyEB->Write();
+th->Close();
 
 
 // Final plots
@@ -580,7 +582,7 @@ OccupancyEEM_vs_Eta->SetMarkerColor(kGreen+2);
 OccupancyEEM_vs_Eta->GetHistogram()->GetXaxis()-> SetRangeUser(-2.5,-1.5);
 OccupancyEEM_vs_Eta->GetHistogram()->GetYaxis()-> SetTitle("Single xtal Event / fb^{-1}");
 OccupancyEEM_vs_Eta->GetHistogram()->GetXaxis()-> SetTitle("#eta");
-OccupancyEEM_vs_Eta->Draw("ap");*/
+OccupancyEEM_vs_Eta->Draw("ap");
 
 
 TCanvas* cAll = new TCanvas("cAll", "history plot vs date",1);
