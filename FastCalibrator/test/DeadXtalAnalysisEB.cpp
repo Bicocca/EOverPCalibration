@@ -141,7 +141,6 @@ int main (int argc, char** argv){
      (Can.at(iPhi)).at(iEta)->Print((outputCanvasPlot+std::string((Can.at(iPhi)).at(iEta)->GetName())+".png").c_str(),"png");
    }
   }
-  
   return 0; 
 
 }
