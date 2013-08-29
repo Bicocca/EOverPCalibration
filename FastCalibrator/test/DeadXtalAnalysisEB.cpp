@@ -83,12 +83,21 @@ int main (int argc, char** argv){
 
   std::vector<std::vector<TH1F*> > ICCrystalEB(IPhiWindow, std::vector<TH1F*> (IEtaWindow) );
 
+  std::vector<std::vector<TH1F*> > ICCrystalEB_Mod1(IPhiWindow, std::vector<TH1F*> (IEtaWindow) );
+  std::vector<std::vector<TH1F*> > ICCrystalEB_Mod2(IPhiWindow, std::vector<TH1F*> (IEtaWindow) );
+  std::vector<std::vector<TH1F*> > ICCrystalEB_Mod3(IPhiWindow, std::vector<TH1F*> (IEtaWindow) );
+  std::vector<std::vector<TH1F*> > ICCrystalEB_Mod4(IPhiWindow, std::vector<TH1F*> (IEtaWindow) );
+
   std::vector<TH2F*> DeadCrystalEB(inputFileList.size());
   std::vector<TH2F*> ICMapEB(inputFileList.size());  
 
   for( int iPhi = 0 ; iPhi < IPhiWindow ; iPhi ++){
     for( int iEta = 0 ; iEta < IEtaWindow ; iEta ++) {
-     (ICCrystalEB.at(iPhi)).at(iEta) = new TH1F(std::string(Form("ICCrystalEB_%d_%d",iPhi,iEta)).c_str(),"",50,0.95,1.4);
+     (ICCrystalEB.at(iPhi)).at(iEta)      = new TH1F(std::string(Form("ICCrystalEB_%d_%d",iPhi,iEta)).c_str(),"",50,0.95,1.4);
+     (ICCrystalEB_Mod1.at(iPhi)).at(iEta) = new TH1F(std::string(Form("ICCrystalEB_Mod1_%d_%d",iPhi,iEta)).c_str(),"",50,0.95,1.4);
+     (ICCrystalEB_Mod2.at(iPhi)).at(iEta) = new TH1F(std::string(Form("ICCrystalEB_Mod2_%d_%d",iPhi,iEta)).c_str(),"",50,0.95,1.4);
+     (ICCrystalEB_Mod3.at(iPhi)).at(iEta) = new TH1F(std::string(Form("ICCrystalEB_Mod3_%d_%d",iPhi,iEta)).c_str(),"",50,0.95,1.4);
+     (ICCrystalEB_Mod4.at(iPhi)).at(iEta) = new TH1F(std::string(Form("ICCrystalEB_Mod4_%d_%d",iPhi,iEta)).c_str(),"",50,0.95,1.4);
     }  
  }
      
@@ -103,9 +112,24 @@ int main (int argc, char** argv){
 	if(DeadCrystalEB.back()->GetBinContent(iPhi+1,iEta+1)!=0 && iEta!=0){
           ICCrystalEB[int(IPhiWindow/2)][int(IEtaWindow/2)]->Fill( ICMapEB.back()->GetBinContent(iPhi+1,iEta+1));
 
+          if(fabs(iEta-85)<=20)                          ICCrystalEB_Mod1[int(IPhiWindow/2)][int(IEtaWindow/2)]->Fill( ICMapEB.back()->GetBinContent(iPhi+1,iEta+1));
+          else if(fabs(iEta-85)>20 && fabs(iEta-85)<=40) ICCrystalEB_Mod2[int(IPhiWindow/2)][int(IEtaWindow/2)]->Fill( ICMapEB.back()->GetBinContent(iPhi+1,iEta+1));
+          else if(fabs(iEta-85)>40 && fabs(iEta-85)<=60) ICCrystalEB_Mod3[int(IPhiWindow/2)][int(IEtaWindow/2)]->Fill( ICMapEB.back()->GetBinContent(iPhi+1,iEta+1));
+          else                                           ICCrystalEB_Mod4[int(IPhiWindow/2)][int(IEtaWindow/2)]->Fill( ICMapEB.back()->GetBinContent(iPhi+1,iEta+1));
+
 	  for( int IPHI = iPhi - int((IPhiWindow-1)/2) ; IPHI <= iPhi + int((IPhiWindow-1)/2) ; IPHI ++){
 	    for( int IETA = iEta - int((IEtaWindow-1)/2) ; IETA <= iEta + int((IEtaWindow-1)/2) ; IETA ++){
 	      (ICCrystalEB.at(int(IPhiWindow/2)+(IPHI-iPhi))).at(int((IEtaWindow)/2)+(IETA-iEta))->Fill(ICMapEB.back()->GetBinContent(IPHI+1,IETA+1));
+
+              if(fabs(iEta-85)<=20)                          
+                (ICCrystalEB_Mod1.at(int(IPhiWindow/2)+(IPHI-iPhi))).at(int((IEtaWindow)/2)+(IETA-iEta))->Fill(ICMapEB.back()->GetBinContent(IPHI+1,IETA+1));
+              else if(fabs(iEta-85)>20 && fabs(iEta-85)<=40) 
+                (ICCrystalEB_Mod2.at(int(IPhiWindow/2)+(IPHI-iPhi))).at(int((IEtaWindow)/2)+(IETA-iEta))->Fill(ICMapEB.back()->GetBinContent(IPHI+1,IETA+1));
+              else if(fabs(iEta-85)>40 && fabs(iEta-85)<=60) 
+                (ICCrystalEB_Mod3.at(int(IPhiWindow/2)+(IPHI-iPhi))).at(int((IEtaWindow)/2)+(IETA-iEta))->Fill(ICMapEB.back()->GetBinContent(IPHI+1,IETA+1));
+              else                                           
+                (ICCrystalEB_Mod4.at(int(IPhiWindow/2)+(IPHI-iPhi))).at(int((IEtaWindow)/2)+(IETA-iEta))->Fill(ICMapEB.back()->GetBinContent(IPHI+1,IETA+1));
+
           }
 	 }	
        }
@@ -113,18 +137,48 @@ int main (int argc, char** argv){
     }
   }
 
-  std::vector<std::vector<TCanvas*> >Can(IPhiWindow);
-  for( int iPhi = 0 ; iPhi < IPhiWindow ; iPhi ++){
-    for(int iEta = 0 ; iEta < IPhiWindow ; iEta ++)
-      (Can.at(iPhi)).push_back( new TCanvas(std::string(Form("Can_%d_%d",iPhi,iEta)).c_str(),"",500,500));
-  }
+  std::vector<std::vector<TCanvas*> >Can(IPhiWindow, std::vector<TCanvas*> (IEtaWindow));
+  std::vector<std::vector<TCanvas*> >Can_Mod1(IPhiWindow,std::vector<TCanvas*> (IEtaWindow));
+  std::vector<std::vector<TCanvas*> >Can_Mod2(IPhiWindow,std::vector<TCanvas*> (IEtaWindow));
+  std::vector<std::vector<TCanvas*> >Can_Mod3(IPhiWindow,std::vector<TCanvas*> (IEtaWindow));
+  std::vector<std::vector<TCanvas*> >Can_Mod4(IPhiWindow,std::vector<TCanvas*> (IEtaWindow));
 
+  for( int iPhi = 0 ; iPhi < IPhiWindow ; iPhi ++){
+    for(int iEta = 0 ; iEta < IPhiWindow ; iEta ++){
+      (Can.at(iPhi)).at(iEta) = new TCanvas(std::string(Form("Can_%d_%d",iPhi,iEta)).c_str(),"",500,500);
+      (Can_Mod1.at(iPhi)).at(iEta) = new TCanvas(std::string(Form("Can_Mod1_%d_%d",iPhi,iEta)).c_str(),"",500,500);
+      (Can_Mod2.at(iPhi)).at(iEta) = new TCanvas(std::string(Form("Can_Mod2_%d_%d",iPhi,iEta)).c_str(),"",500,500);
+      (Can_Mod3.at(iPhi)).at(iEta) = new TCanvas(std::string(Form("Can_Mod3_%d_%d",iPhi,iEta)).c_str(),"",500,500);
+      (Can_Mod4.at(iPhi)).at(iEta) = new TCanvas(std::string(Form("Can_Mod4_%d_%d",iPhi,iEta)).c_str(),"",500,500);
+    }
+  }
   std::vector<std::vector<TF1*> > GaussianFits (IPhiWindow, std::vector<TF1*> (IEtaWindow));
+  std::vector<std::vector<TF1*> > GaussianFits_Mod1 (IPhiWindow, std::vector<TF1*> (IEtaWindow));
+  std::vector<std::vector<TF1*> > GaussianFits_Mod2 (IPhiWindow, std::vector<TF1*> (IEtaWindow));
+  std::vector<std::vector<TF1*> > GaussianFits_Mod3 (IPhiWindow, std::vector<TF1*> (IEtaWindow));
+  std::vector<std::vector<TF1*> > GaussianFits_Mod4 (IPhiWindow, std::vector<TF1*> (IEtaWindow));
+
+  std::vector<std::vector<TH1F*> > MeanIC_vs_Eta (IPhiWindow, std::vector<TH1F*> (IEtaWindow));
+  std::vector<std::vector<TH1F*> > Gaus_MeanIC_vs_Eta (IPhiWindow, std::vector<TH1F*> (IEtaWindow));
+
+  std::vector<std::vector<TCanvas*> > Can_MeanIC_vs_Eta(IPhiWindow,std::vector<TCanvas*> (IEtaWindow));
+  std::vector<std::vector<TCanvas*> > Can_Gaus_MeanIC_vs_Eta(IPhiWindow,std::vector<TCanvas*> (IEtaWindow));
 
   
   for( int iPhi = 0 ; iPhi < IPhiWindow ; iPhi ++){
    for( int iEta = 0 ; iEta < IEtaWindow ; iEta ++){
      GaussianFits[iPhi][iEta] = new TF1(std::string(Form("Gaus_%d_%d",iPhi,iEta)).c_str(),"gaus",0.9,1.5);
+     GaussianFits_Mod1[iPhi][iEta] = new TF1(std::string(Form("Gaus_Mod1_%d_%d",iPhi,iEta)).c_str(),"gaus",0.9,1.5);
+     GaussianFits_Mod2[iPhi][iEta] = new TF1(std::string(Form("Gaus_Mod2_%d_%d",iPhi,iEta)).c_str(),"gaus",0.9,1.5);
+     GaussianFits_Mod3[iPhi][iEta] = new TF1(std::string(Form("Gaus_Mod3_%d_%d",iPhi,iEta)).c_str(),"gaus",0.9,1.5);
+     GaussianFits_Mod4[iPhi][iEta] = new TF1(std::string(Form("Gaus_Mod4_%d_%d",iPhi,iEta)).c_str(),"gaus",0.9,1.5);
+
+     MeanIC_vs_Eta[iPhi][iEta] = new TH1F(std::string(Form("MeanIC_vs_Eta_%d_%d",iPhi,iEta)).c_str(),"",4,0,4); 
+     Can_MeanIC_vs_Eta[iPhi][iEta] = new TCanvas(std::string(Form("Can_MeanIC_vs_Eta_%d_%d",iPhi,iEta)).c_str(),"",500,500);
+
+     Gaus_MeanIC_vs_Eta[iPhi][iEta] = new TH1F(std::string(Form("Gaus_MeanIC_vs_Eta_%d_%d",iPhi,iEta)).c_str(),"",4,0,4); 
+     Can_Gaus_MeanIC_vs_Eta[iPhi][iEta] = new TCanvas(std::string(Form("Can_Gaus_MeanIC_vs_Eta_%d_%d",iPhi,iEta)).c_str(),"",500,500);
+
      (Can.at(iPhi)).at(iEta)->cd();
      (Can.at(iPhi)).at(iEta)->SetGridx();
      (Can.at(iPhi)).at(iEta)->SetGridy();
@@ -139,8 +193,112 @@ int main (int argc, char** argv){
      ICCrystalEB[iPhi][iEta]->Draw("E");
      (Can.at(iPhi)).at(iEta)->Print((outputCanvasPlot+std::string((Can.at(iPhi)).at(iEta)->GetName())+".pdf").c_str(),"pdf");
      (Can.at(iPhi)).at(iEta)->Print((outputCanvasPlot+std::string((Can.at(iPhi)).at(iEta)->GetName())+".png").c_str(),"png");
+
+     (Can_Mod1.at(iPhi)).at(iEta)->cd();
+     (Can_Mod1.at(iPhi)).at(iEta)->SetGridx();
+     (Can_Mod1.at(iPhi)).at(iEta)->SetGridy();
+     ICCrystalEB_Mod1[iPhi][iEta]->SetLineColor(kBlack);
+     ICCrystalEB_Mod1[iPhi][iEta]->SetLineWidth(2);
+     ICCrystalEB_Mod1[iPhi][iEta]->SetMarkerStyle(20);
+     ICCrystalEB_Mod1[iPhi][iEta]->SetMarkerSize(1.);
+     ICCrystalEB_Mod1[iPhi][iEta]->SetMarkerColor(kRed);
+     GaussianFits_Mod1[iPhi][iEta]->SetLineColor(kBlue);
+     GaussianFits_Mod1[iPhi][iEta]->SetLineWidth(2);
+     ICCrystalEB_Mod1[iPhi][iEta]->Fit(GaussianFits_Mod1[iPhi][iEta],"RMEQ");
+     ICCrystalEB_Mod1[iPhi][iEta]->Draw("E");
+     (Can_Mod1.at(iPhi)).at(iEta)->Print((outputCanvasPlot+std::string((Can_Mod1.at(iPhi)).at(iEta)->GetName())+".pdf").c_str(),"pdf");
+     (Can_Mod1.at(iPhi)).at(iEta)->Print((outputCanvasPlot+std::string((Can_Mod1.at(iPhi)).at(iEta)->GetName())+".png").c_str(),"png");
+
+     (Can_Mod2.at(iPhi)).at(iEta)->cd();
+     (Can_Mod2.at(iPhi)).at(iEta)->SetGridx();
+     (Can_Mod2.at(iPhi)).at(iEta)->SetGridy();
+     ICCrystalEB_Mod2[iPhi][iEta]->SetLineColor(kBlack);
+     ICCrystalEB_Mod2[iPhi][iEta]->SetLineWidth(2);
+     ICCrystalEB_Mod2[iPhi][iEta]->SetMarkerStyle(20);
+     ICCrystalEB_Mod2[iPhi][iEta]->SetMarkerSize(1.);
+     ICCrystalEB_Mod2[iPhi][iEta]->SetMarkerColor(kRed);
+     GaussianFits_Mod2[iPhi][iEta]->SetLineColor(kBlue);
+     GaussianFits_Mod2[iPhi][iEta]->SetLineWidth(2);
+     ICCrystalEB_Mod2[iPhi][iEta]->Fit(GaussianFits_Mod2[iPhi][iEta],"RMEQ");
+     ICCrystalEB_Mod2[iPhi][iEta]->Draw("E");
+     (Can_Mod2.at(iPhi)).at(iEta)->Print((outputCanvasPlot+std::string((Can_Mod2.at(iPhi)).at(iEta)->GetName())+".pdf").c_str(),"pdf");
+     (Can_Mod2.at(iPhi)).at(iEta)->Print((outputCanvasPlot+std::string((Can_Mod2.at(iPhi)).at(iEta)->GetName())+".png").c_str(),"png");
+
+     (Can_Mod3.at(iPhi)).at(iEta)->cd();
+     (Can_Mod3.at(iPhi)).at(iEta)->SetGridx();
+     (Can_Mod3.at(iPhi)).at(iEta)->SetGridy();
+     ICCrystalEB_Mod3[iPhi][iEta]->SetLineColor(kBlack);
+     ICCrystalEB_Mod3[iPhi][iEta]->SetLineWidth(2);
+     ICCrystalEB_Mod3[iPhi][iEta]->SetMarkerStyle(20);
+     ICCrystalEB_Mod3[iPhi][iEta]->SetMarkerSize(1.);
+     ICCrystalEB_Mod3[iPhi][iEta]->SetMarkerColor(kRed);
+     GaussianFits_Mod3[iPhi][iEta]->SetLineColor(kBlue);
+     GaussianFits_Mod3[iPhi][iEta]->SetLineWidth(2);
+     ICCrystalEB_Mod3[iPhi][iEta]->Fit(GaussianFits_Mod3[iPhi][iEta],"RMEQ");
+     ICCrystalEB_Mod3[iPhi][iEta]->Draw("E");
+     (Can_Mod3.at(iPhi)).at(iEta)->Print((outputCanvasPlot+std::string((Can_Mod3.at(iPhi)).at(iEta)->GetName())+".pdf").c_str(),"pdf");
+     (Can_Mod3.at(iPhi)).at(iEta)->Print((outputCanvasPlot+std::string((Can_Mod3.at(iPhi)).at(iEta)->GetName())+".png").c_str(),"png");
+
+     (Can_Mod4.at(iPhi)).at(iEta)->cd();
+     (Can_Mod4.at(iPhi)).at(iEta)->SetGridx();
+     (Can_Mod4.at(iPhi)).at(iEta)->SetGridy();
+     ICCrystalEB_Mod4[iPhi][iEta]->SetLineColor(kBlack);
+     ICCrystalEB_Mod4[iPhi][iEta]->SetLineWidth(2);
+     ICCrystalEB_Mod4[iPhi][iEta]->SetMarkerStyle(20);
+     ICCrystalEB_Mod4[iPhi][iEta]->SetMarkerSize(1.);
+     ICCrystalEB_Mod4[iPhi][iEta]->SetMarkerColor(kRed);
+     GaussianFits_Mod4[iPhi][iEta]->SetLineColor(kBlue);
+     GaussianFits_Mod4[iPhi][iEta]->SetLineWidth(2);
+     ICCrystalEB_Mod4[iPhi][iEta]->Fit(GaussianFits_Mod4[iPhi][iEta],"RMEQ");
+     ICCrystalEB_Mod4[iPhi][iEta]->Draw("E");
+     (Can_Mod4.at(iPhi)).at(iEta)->Print((outputCanvasPlot+std::string((Can_Mod4.at(iPhi)).at(iEta)->GetName())+".pdf").c_str(),"pdf");
+     (Can_Mod4.at(iPhi)).at(iEta)->Print((outputCanvasPlot+std::string((Can_Mod4.at(iPhi)).at(iEta)->GetName())+".png").c_str(),"png");
+     
+     (Can_MeanIC_vs_Eta.at(iPhi)).at(iEta)->cd();
+     (Can_MeanIC_vs_Eta.at(iPhi)).at(iEta)->SetGridx();
+     (Can_MeanIC_vs_Eta.at(iPhi)).at(iEta)->SetGridy();
+     MeanIC_vs_Eta[iPhi][iEta]->SetLineColor(kBlack);
+     MeanIC_vs_Eta[iPhi][iEta]->SetLineWidth(2);
+     MeanIC_vs_Eta[iPhi][iEta]->SetMarkerStyle(20);
+     MeanIC_vs_Eta[iPhi][iEta]->SetMarkerSize(1.);
+     MeanIC_vs_Eta[iPhi][iEta]->SetMarkerColor(kRed);
+     MeanIC_vs_Eta[iPhi][iEta]->SetBinContent(1,ICCrystalEB_Mod1[iPhi][iEta]->GetMean());
+     MeanIC_vs_Eta[iPhi][iEta]->SetBinContent(2,ICCrystalEB_Mod2[iPhi][iEta]->GetMean());
+     MeanIC_vs_Eta[iPhi][iEta]->SetBinContent(3,ICCrystalEB_Mod3[iPhi][iEta]->GetMean());
+     MeanIC_vs_Eta[iPhi][iEta]->SetBinContent(4,ICCrystalEB_Mod4[iPhi][iEta]->GetMean());
+     MeanIC_vs_Eta[iPhi][iEta]->SetBinError(1,ICCrystalEB_Mod1[iPhi][iEta]->GetMeanError());
+     MeanIC_vs_Eta[iPhi][iEta]->SetBinError(2,ICCrystalEB_Mod2[iPhi][iEta]->GetMeanError());
+     MeanIC_vs_Eta[iPhi][iEta]->SetBinError(3,ICCrystalEB_Mod3[iPhi][iEta]->GetMeanError());
+     MeanIC_vs_Eta[iPhi][iEta]->SetBinError(4,ICCrystalEB_Mod4[iPhi][iEta]->GetMeanError());
+     MeanIC_vs_Eta[iPhi][iEta]->Draw("E");
+     (Can_MeanIC_vs_Eta.at(iPhi)).at(iEta)->Print((outputCanvasPlot+std::string((Can_MeanIC_vs_Eta.at(iPhi)).at(iEta)->GetName())+".pdf").c_str(),"pdf");
+     (Can_MeanIC_vs_Eta.at(iPhi)).at(iEta)->Print((outputCanvasPlot+std::string((Can_MeanIC_vs_Eta.at(iPhi)).at(iEta)->GetName())+".png").c_str(),"png");
+
+     
+     (Can_Gaus_MeanIC_vs_Eta.at(iPhi)).at(iEta)->cd();
+     (Can_Gaus_MeanIC_vs_Eta.at(iPhi)).at(iEta)->SetGridx();
+     (Can_Gaus_MeanIC_vs_Eta.at(iPhi)).at(iEta)->SetGridy();
+     Gaus_MeanIC_vs_Eta[iPhi][iEta]->SetLineColor(kBlack);
+     Gaus_MeanIC_vs_Eta[iPhi][iEta]->SetLineWidth(2);
+     Gaus_MeanIC_vs_Eta[iPhi][iEta]->SetMarkerStyle(20);
+     Gaus_MeanIC_vs_Eta[iPhi][iEta]->SetMarkerSize(1.);
+     Gaus_MeanIC_vs_Eta[iPhi][iEta]->SetMarkerColor(kRed);
+     Gaus_MeanIC_vs_Eta[iPhi][iEta]->SetBinContent(1,GaussianFits_Mod1[iPhi][iEta]->GetParameter(1));
+     Gaus_MeanIC_vs_Eta[iPhi][iEta]->SetBinContent(2,GaussianFits_Mod2[iPhi][iEta]->GetParameter(1));
+     Gaus_MeanIC_vs_Eta[iPhi][iEta]->SetBinContent(3,GaussianFits_Mod3[iPhi][iEta]->GetParameter(1));
+     Gaus_MeanIC_vs_Eta[iPhi][iEta]->SetBinContent(4,GaussianFits_Mod4[iPhi][iEta]->GetParameter(1));
+     Gaus_MeanIC_vs_Eta[iPhi][iEta]->SetBinError(1,GaussianFits_Mod1[iPhi][iEta]->GetParError(1));
+     Gaus_MeanIC_vs_Eta[iPhi][iEta]->SetBinError(2,GaussianFits_Mod2[iPhi][iEta]->GetParError(1));
+     Gaus_MeanIC_vs_Eta[iPhi][iEta]->SetBinError(3,GaussianFits_Mod3[iPhi][iEta]->GetParError(1));
+     Gaus_MeanIC_vs_Eta[iPhi][iEta]->SetBinError(4,GaussianFits_Mod4[iPhi][iEta]->GetParError(1));
+     Gaus_MeanIC_vs_Eta[iPhi][iEta]->Draw("E");
+     (Can_Gaus_MeanIC_vs_Eta.at(iPhi)).at(iEta)->Print((outputCanvasPlot+std::string((Can_Gaus_MeanIC_vs_Eta.at(iPhi)).at(iEta)->GetName())+".pdf").c_str(),"pdf");
+     (Can_Gaus_MeanIC_vs_Eta.at(iPhi)).at(iEta)->Print((outputCanvasPlot+std::string((Can_Gaus_MeanIC_vs_Eta.at(iPhi)).at(iEta)->GetName())+".png").c_str(),"png");
+     
    }
-  }
-  return 0; 
+
+ }
+
+ return 0; 
 
 }
