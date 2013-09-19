@@ -1020,34 +1020,42 @@ void FastCalibratorEE::saveEoPeta(TFile * f2)
 }
 
 /// Acquire fake Dead Xtal in order to study the effect of IC near them
-void FastCalibratorEE::AcquireDeadXtal(TString inputDeadXtal)
-{
-  if(inputDeadXtal!="NULL")
-  {
+void FastCalibratorEE::AcquireDeadXtal(TString inputDeadXtal, const bool & isDeadTriggerTower){
+
+  if(inputDeadXtal!="NULL"){
+
    std::ifstream DeadXtal (inputDeadXtal.Data(),std::ios::binary);
    
    std::string buffer;
    int iX, iY ,iZ;
   
-   while(!DeadXtal.eof())
-   {
+   while(!DeadXtal.eof()){
+ 
     getline(DeadXtal,buffer);
     std::stringstream line( buffer );
     line >> iX >> iY >>iZ ;
+  
     DeadXtal_HashedIndex.push_back(GetHashedIndexEE(iX,iY,iZ)) ;
-   
-   }
+    if(isDeadTriggerTower){
+ 
+      for (int ix = -2 ; ix <=2 ; ix++){
+       for (int iy = -2 ; iy <=2 ; iy++){
+         if(ix==0 && iy==0) continue ;
+	 DeadXtal_HashedIndex.push_back(GetHashedIndexEE(iX+ix,iY+iy,iZ)) ; 
+       }   
+      }
+    } 
+  }
 
   sort(DeadXtal_HashedIndex.begin(), DeadXtal_HashedIndex.end());
   }
-  else{
-       DeadXtal_HashedIndex.push_back(-9999);
-      }
+  else DeadXtal_HashedIndex.push_back(-9999);
+      
 
 }
 /// Check if the channel considered is in the list of dead or not
-bool FastCalibratorEE::CheckDeadXtal(const int & iX, const int & iY, const int & iZ)
-{
+bool FastCalibratorEE::CheckDeadXtal(const int & iX, const int & iY, const int & iZ){
+
   int hashed_Index;
   hashed_Index = GetHashedIndexEE(iX,iY,iZ);
   
