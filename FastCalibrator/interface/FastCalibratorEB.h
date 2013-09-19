@@ -52,7 +52,7 @@ class FastCalibratorEB {
 
     virtual void     saveEoPeta(TFile * f2);
     
-    virtual void     AcquireDeadXtal(TString imputDeadXtal);
+    virtual void     AcquireDeadXtal(TString imputDeadXtal, const bool & isDeadTriggerTower = false);
     
     virtual bool     CheckDeadXtal(const int & iEta, const int & iPhi);
 
