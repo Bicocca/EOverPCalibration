@@ -891,9 +891,10 @@ void FastCalibratorEB::saveEoPeta(TFile * f2){
 }
 
 ///! Acquire fake dead channel list on order to evaluate the effected of IC near to them
-void FastCalibratorEB::AcquireDeadXtal(TString inputDeadXtal){
+void FastCalibratorEB::AcquireDeadXtal(TString inputDeadXtal, const bool & isDeadTriggerTower){
 
   if(inputDeadXtal!="NULL"){
+
    std::ifstream DeadXtal (inputDeadXtal.Data(),std::ios::binary);
    
    std::string buffer;
@@ -904,12 +905,35 @@ void FastCalibratorEB::AcquireDeadXtal(TString inputDeadXtal){
     std::stringstream line( buffer );
     line >> iEta >> iPhi ;
 
-    if(iEta >=0) DeadXtal_HashedIndex.push_back(GetHashedIndexEB(iEta,iPhi,1)) ;
-    else DeadXtal_HashedIndex.push_back(GetHashedIndexEB(iEta,iPhi,-1)) ;   
-   }
+    if(iEta >=0){ 
+      DeadXtal_HashedIndex.push_back(GetHashedIndexEB(iEta,iPhi,1)) ;
+      if(isDeadTriggerTower) {
+	for(int iphi = -2 ; iphi <= 2 ; iphi ++){
+          for(int ieta = -2 ; ieta <=2 ; ieta ++){
+            if(iphi==0 && ieta==0) continue ;
+             DeadXtal_HashedIndex.push_back(GetHashedIndexEB(iEta+ieta,iPhi+iphi,1)) ;
+	  }
+	}
+      }
+    }
+
+    else{
+
+       DeadXtal_HashedIndex.push_back(GetHashedIndexEB(iEta,iPhi,-1)) ;   
+       if(isDeadTriggerTower) {
+	for(int iphi = -2 ; iphi <= 2 ; iphi ++){
+          for(int ieta = -2 ; ieta <=2 ; ieta ++){
+            if(iphi==0 && ieta==0) continue ;
+             DeadXtal_HashedIndex.push_back(GetHashedIndexEB(iEta+ieta,iPhi+iphi,-1)) ;
+	  }
+	}
+      }
+    }
+  }
 
   sort(DeadXtal_HashedIndex.begin(), DeadXtal_HashedIndex.end());
   }
+
   else DeadXtal_HashedIndex.push_back(-9999);
       
 }
