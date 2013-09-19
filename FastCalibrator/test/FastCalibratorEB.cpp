@@ -31,6 +31,11 @@ int main (int argc, char ** argv) {
   std::string inputFileDeadXtal = "NULL";
   try{ inputFileDeadXtal = gConfigParser -> readStringOption("Input::inputFileDeadXtal");}
   catch( char const* exceptionString ){ inputFileDeadXtal = "NULL"; }
+
+  // input dead xtal name --> switch off by hand 
+  bool isDeadTriggerTower ;
+  try{ isDeadTriggerTower = gConfigParser -> readStringOption("Input::isDeadTriggerTower");}
+  catch( char const* exceptionString ){ isDeadTriggerTower = false; }
   
   // jsonFileName  
   std::string jsonFileName ="NULL";
@@ -214,14 +219,14 @@ int main (int argc, char ** argv) {
     if(isSaveEPDistribution == true){
       FastCalibratorEB analyzer(tree, g_EoC_EB, typeEB, outEPDistribution);
       analyzer.bookHistos(nLoops);
-      analyzer.AcquireDeadXtal(DeadXtal);
+      analyzer.AcquireDeadXtal(DeadXtal,isDeadTriggerTower);
       analyzer.Loop(numberOfEvents, useZ, useW, splitStat, nLoops, isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
       analyzer.saveHistos(outputName);
     }
     else{
       FastCalibratorEB analyzer(tree, g_EoC_EB, typeEB);
       analyzer.bookHistos(nLoops);
-      analyzer.AcquireDeadXtal(DeadXtal);
+      analyzer.AcquireDeadXtal(DeadXtal,isDeadTriggerTower);
       analyzer.Loop(numberOfEvents, useZ, useW, splitStat, nLoops, isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
       analyzer.saveHistos(outputName);
     }
@@ -338,14 +343,14 @@ int main (int argc, char ** argv) {
     /// Run on odd
     FastCalibratorEB analyzer_even(tree, g_EoC_EB, typeEB);
     analyzer_even.bookHistos(nLoops);
-    analyzer_even.AcquireDeadXtal(DeadXtal);
+    analyzer_even.AcquireDeadXtal(DeadXtal,isDeadTriggerTower);
     analyzer_even.Loop(numberOfEvents, useZ, useW, splitStat, nLoops,isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
     analyzer_even.saveHistos(outputName1);
   
     /// Run on even
     FastCalibratorEB analyzer_odd(tree, g_EoC_EB, typeEB);
     analyzer_odd.bookHistos(nLoops);
-    analyzer_odd.AcquireDeadXtal(DeadXtal);
+    analyzer_odd.AcquireDeadXtal(DeadXtal,isDeadTriggerTower);
     analyzer_odd.Loop(numberOfEvents, useZ, useW, splitStat*(-1), nLoops,isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
     analyzer_odd.saveHistos(outputName2);
     
