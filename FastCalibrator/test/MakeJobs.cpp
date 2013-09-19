@@ -37,6 +37,11 @@ int main (int argc, char** argv){
  try{ EtaBinCenterDeadXtal = gConfigParser -> readIntListOption("Input::EtaBinCenterDeadXtal"); }
  catch(char const* exceptionString ){ EtaBinCenterDeadXtal.push_back(-999.); }
 
+
+ bool isDeadTriggerTower ;
+ try{ isDeadTriggerTower = gConfigParser -> readBoolOption("Input::isDeadTriggerTower");}
+ catch(char const* exceptionString ){ isDeadTriggerTower = false ;}
+
  // Dead xtal in EE
 
  std::vector<int> IxEEPBinCenterDeadXtal ;
@@ -226,6 +231,7 @@ int main (int argc, char** argv){
  system (("cat "+inputTemp1+" | sed -e s%USEW%"+std::string(Form("%d",useW))+"%g > "+inputTemp2).c_str()) ;
  system (("cat "+inputTemp2+" | sed -e s%SPLIT%"+std::string(Form("%d",splitStat))+"%g > "+inputTemp1).c_str()) ;
  system (("cat "+inputTemp1+" | sed -e s%LOOPS%"+std::string(Form("%d",nLoops))+"%g > "+inputTemp2).c_str()) ;
+ system (("cat "+inputTemp2+" | sed -e s%DEADTRIGGERTOWER%"+std::string(Form("%o",isDeadTriggerTower))+"%g > "+inputTemp1).c_str()) ;
 
 
  system(std::string(Form("touch %slancia_EB.sh",OutputCfgPath.c_str())).c_str());
@@ -252,8 +258,8 @@ int main (int argc, char** argv){
     // lunch normal calibration
     TString NameCfg_EB     = Form("%sFastCalibrator_EB.cfg",OutputCfgPath.c_str());
 
-    system (("cat "+inputTemp2+" | sed -e s%OUTPUTFILE%"+std::string(outputFile)+"%g > "+inputTemp1).c_str()) ;
-    system (("cat "+inputTemp1+" | sed -e s%INPUTFILEDEADXTAL%"+"%g > "+std::string(NameCfg_EB)).c_str()) ;
+    system (("cat "+inputTemp1+" | sed -e s%OUTPUTFILE%"+std::string(outputFile)+"%g > "+inputTemp2).c_str()) ;
+    system (("cat "+inputTemp2+" | sed -e s%INPUTFILEDEADXTAL%"+"%g > "+std::string(NameCfg_EB)).c_str()) ;
 
     TString NameJobFile_EB =  Form("%sbjob_FastCalibrator_EB.sh",OutputCfgPath.c_str());
     TString NameOut_EB     = Form("%sout_EB.txt",OutputCfgPath.c_str());
@@ -291,8 +297,8 @@ int main (int argc, char** argv){
 
      
      TString NameCfg_EB_1    = Form("%sFastCalibrator_EB_pX%d.cfg",OutputCfgPath.c_str(),nShift);
-     system (("cat "+inputTemp2+" | sed -e s%OUTPUTFILE%"+std::string(outputFile)+std::string(Form("_p%d",nShift))+"%g > "+inputTemp1).c_str()) ;
-     system (("cat "+inputTemp1+" | sed -e s%INPUTFILEDEADXTAL%"+std::string(Name1)+"%g > "+std::string(NameCfg_EB_1)).c_str()) ;
+     system (("cat "+inputTemp1+" | sed -e s%OUTPUTFILE%"+std::string(outputFile)+std::string(Form("_p%d",nShift))+"%g > "+inputTemp2).c_str()) ;
+     system (("cat "+inputTemp2+" | sed -e s%INPUTFILEDEADXTAL%"+std::string(Name1)+"%g > "+std::string(NameCfg_EB_1)).c_str()) ;
 
      TString NameJobFile_EB_1 =  Form("%sbjob_FastCalibrator_EB_p%d.sh",OutputCfgPath.c_str(),nShift);
      TString NameOut_EB_1     = Form("%sout_EB_p%d.txt",OutputCfgPath.c_str(),nShift);
@@ -315,8 +321,8 @@ int main (int argc, char** argv){
      }
 
      TString NameCfg_EB_2    = Form("%sFastCalibrator_EB_m%d.cfg",OutputCfgPath.c_str(),nShift);
-     system (("cat "+inputTemp2+" | sed -e s%OUTPUTFILE%"+std::string(outputFile)+std::string(Form("_m%d",nShift))+"%g > "+inputTemp1).c_str()) ;
-     system (("cat "+inputTemp1+" | sed -e s%INPUTFILEDEADXTAL%"+std::string(Name2)+"%g > "+std::string(NameCfg_EB_2)).c_str()) ;
+     system (("cat "+inputTemp1+" | sed -e s%OUTPUTFILE%"+std::string(outputFile)+std::string(Form("_m%d",nShift))+"%g > "+inputTemp2).c_str()) ;
+     system (("cat "+inputTemp2+" | sed -e s%INPUTFILEDEADXTAL%"+std::string(Name2)+"%g > "+std::string(NameCfg_EB_2)).c_str()) ;
 
      TString NameJobFile_EB_2 =  Form("%sbjob_FastCalibrator_EB_m%d.sh",OutputCfgPath.c_str(),nShift);
      TString NameOut_EB_2     = Form("%sout_EB_m%d.txt",OutputCfgPath.c_str(),nShift);
@@ -388,8 +394,8 @@ int main (int argc, char** argv){
   
 
     TString NameCfg_EE    = Form("%sFastCalibrator_EE.cfg",OutputCfgPath.c_str());
-    system (("cat "+inputTemp2+" | sed -e s%OUTPUTFILE%"+std::string(outputFile)+"%g > "+inputTemp1).c_str()) ;
-    system (("cat "+inputTemp1+" | sed -e s%INPUTFILEDEADXTAL%"+"%g > "+std::string(NameCfg_EE)).c_str()) ;
+    system (("cat "+inputTemp1+" | sed -e s%OUTPUTFILE%"+std::string(outputFile)+"%g > "+inputTemp2).c_str()) ;
+    system (("cat "+inputTemp2+" | sed -e s%INPUTFILEDEADXTAL%"+"%g > "+std::string(NameCfg_EE)).c_str()) ;
 
     TString NameJobFile_EE =  Form("%sbjob_FastCalibrator_EE.sh",OutputCfgPath.c_str());
     TString NameOut_EE     = Form("%sout_EE.txt",OutputCfgPath.c_str());
@@ -425,8 +431,8 @@ int main (int argc, char** argv){
      
 
      TString NameCfg_EE_1    = Form("%sFastCalibrator_EE_pX%d.cfg",OutputCfgPath.c_str(),xShift);
-     system (("cat "+inputTemp2+" | sed -e s%OUTPUTFILE%"+std::string(outputFile)+std::string(Form("_pX%d",xShift))+"%g > "+inputTemp1).c_str()) ;
-     system (("cat "+inputTemp1+" | sed -e s%INPUTFILEDEADXTAL%"+std::string(Name1)+"%g > "+std::string(NameCfg_EE_1)).c_str()) ;
+     system (("cat "+inputTemp1+" | sed -e s%OUTPUTFILE%"+std::string(outputFile)+std::string(Form("_pX%d",xShift))+"%g > "+inputTemp2).c_str()) ;
+     system (("cat "+inputTemp2+" | sed -e s%INPUTFILEDEADXTAL%"+std::string(Name1)+"%g > "+std::string(NameCfg_EE_1)).c_str()) ;
 
      TString NameJobFile_EE_1 =  Form("%sbjob_FastCalibrator_EE_pX%d.sh",OutputCfgPath.c_str(),xShift);
      TString NameOut_EE_1     = Form("%sout_EE_pX%d.txt",OutputCfgPath.c_str(),xShift);
@@ -449,8 +455,8 @@ int main (int argc, char** argv){
        outDeadXtalEE_2<<IxEEMBinCenterDeadXtal.at(iX)-xShift<<"  "<<IyEEMBinCenterDeadXtal.at(iY)<<"  "<<"-1"<<std::endl;
 
      TString NameCfg_EE_2    = Form("%sFastCalibrator_EE_mX%d.cfg",OutputCfgPath.c_str(),xShift);
-     system (("cat "+inputTemp2+" | sed -e s%OUTPUTFILE%"+std::string(outputFile)+std::string(Form("_mX%d",xShift))+"%g > "+inputTemp1).c_str()) ;
-     system (("cat "+inputTemp1+" | sed -e s%INPUTFILEDEADXTAL%"+std::string(Name2)+"%g > "+std::string(NameCfg_EE_2)).c_str()) ;
+     system (("cat "+inputTemp1+" | sed -e s%OUTPUTFILE%"+std::string(outputFile)+std::string(Form("_mX%d",xShift))+"%g > "+inputTemp2).c_str()) ;
+     system (("cat "+inputTemp2+" | sed -e s%INPUTFILEDEADXTAL%"+std::string(Name2)+"%g > "+std::string(NameCfg_EE_2)).c_str()) ;
 
      TString NameJobFile_EE_2 =  Form("%sbjob_FastCalibrator_EE_mX%d.sh",OutputCfgPath.c_str(),xShift);
      TString NameOut_EE_2     = Form("%sout_EE_mX%d.txt",OutputCfgPath.c_str(),xShift);
@@ -515,8 +521,8 @@ int main (int argc, char** argv){
      
 
      TString NameCfg_EE_1    = Form("%sFastCalibrator_EE_pY%d.cfg",OutputCfgPath.c_str(),yShift);
-     system (("cat "+inputTemp2+" | sed -e s%OUTPUTFILE%"+std::string(outputFile)+std::string(Form("_pY%d",yShift))+"%g > "+inputTemp1).c_str()) ;
-     system (("cat "+inputTemp1+" | sed -e s%INPUTFILEDEADXTAL%"+std::string(Name1)+"%g > "+std::string(NameCfg_EE_1)).c_str()) ;
+     system (("cat "+inputTemp1+" | sed -e s%OUTPUTFILE%"+std::string(outputFile)+std::string(Form("_pY%d",yShift))+"%g > "+inputTemp2).c_str()) ;
+     system (("cat "+inputTemp2+" | sed -e s%INPUTFILEDEADXTAL%"+std::string(Name1)+"%g > "+std::string(NameCfg_EE_1)).c_str()) ;
 
      TString NameJobFile_EE_1 =  Form("%sbjob_FastCalibrator_EE_pY%d.sh",OutputCfgPath.c_str(),yShift);
      TString NameOut_EE_1     = Form("%sout_EE_pY%d.txt",OutputCfgPath.c_str(),yShift);
@@ -539,8 +545,8 @@ int main (int argc, char** argv){
        outDeadXtalEE_2<<IxEEMBinCenterDeadXtal.at(iX)<<"  "<<IyEEMBinCenterDeadXtal.at(iY)-yShift<<"  "<<"-1"<<std::endl;
 
      TString NameCfg_EE_2    = Form("%sFastCalibrator_EE_mY%d.cfg",OutputCfgPath.c_str(),yShift);
-     system (("cat "+inputTemp2+" | sed -e s%OUTPUTFILE%"+std::string(outputFile)+std::string(Form("_mY%d",yShift))+"%g > "+inputTemp1).c_str()) ;
-     system (("cat "+inputTemp1+" | sed -e s%INPUTFILEDEADXTAL%"+std::string(Name2)+"%g > "+std::string(NameCfg_EE_2)).c_str()) ;
+     system (("cat "+inputTemp1+" | sed -e s%OUTPUTFILE%"+std::string(outputFile)+std::string(Form("_mY%d",yShift))+"%g > "+inputTemp2).c_str()) ;
+     system (("cat "+inputTemp2+" | sed -e s%INPUTFILEDEADXTAL%"+std::string(Name2)+"%g > "+std::string(NameCfg_EE_2)).c_str()) ;
 
      TString NameJobFile_EE_2 =  Form("%sbjob_FastCalibrator_EE_mY%d.sh",OutputCfgPath.c_str(),yShift);
      TString NameOut_EE_2     = Form("%sout_EE_mY%d.txt",OutputCfgPath.c_str(),yShift);
