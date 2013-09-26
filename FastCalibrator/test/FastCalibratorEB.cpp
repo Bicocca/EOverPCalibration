@@ -33,10 +33,10 @@ int main (int argc, char ** argv) {
   catch( char const* exceptionString ){ inputFileDeadXtal = "NULL"; }
 
   // input dead xtal name --> switch off by hand 
-  bool isDeadTriggerTower ;
-  try{ isDeadTriggerTower = gConfigParser -> readStringOption("Input::isDeadTriggerTower");}
+  bool isDeadTriggerTower =false ;
+  try{ if(gConfigParser -> readIntOption("Input::isDeadTriggerTower") == 1) isDeadTriggerTower = true;}
   catch( char const* exceptionString ){ isDeadTriggerTower = false; }
-  
+  std::cout<<" isDeadTriggerTower "<<isDeadTriggerTower<<std::endl;  
   // jsonFileName  
   std::string jsonFileName ="NULL";
   try{  jsonFileName  = gConfigParser -> readStringOption("Input::jsonFileName");}
