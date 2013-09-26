@@ -519,6 +519,8 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
           float E_seed = 0;
           int seed_hashedIndex = 0; 
           float thisE3x3 = 0 ;
+
+          bool skipElectron = false;
          
           /// Cycle on the all the recHits of the Event: to get the old IC and the corrected SC energy
           for (unsigned int iRecHit = 0; iRecHit < ele1_recHit_E->size(); iRecHit++ ) {
@@ -531,13 +533,14 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
             if (ele1_recHit_flag->at(iRecHit) < 4) ///! SC Energy
             thisE += theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC;
 
-              
+	    if(theScalibration[thisIndex] == 0  && ele1_recHit_E -> at(iRecHit)/ele1_scE >= 0.15 ) ///! not to introduce a bias in the Dead xtal study
+	      skipElectron = true; 
+
             if(ele1_recHit_E -> at(iRecHit) > E_seed && ele1_recHit_flag->at(iRecHit)<4){
               E_seed=ele1_recHit_E -> at(iRecHit);
               iseed=iRecHit;
               seed_hashedIndex=ele1_recHit_hashedIndex -> at(iRecHit); //! Seed Infos
              }
-          
               
           }
           
@@ -554,8 +557,7 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
               thisE3x3+=theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC;
            }
  
-          bool skipElectron = false;
-   
+  
 	  ///! if MCTruth Analysis
           if(!isMCTruth)  {
             pIn = ele1_tkP;
@@ -650,6 +652,8 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
             if(ele2_recHit_flag->at(iRecHit) < 4)
             thisE += theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*thisIC;
 
+            if(theScalibration[thisIndex] == 0  && ele2_recHit_E -> at(iRecHit)/ele2_scE >= 0.15 ) ///! not to introduce a bias in the Dead xtal study
+	      skipElectron = true;
               
             if(ele2_recHit_E -> at(iRecHit) > E_seed && ele2_recHit_flag->at(iRecHit) < 4){
               E_seed=ele2_recHit_E -> at(iRecHit);
