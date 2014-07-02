@@ -360,7 +360,11 @@ void BookSpreadHistos_EB(TH1F* h_spread, std::vector<TH1F*>& h_spread_vsEta, TGr
 {
   char histoName[100];
   char funcName[100];
-  
+
+  std::ofstream RMSFile;
+  if (hcmap2 == NULL) {
+  RMSFile.open ("RMSFile.txt");
+      }
   
   // define the number of eta rings
   int nEtaRings = 85/etaRingWidth;
@@ -403,9 +407,11 @@ void BookSpreadHistos_EB(TH1F* h_spread, std::vector<TH1F*>& h_spread_vsEta, TGr
         {
           h_spread -> Fill((IC1-IC2)/(IC1+IC2));
           h_spread_vsEta.at(etaRing) -> Fill((IC1-IC2)/(IC1+IC2));
+	  //  std::cout<<"eta: "<<etaRing<<" values: "<<IC1<<" "<<IC2<<" "<<(IC1-IC2)/(IC1+IC2)<<std::endl;
         }
       }
     }
+
   }
   
   
@@ -447,6 +453,9 @@ void BookSpreadHistos_EB(TH1F* h_spread, std::vector<TH1F*>& h_spread_vsEta, TGr
     
     g_spread_vsEta -> SetPoint(etaRing,etaMin,fgaus->GetParameter(2));
     g_spread_vsEta -> SetPointError(etaRing,0.5*etaRingWidth,fgaus->GetParError(2));
+
+    //   std::cout<<etaMin <<" "<<fgaus->GetParameter(2)<<std::endl;
+    if (hcmap2 == NULL)    RMSFile << etaMin << " "<< fgaus->GetParameter(2)<<"\n";
   }
 }
 
