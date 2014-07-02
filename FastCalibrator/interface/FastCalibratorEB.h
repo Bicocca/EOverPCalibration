@@ -45,8 +45,10 @@ class FastCalibratorEB {
     virtual Long64_t LoadTree(Long64_t entry);
     
     virtual void     Init(TTree *tree);
+
+    virtual void     FillScalibMap (TString miscalibMap);
     
-    virtual void     Loop(int, int, int, int, int,bool,bool,bool,bool,float,bool,float,bool,float,bool,std::map<int, std::vector<std::pair<int, int> > >);
+    virtual void     Loop(int, int, int, int, int,bool,bool,bool,bool,float,bool,float,bool,float,bool,std::map<int, std::vector<std::pair<int, int> > >, float, TString);
         
     virtual void     BuildEoPeta_ele(int,int,int,int,std::vector<float>,bool,bool,float,bool,float,bool,float,bool);
 
@@ -231,6 +233,8 @@ class FastCalibratorEB {
 
     TGraphErrors *g_ICmeanVsLoop;
     TGraphErrors *g_ICrmsVsLoop;
+
+    std::map<int,float> scalibMap;
 
  private:
  
