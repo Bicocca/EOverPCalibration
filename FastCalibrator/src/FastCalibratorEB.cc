@@ -12,7 +12,6 @@
 #include <sstream>
 #include <algorithm>
 
-
 ///==== Default constructor Contructor 
 
 FastCalibratorEB::FastCalibratorEB(TTree *tree, std::vector<TGraphErrors*> & inputMomentumScale, const std::string& typeEB, TString outEPDistribution):
@@ -53,7 +52,6 @@ Int_t FastCalibratorEB::GetEntry(Long64_t entry){
 ///==== Load information of input Ntupla
 
 Long64_t FastCalibratorEB::LoadTree(Long64_t entry){
-
 // Set the environment to read one entry
   if (!fChain) return -5;
   Long64_t centry = fChain->LoadTree(entry);
@@ -66,6 +64,30 @@ Long64_t FastCalibratorEB::LoadTree(Long64_t entry){
   }
   return centry;
 }
+
+
+//===== Fill Scalibration Map
+
+void FastCalibratorEB::FillScalibMap(TString miscalibMap){
+
+  std::ifstream scalibFile;
+  scalibFile.open(miscalibMap.Data());
+
+  if (!scalibFile) {
+    std::cout<<"miscalib map missing!!!"<<std::endl;
+    return;
+}
+
+  float eta;
+  float scalibValue;
+
+  while (!scalibFile.eof()) {
+    scalibFile >> eta >> scalibValue;
+    scalibMap.insert(std::pair<float,float>(eta,scalibValue));       	 
+      }
+  scalibFile.close();
+}
+
 
 ///==== Variables initialization
 
@@ -405,7 +427,7 @@ void FastCalibratorEB::BuildEoPeta_ele(int iLoop, int nentries , int useW, int u
 /// Calibration Loop over the ntu events
 void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, int nLoops, bool isMiscalib,bool isSaveEPDistribution,
                              bool isEPselection,bool isR9selection, float R9Min, bool isfbrem, float fbremMax, bool isPtCut, float PtMin,
-                             bool isMCTruth, std::map<int, std::vector<std::pair<int, int> > > jsonMap){
+                             bool isMCTruth, std::map<int, std::vector<std::pair<int, int> > > jsonMap, float miscalibMethod, TString miscalibMap){
    if (fChain == 0) return;
    
    /// Define the number of crystal you want to calibrate
@@ -447,8 +469,17 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
      h_map_Dead_Channels->Fill(GetIphiFromHashedIndex(iIndex),GetIetaFromHashedIndex(iIndex));
      }
      else{
-       
-       if(isMiscalib == true) theScalibration[iIndex] = genRand.Gaus(1.,0.01); ///! 5% of Miscalibration fixed
+       if(isMiscalib == true) {
+	 if (miscalibMethod == 1) {  //miscalibration with a gaussian spread (eta-dependent)
+	         FillScalibMap(miscalibMap);  //fill the map with the scalib values
+	 	 theScalibration[iIndex] = scalibMap.at(GetIetaFromHashedIndex(iIndex));   //take the values from the map filled before
+	 }
+	 else 
+	 	 theScalibration[iIndex] = 1 + 0.1*fabs(GetIetaFromHashedIndex(iIndex))/85.;   //linear eta-dependent scalibration
+
+       }
+      
+//       theScalibration[iIndex] = 1.+ 0.01*fabs(GetIetaFromHashedIndex(iIndex));//  genRand.Gaus(1.,0.01); ///! 5% of Miscalibration fixed
        if(isMiscalib == false) theScalibration[iIndex] = 1.;
        h_scalib_EB -> Fill ( GetIphiFromHashedIndex(iIndex), GetIetaFromHashedIndex(iIndex), theScalibration[iIndex] ); ///! Scalib map
      }
@@ -492,8 +523,8 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
 	bool skipEvent = false;
 	if( isMCTruth == 0 )
         {
-          if(AcceptEventByRunAndLumiSection(runId,lumiId,jsonMap) == false) skipEvent = true;
-          
+	  if(AcceptEventByRunAndLumiSection(runId,lumiId,jsonMap) == false) skipEvent = true;
+
           std::pair<int,Long64_t> eventLSandID(lumiId,eventId);
           std::pair<int,std::pair<int,Long64_t> > eventRUNandLSandID(runId,eventLSandID);
           if( eventsMap[eventRUNandLSandID] == 1 ) skipEvent = true;
@@ -573,6 +604,7 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
           int eta_seed = GetIetaFromHashedIndex(seed_hashedIndex);
           TH1F* EoPHisto = hC_EoP_eta_ele->GetHisto(eta_seed+85);
           
+
 	  /// Basic selection on E/p or R9 if you want to apply
           if( fabs(thisE/pIn  - 1) > 0.3 && isEPselection == true ) skipElectron = true;
           if( fabs(thisE3x3/thisE) < R9Min && isR9selection == true ) skipElectron = true;
@@ -584,7 +616,7 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
           
             /// Now cycle on the all the recHits and update the numerator and denominator
             for ( unsigned int iRecHit = 0; iRecHit < ele1_recHit_E->size(); iRecHit++ ) {
-            
+
               if (ele1_recHit_flag->at(iRecHit) >= 4) continue ;
            
               int thisIndex = ele1_recHit_hashedIndex -> at(iRecHit);
@@ -807,16 +839,18 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
 
        for ( int iphi = MIN_IPHI; iphi <= MAX_IPHI; iphi++ ){
          
-
          int thisHashedIndex = GetHashedIndexEB(iabseta*theZside, iphi, theZside);
-	 if ( h_Occupancy_hashedIndex -> GetBinContent(thisHashedIndex+1) == 0 ) continue;
+      	 if ( h_Occupancy_hashedIndex -> GetBinContent(thisHashedIndex+1) == 0 ) continue;
 	 float thisIntercalibConstant = h_scale_EB_hashedIndex -> GetBinContent (thisHashedIndex+1);
+	 //	 std::cout<<iabseta*theZside<<" "<<iphi<<" "<<thisIntercalibConstant<<" "<<h_Occupancy_hashedIndex -> GetBinContent(thisHashedIndex+1)<<std::endl;
          h_scale_EB -> Fill(iphi, iabseta*theZside, thisIntercalibConstant); ///Fill with Last IC Value
          
          if (GetIetaFromHashedIndex(thisHashedIndex) == 85) h_IntercalibValues_test -> Fill (thisIntercalibConstant);
-         p_IntercalibValues_iEta -> Fill(GetIetaFromHashedIndex(thisHashedIndex), thisIntercalibConstant);
-         
+
+	 p_IntercalibValues_iEta -> Fill(GetIetaFromHashedIndex(thisHashedIndex), thisIntercalibConstant);
+
          histoAuxiliary . Fill (thisIntercalibConstant);
+	 
          
          ///Vectors
          IetaValues.push_back(iabseta*theZside);
@@ -828,7 +862,7 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
 
        }
        
-       for ( int uu = 0; uu < totIphi; uu++ )
+       for ( int uu = 0; uu < totIphi; uu++ ) 
          meanICforPhiRingValues.push_back(meanICforPhiRing/totIphi); 
        /// Note this info are not used furhter because channels near to the dead ones are not skipped 
 	                                               
@@ -844,7 +878,7 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
        }
        f1.SetParameters(histoAuxiliary.GetEntries(),histoAuxiliary.GetMean(),histoAuxiliary.GetRMS());
        f1.SetRange(1-5*histoAuxiliary.GetRMS(), 1+5*histoAuxiliary.GetRMS());
-       histoAuxiliary . Fit("f1","QR");
+       histoAuxiliary . Fit("f1","QR+");
        
        if ( f1.GetParError(2) > 0.5 ) continue;
        h_IntercalibSpread_iEta -> SetBinContent( iabseta*theZside + 85 + 1, f1.GetParameter(2) );
@@ -881,7 +915,6 @@ void FastCalibratorEB::saveHistos(TFile * f1){
   g_ICrmsVsLoop -> Write();
 
   h_map_Dead_Channels -> Write() ;
-
 
   f1->Close();
 
