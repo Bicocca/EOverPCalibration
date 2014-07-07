@@ -46,7 +46,9 @@ class FastCalibratorEE{
     
     virtual void     Init(TTree *tree);
 
-    virtual void     Loop(int, int, int, int, int, bool,bool,bool,bool,float,bool,float,bool,float,bool,std::map<int, std::vector<std::pair<int, int> > >);
+    virtual void     FillScalibMap (TString miscalibMap);
+
+    virtual void     Loop(int, int, int, int, int, bool,bool,bool,bool,float,bool,float,bool,float,bool,std::map<int, std::vector<std::pair<int, int> > >, float, TString);
     virtual void     BuildEoPeta_ele(int,int,int,int,std::vector<float> ,bool,bool,float,bool,float,bool,float,bool);
     
     virtual void     saveEoPeta(TFile * f2);
@@ -251,6 +253,9 @@ class FastCalibratorEE{
 
     TH2F       *h_map_Dead_Channels_EEP ;
     TH2F       *h_map_Dead_Channels_EEM ;
+
+    std::map<int,float> scalibMap;
+
             
   private :
   
