@@ -430,6 +430,14 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
                              bool isMCTruth, std::map<int, std::vector<std::pair<int, int> > > jsonMap, float miscalibMethod, TString miscalibMap){
    if (fChain == 0) return;
    
+   if(isMiscalib == true) {
+     std::cout<<"method used for the scalibration (1=from map, 0=linear): "<<miscalibMethod<<std::endl;
+     if (miscalibMethod == 1) {  //miscalibration with a gaussian spread (eta-dependent)                                                       
+       FillScalibMap(miscalibMap);  //fill the map with the scalib values                                                                     
+       std::cout<<"Using miscalibration from map"<<std::endl;
+     }
+   }
+
    /// Define the number of crystal you want to calibrate
    int m_regions = 0;
  
@@ -471,7 +479,6 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
      else{
        if(isMiscalib == true) {
 	 if (miscalibMethod == 1) {  //miscalibration with a gaussian spread (eta-dependent)
-	         FillScalibMap(miscalibMap);  //fill the map with the scalib values
 	 	 theScalibration[iIndex] = scalibMap.at(GetIetaFromHashedIndex(iIndex));   //take the values from the map filled before
 	 }
 	 else 
