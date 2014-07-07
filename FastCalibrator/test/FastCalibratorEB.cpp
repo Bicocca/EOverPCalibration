@@ -99,7 +99,7 @@ int main (int argc, char ** argv) {
 
   // method for the miscalibration
   float miscalibMethod ;
-  try { miscalibMethod = gConfigParser -> readBoolOption("Input::miscalibMethod"); }
+  try { miscalibMethod = gConfigParser -> readFloatOption("Input::miscalibMethod"); }
   catch( char const* exceptionString ){ miscalibMethod = false; }
 
   // Momentum scale file
