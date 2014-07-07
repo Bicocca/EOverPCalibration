@@ -45,7 +45,14 @@ int main (int argc, char ** argv) {
   std::map<int, std::vector<std::pair<int, int> > > jsonMap;
   jsonMap = readJSONFile(jsonFileName);
 
-  // Miscalibration --> scalib 5%                                                                                                                                                                 
+  // map with scalibration                                                                                                                                      
+  std::string miscalibMap = "NULL";
+  try{ miscalibMap = gConfigParser -> readStringOption("Input::miscalibMap");}
+  catch(char const* exceptionString ){ miscalibMap = "/gwteray/users/brianza/scalibMap2.txt";}
+
+  std::cout<<"map used: "<<miscalibMap<<std::endl;
+
+  // Miscalibration                                                                                                                                             
   bool isMiscalib ;
   try{isMiscalib = gConfigParser -> readBoolOption("Input::isMiscalib");}
   catch( char const* exceptionString ){ isMiscalib = false;}
@@ -86,6 +93,12 @@ int main (int argc, char ** argv) {
   float R9Min ;
   try{ R9Min = gConfigParser -> readFloatOption("Input::R9Min");}
   catch( char const* exceptionString ){ R9Min = 0.; }
+
+  // method for the miscalibration                                                                                                            
+
+  float miscalibMethod ;
+  try { miscalibMethod = gConfigParser -> readFloatOption("Input::miscalibMethod"); }
+  catch( char const* exceptionString ){ miscalibMethod = 1.; }
 
   // Run Calibration on E/Etrue instead of E/P --> MC only                                                                                                                                        
   bool isMCTruth ;
@@ -224,14 +237,14 @@ int main (int argc, char ** argv) {
       FastCalibratorEE analyzer(tree, g_EoC_EE, typeEE, outEPDistribution);
       analyzer.bookHistos(nLoops);
       analyzer.AcquireDeadXtal(DeadXtal,isDeadTriggerTower);
-      analyzer.Loop(numberOfEvents, useZ, useW, splitStat, nLoops, isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
+      analyzer.Loop(numberOfEvents, useZ, useW, splitStat, nLoops, isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap, miscalibMethod, miscalibMap);
       analyzer.saveHistos(f1);
     }
     else{
       FastCalibratorEE analyzer(tree, g_EoC_EE, typeEE);
       analyzer.bookHistos(nLoops);
       analyzer.AcquireDeadXtal(DeadXtal,isDeadTriggerTower);  
-      analyzer.Loop(numberOfEvents, useZ, useW, splitStat, nLoops, isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
+      analyzer.Loop(numberOfEvents, useZ, useW, splitStat, nLoops, isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap, miscalibMethod, miscalibMap);
       analyzer.saveHistos(f1);
     }
    
@@ -342,20 +355,21 @@ int main (int argc, char ** argv) {
     TFile *outputName2 = new TFile(outputPath+name2,"RECREATE");
 
     TString DeadXtal = Form("%s",inputFileDeadXtal.c_str());
-  
+
+    std::cout<<"method: "<<miscalibMethod<<std::endl;
      
     /// Run on odd
     FastCalibratorEE analyzer_even(tree, g_EoC_EE, typeEE);
     analyzer_even.bookHistos(nLoops);
     analyzer_even.AcquireDeadXtal(DeadXtal,isDeadTriggerTower);
-    analyzer_even.Loop(numberOfEvents, useZ, useW, splitStat, nLoops,isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
+    analyzer_even.Loop(numberOfEvents, useZ, useW, splitStat, nLoops,isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap, miscalibMethod, miscalibMap);
     analyzer_even.saveHistos(outputName1);
   
     /// Run on even
     FastCalibratorEE analyzer_odd(tree, g_EoC_EE, typeEE);
     analyzer_odd.bookHistos(nLoops);
     analyzer_odd.AcquireDeadXtal(DeadXtal,isDeadTriggerTower);
-    analyzer_odd.Loop(numberOfEvents, useZ, useW, splitStat*(-1), nLoops,isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
+    analyzer_odd.Loop(numberOfEvents, useZ, useW, splitStat*(-1), nLoops,isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap, miscalibMethod, miscalibMap);
     analyzer_odd.saveHistos(outputName2);
     
   }
