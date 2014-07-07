@@ -9,7 +9,7 @@
 #include <fstream>
 #include <sstream>
 #include <TRandom.h>
-
+#include <TMath.h>
 
 /// Default constructor 
 FastCalibratorEE::FastCalibratorEE(TTree *tree, std::vector<TGraphErrors*> & inputMomentumScale, const std::string& typeEE, TString outEPDistribution):
@@ -71,6 +71,32 @@ Long64_t FastCalibratorEE::LoadTree(Long64_t entry){
   }
   return centry;
 }
+
+///Fill the miscalib map
+void FastCalibratorEE::FillScalibMap(TString miscalibMap){
+
+  std::ifstream scalibFile;
+  scalibFile.open(miscalibMap.Data());
+
+  if (!scalibFile) {
+    std::cout<<"miscalib map missing!!!"<<std::endl;
+    return;
+  }
+
+  else {
+    std::cout<<"miscalib map successfully opened!!!"<<std::endl;
+  }
+
+  float etaRing;
+  float scalibValue;
+
+  while (!scalibFile.eof()) {
+    scalibFile >> etaRing >> scalibValue;
+    scalibMap.insert(std::pair<float,float>(etaRing,scalibValue));
+  }
+  scalibFile.close();
+}
+
 
 /// Intialize pointers
 void FastCalibratorEE::Init(TTree *tree){
@@ -417,10 +443,18 @@ void FastCalibratorEE::BuildEoPeta_ele(int iLoop, int nentries , int useW, int u
 /// L3 Loop method ----> Calibration Loop function
 void FastCalibratorEE::Loop( int nentries, int useZ, int useW, int splitStat, int nLoops, bool isMiscalib,bool isSaveEPDistribution,
 			     bool isEPselection, bool isR9selection, float R9Min, bool isfbrem, float fbremMax, bool isPtCut, float PtMin,
-                             bool isMCTruth, std::map<int, std::vector<std::pair<int, int> > > jsonMap){
+                             bool isMCTruth, std::map<int, std::vector<std::pair<int, int> > > jsonMap, float miscalibMethod, TString miscalibMap){
 
    if (fChain == 0) return;
-   
+
+   if(isMiscalib == true) {
+      std::cout<<"method used for the scalibration (1=from map, 0=linear): "<<miscalibMethod<<std::endl;
+      if (miscalibMethod == 1) {  //miscalibration with a gaussian spread (eta-dependent)                                          
+	 FillScalibMap(miscalibMap);  //fill the map with the scalib values    
+	 std::cout<<"Using miscalibration from map"<<std::endl;
+      }
+   }
+
    /// Define the number of crystal you want to calibrate
    int m_regions = kEEhalf;
    
@@ -430,7 +464,7 @@ void FastCalibratorEE::Loop( int nentries, int useZ, int useW, int splitStat, in
    std::vector<float> theScalibration(m_regions*2, 0.);
    TRandom genRand;
    for ( int iIndex = 0; iIndex < m_regions*2; iIndex++ ){
-   
+
      bool isDeadXtal = false ;
      /// Check if the xtal has to be considered dead or not ---> >Fake dead list given by user
      if(DeadXtal_HashedIndex.at(0)!=-9999) isDeadXtal = CheckDeadXtal(GetIxFromHashedIndex(iIndex),GetIyFromHashedIndex(iIndex),GetZsideFromHashedIndex(iIndex));
@@ -442,12 +476,20 @@ void FastCalibratorEE::Loop( int nentries, int useZ, int useW, int splitStat, in
      else h_map_Dead_Channels_EEM->Fill(GetIxFromHashedIndex(iIndex),GetIyFromHashedIndex(iIndex));
      }
      else{
+       if(isMiscalib == true) {
+	 int etaRing = eRings->GetEndcapRing(GetIxFromHashedIndex(iIndex),GetIyFromHashedIndex(iIndex),GetZsideFromHashedIndex(iIndex));
+         if (miscalibMethod == 1) {  //miscalibration with a gaussian spread (eta-dependent)                                          
+	   theScalibration[iIndex] = scalibMap.at(etaRing);   //take the values from the map filled before                         
+	 }
+	 else
+	    theScalibration[iIndex] = 1 + 0.12*etaRing/33.;   //linear eta-dependent scalibration              
+       }
      
-         if(isMiscalib==true) theScalibration[iIndex] = genRand.Gaus(1.,0.05); /// Miscalibration fixed at 5%
-         if(isMiscalib == false) theScalibration[iIndex] = 1.;
-         if(GetZsideFromHashedIndex(iIndex)>0)
-         h_scalib_EEP -> Fill ( GetIxFromHashedIndex(iIndex), GetIyFromHashedIndex(iIndex), theScalibration[iIndex] ); /// scalibration map for EE+ and EE-
-         else  h_scalib_EEM-> Fill ( GetIxFromHashedIndex(iIndex), GetIyFromHashedIndex(iIndex), theScalibration[iIndex] );
+       //       if(isMiscalib==true) theScalibration[iIndex] = genRand.Gaus(1.,0.05); /// Miscalibration fixed at 5%
+       if(isMiscalib == false) theScalibration[iIndex] = 1.;
+       if(GetZsideFromHashedIndex(iIndex)>0)
+       h_scalib_EEP -> Fill ( GetIxFromHashedIndex(iIndex), GetIyFromHashedIndex(iIndex), theScalibration[iIndex] ); /// scalibration map for EE+ and EE-
+       else  h_scalib_EEM-> Fill ( GetIxFromHashedIndex(iIndex), GetIyFromHashedIndex(iIndex), theScalibration[iIndex] );
 
      }
    }
