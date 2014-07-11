@@ -84,7 +84,7 @@ void FastCalibratorEE::FillScalibMap(TString miscalibMap){
   }
 
   else {
-    std::cout<<"miscalib map successfully opened!!!"<<std::endl;
+    std::cout<<"miscalib map successfully opened!!! Map: "<<miscalibMap<<std::endl;
   }
 
   float etaRing;
@@ -462,7 +462,7 @@ void FastCalibratorEE::Loop( int nentries, int useZ, int useW, int splitStat, in
   
    /// build up scalibration map
    std::vector<float> theScalibration(m_regions*2, 0.);
-   TRandom genRand;
+   TRandom3 genRand;
    for ( int iIndex = 0; iIndex < m_regions*2; iIndex++ ){
 
      bool isDeadXtal = false ;
@@ -482,7 +482,8 @@ void FastCalibratorEE::Loop( int nentries, int useZ, int useW, int splitStat, in
 	   theScalibration[iIndex] = scalibMap.at(etaRing);   //take the values from the map filled before                         
 	 }
 	 else
-	    theScalibration[iIndex] = 1 + 0.12*etaRing/33.;   //linear eta-dependent scalibration              
+	   	   theScalibration[iIndex] = 1 + 0.015*etaRing/33.;   //linear eta-dependent scalibration              
+	   //	   	   theScalibration[iIndex] = genRand.Gaus(1.,0.001);
        }
      
        //       if(isMiscalib==true) theScalibration[iIndex] = genRand.Gaus(1.,0.05); /// Miscalibration fixed at 5%
