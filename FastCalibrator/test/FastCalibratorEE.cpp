@@ -48,9 +48,7 @@ int main (int argc, char ** argv) {
   // map with scalibration                                                                                                                                      
   std::string miscalibMap = "NULL";
   try{ miscalibMap = gConfigParser -> readStringOption("Input::miscalibMap");}
-  catch(char const* exceptionString ){ miscalibMap = "/gwteray/users/brianza/scalibMap2.txt";}
-
-  std::cout<<"map used: "<<miscalibMap<<std::endl;
+  catch(char const* exceptionString ){ miscalibMap = "/gwteray/users/brianza/scalibMapEE.txt";}
 
   // Miscalibration                                                                                                                                             
   bool isMiscalib ;
@@ -355,8 +353,6 @@ int main (int argc, char ** argv) {
     TFile *outputName2 = new TFile(outputPath+name2,"RECREATE");
 
     TString DeadXtal = Form("%s",inputFileDeadXtal.c_str());
-
-    std::cout<<"method: "<<miscalibMethod<<std::endl;
      
     /// Run on odd
     FastCalibratorEE analyzer_even(tree, g_EoC_EE, typeEE);
