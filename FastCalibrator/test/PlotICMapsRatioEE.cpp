@@ -32,7 +32,7 @@ int main(int argc, char **argv)
   std::ifstream io1, io2, rms1, rms2;
 
   //  std::ifstream io3, io4, io6;
-  io1.open ("output_EE_runD_SISCALIB_BIN_ETA/IC_Run2012ABC_22JanuaryRereco_WZ_R9_EE_relative.txt");
+  io1.open ("output_EE_runD_SISCALIB_GAUSS_NOETA_STRAWEAK/IC_Run2012ABC_22JanuaryRereco_WZ_R9_EE_relative.txt");
   io2.open ("output_EE_runD_NOSCALIB/IC_Run2012ABC_22JanuaryRereco_WZ_R9_EE_relative.txt");
 
   TEndcapRings *eRings = new TEndcapRings();
@@ -94,9 +94,9 @@ int main(int argc, char **argv)
 
   for (int e=0; e<40; e++) {
     sprintf(histoNameEEp,"h_ratio_EEp_%d",e);
-    histoEtaRingEEp[e] = new TH1F(histoNameEEp,"",50,0.8,1.2);
+    histoEtaRingEEp[e] = new TH1F(histoNameEEp,"",150,0.0,2.0);
     sprintf(histoNameEEm,"h_ratio_EEm_%d",e);
-    histoEtaRingEEm[e] = new TH1F(histoNameEEm,"",50,0.8,1.2);
+    histoEtaRingEEm[e] = new TH1F(histoNameEEm,"",150,0.0,2.0);
 
     /*    sprintf(histoName4,"h_ratio4_%d",e);
     histoEtaRing4[e] = new TH1F(histoName4,"",50,0.99,1.01);
@@ -128,10 +128,11 @@ int main(int argc, char **argv)
       //      std::cout<<x<<" "<<y<<" "<<IC<<" "<<status<<std::endl;
       //   std::cout<<x2<<" "<<y2<<" "<<IC2<<" "<<status2<<std::endl;
 
+
       //      io3>>x>>phi>>status>>IC3>>err;
       //      io4>>x>>phi>>status>>IC4>>err;
       //      io6>>x>>phi>>status>>IC6>>err;
-            r = sqrt ((x-50)*(x-50) + (y-50)*(y-50));
+	    //            r = sqrt ((x-50)*(x-50) + (y-50)*(y-50));
 
       if (status==-1) {
 	  mapEEm[x-1][y-1]=IC;
@@ -142,10 +143,16 @@ int main(int argc, char **argv)
 	  map2EEp[x2-1][y2-1]=IC2;
       }
 
-      if ((status==-1) && (IC!=-1) && (status2==-1) && (IC2!=-1)) {
+      //                  if (eRings->GetEndcapRing(x,y,status)==32)
+      //	    std::cout<<eRings->GetEndcapRing(x2,y2,status2)<<" "<<IC<<" "<<IC2<<" "<<status2<<std::endl;
+
+      if ( (status==-1) && (IC!=-1) && (status2==-1) && (IC2!=-1)) {
 	if ((x==x2) && (y==y2)) {
 
-	  histoEtaRingEEm[int(fabs(eRings->GetEndcapIeta(x,y,status)))-86]->Fill(IC/IC2);
+	    histoEtaRingEEm[int(eRings->GetEndcapRing(x,y,0))]->Fill(IC/IC2);
+	    //	    if (x==34 && y==47)  std::cout<<"anello: "<<eRings->GetEndcapRing(x,y,status)<<std::endl;
+	      if (eRings->GetEndcapRing(x,y,0)==16)
+	      std::cout<<x<<" "<<y<<" "<<IC<<" "<<IC2<<std::endl;
 	  //	  std::cout<<x<<" "<<y<<" "<<etaRing<<std::endl;
 	  //	  histoEtaRing3[int(fabs(eta))]->Fill(IC3/IC2);
 	  //	  histoEtaRing4[int(fabs(eta))]->Fill(IC4/IC2);
@@ -170,7 +177,7 @@ int main(int argc, char **argv)
       else if ((status==1) && (IC!=-1) && (status2==1) && (IC2!=-1)) {
 	if ((x==x2) && (y==y2)) {
 
-	  histoEtaRingEEp[eRings->GetEndcapIeta(x,y,status)-86]->Fill(IC/IC2);
+	  histoEtaRingEEp[int(eRings->GetEndcapRing(x,y,status))]->Fill(IC/IC2);
 
 	  //	  histoEtaRing3[int(fabs(eta))]->Fill(IC3/IC2);
 	  //	  histoEtaRing4[int(fabs(eta))]->Fill(IC4/IC2);
@@ -196,19 +203,39 @@ int main(int argc, char **argv)
 
 
 
-  TFile f1 ("confronti_EE_bin_eta.root", "RECREATE");
+  TFile f1 ("confronti.root", "RECREATE");
   f1.cd();
 
     for (int e=0; e<40; e++) {
 
-    g_RMSEEp->SetPoint (e, float(e), histoEtaRingEEp[e]->GetRMS());
-    g_RMSEEm->SetPoint (e, float(e), histoEtaRingEEm[e]->GetRMS());    
+      sprintf(funcNameEEp,"f_EEp_%d",e);
+      TF1* fgausEEp = new TF1(funcNameEEp,"gaus",0.1,1.9);
+      fgausEEp -> SetParameter(1,histoEtaRingEEp[e]->GetMean());
+      fgausEEp -> SetParameter(2,histoEtaRingEEp[e]->GetRMS());
+      //      histoEtaRingEEp[e] -> Fit(funcNameEEp,"QS+","",1-histoEtaRingEEp[e]->GetRMS(),1+histoEtaRingEEp[e]->GetRMS());
+      //      g_RMSEEp->SetPoint (e, float(e), fgausEEp->GetParameter(2));
+
+      sprintf(funcNameEEm,"f_EEm_%d",e);
+      TF1* fgausEEm = new TF1(funcNameEEm,"gaus",0.1,1.9);
+      fgausEEm -> SetParameter(1,histoEtaRingEEm[e]->GetMean());
+      fgausEEm -> SetParameter(2,histoEtaRingEEm[e]->GetRMS());
+      //      histoEtaRingEEm[e] -> Fit(funcNameEEm,"QS+","",1-histoEtaRingEEm[e]->GetRMS(),1+histoEtaRingEEm[e]->GetRMS());
+      //      g_RMSEEm->SetPoint (e, float(e), fgausEEm->GetParameter(2));
+
+          g_RMSEEp->SetPoint (e, float(e), histoEtaRingEEp[e]->GetRMS());
+          g_RMSEEm->SetPoint (e, float(e), histoEtaRingEEm[e]->GetRMS());    
+
     //    g_RMS3->SetPoint (e-1, float(e), histoEtaRing3[e]->GetRMS());
     //    g_RMS4->SetPoint (e-1, float(e), histoEtaRing4[e]->GetRMS());
     //    g_RMS6->SetPoint (e-1, float(e), histoEtaRing6[e]->GetRMS());
     //    g_RMS->SetPointError (e-1, 0, 0);
-    if (e==2 || e==4 || e==19 || e==26 || e==30 || e==32) {
-      //      histoEtaRing[e]->Draw();
+    if (e==1 || e==2 || e==4 || e==19 || e==26 || e==30 || e==31 || e==32 || e==33 ) {
+      histoEtaRingEEp[e]->Draw();
+      //      fgausEEp->Draw("same");
+
+      histoEtaRingEEm[e]->Draw();
+      //      fgausEEm->Draw("same");
+
       histoEtaRingEEp[e]->Write();
       histoEtaRingEEm[e]->Write();
     }
@@ -219,7 +246,8 @@ int main(int argc, char **argv)
   g_RMSEEp -> GetXaxis() -> SetTitle("i|#eta|");
   g_RMSEEp -> GetYaxis() -> SetTitle("RMS");
   g_RMSEEp -> SetMinimum(0.00000);
-  //    g_RMS -> SetMaximum(0.0025);
+  //      g_RMSEEp -> SetMaximum(0.015);
+  //    g_RMSEEm -> SetMaximum(0.015);
   g_RMSEEp -> SetMarkerStyle(20);
   g_RMSEEp -> SetMarkerSize(1.0);
   g_RMSEEp -> SetMarkerColor(kBlue+1);
