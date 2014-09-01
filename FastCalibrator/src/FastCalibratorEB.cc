@@ -1,3 +1,5 @@
+//adapting it to ECALELF ntuple
+
 #include "FastCalibratorEB.h"
 #include "GetHashedIndexEB.h"
 #include <TH2.h>
