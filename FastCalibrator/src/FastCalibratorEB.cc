@@ -97,17 +97,17 @@ void FastCalibratorEB::Init(TTree *tree){
 
   /// Set object pointer
   
-  ele1_recHit_E = 0;
-  ele1_recHit_hashedIndex = 0;
-  ele1_recHit_iphiORiy = 0;
-  ele1_recHit_ietaORix = 0;
-  ele1_recHit_flag = 0;
+  energyRecHitSCEle1 = 0;
+  XRecHitSCEle1 = 0;  //ETA
+  YRecHitSCEle1 = 0;  //PHI
+  ZRecHitSCEle1 = 0;
+  recoFlagRecHitSCEle1 = 0;
 
-  ele2_recHit_E = 0;
-  ele2_recHit_hashedIndex = 0;
-  ele2_recHit_iphiORiy = 0;
-  ele2_recHit_ietaORix = 0;
-  ele2_recHit_flag = 0;
+  energyRecHitSCEle2 = 0;
+  XRecHitSCEle2 = 0;  //ETA
+  YRecHitSCEle2 = 0;  //PHI
+  ZRecHitSCEle2 = 0;
+  recoFlagRecHitSCEle2 = 0;
   
   /// Set branch addresses and branch pointers
   
@@ -118,70 +118,42 @@ void FastCalibratorEB::Init(TTree *tree){
   
   fChain->SetBranchStatus("*", 0);
   
-  fChain->SetBranchStatus("runId", 1);   fChain->SetBranchAddress("runId", &runId, &b_runId);
-  fChain->SetBranchStatus("lumiId", 1);  fChain->SetBranchAddress("lumiId", &lumiId, &b_lumiId);
-  fChain->SetBranchStatus("eventId", 1); fChain->SetBranchAddress("eventId", &eventId, &b_eventId);
+  fChain->SetBranchStatus("runNumber", 1);   fChain->SetBranchAddress("runNumber", &runNumber, &b_runNumber);
+  fChain->SetBranchStatus("lumiBlock", 1);  fChain->SetBranchAddress("lumiBlock", &lumiBlock, &b_lumiBlock);
+  fChain->SetBranchStatus("eventNumber", 1); fChain->SetBranchAddress("eventNumber", &eventNumber, &b_eventNumber);
   fChain->SetBranchStatus("isW", 1);     fChain->SetBranchAddress("isW", &isW, &b_isW);
   fChain->SetBranchStatus("isZ", 1);     fChain->SetBranchAddress("isZ", &isZ, &b_isZ);
   
-  // ele1
-  fChain->SetBranchStatus("ele1_recHit_E", 1);           fChain->SetBranchAddress("ele1_recHit_E", &ele1_recHit_E, &b_ele1_recHit_E);
-  fChain->SetBranchStatus("ele1_recHit_hashedIndex", 1); fChain->SetBranchAddress("ele1_recHit_hashedIndex", &ele1_recHit_hashedIndex, &b_ele1_recHit_hashedIndex);
-  fChain->SetBranchStatus("ele1_recHit_ietaORix", 1);    fChain->SetBranchAddress("ele1_recHit_ietaORix", &ele1_recHit_ietaORix, &b_ele1_recHit_ietaORix);
-  fChain->SetBranchStatus("ele1_recHit_iphiORiy", 1);    fChain->SetBranchAddress("ele1_recHit_iphiORiy", &ele1_recHit_iphiORiy, &b_ele1_recHit_iphiORiy);
-  fChain->SetBranchStatus("ele1_recHit_flag", 1);        fChain->SetBranchAddress("ele1_recHit_flag", &ele1_recHit_flag, &b_ele1_recHit_flag);
-  fChain->SetBranchStatus("ele1_E_true", 1);             fChain->SetBranchAddress("ele1_E_true", &ele1_E_true, &b_ele1_E_true);
-  fChain->SetBranchStatus("ele1_DR", 1);                 fChain->SetBranchAddress("ele1_DR", &ele1_DR, &b_ele1_DR);
-  fChain->SetBranchStatus("ele1_charge", 1);             fChain->SetBranchAddress("ele1_charge", &ele1_charge, &b_ele1_charge);
+  fChain->SetBranchStatus("chargeEle", 1);             fChain->SetBranchAddress("chargeEle", chargeEle);
+  fChain->SetBranchStatus("etaEle", 1);             fChain->SetBranchAddress("etaEle", &etaEle, &b_etaEle);
+  fChain->SetBranchStatus("PtEle", 1);             fChain->SetBranchAddress("PtEle", &PtEle, &b_PtEle);
+  fChain->SetBranchStatus("phiEle", 1);             fChain->SetBranchAddress("phiEle", &phiEle, &b_phiEle);
+  fChain->SetBranchStatus("rawEnergySCEle", 1);             fChain->SetBranchAddress("rawEnergySCEle", &rawEnergySCEle, &b_rawEnergySCEle);
+  fChain->SetBranchStatus("energySCEle", 1);             fChain->SetBranchAddress("energySCEle", &energySCEle, &b_energySCEle);
+  fChain->SetBranchStatus("etaSCEle", 1);             fChain->SetBranchAddress("etaSCEle", &etaSCEle, &b_etaSCEle);
+  fChain->SetBranchStatus("esEnergySCEle", 1);             fChain->SetBranchAddress("esEnergySCEle", &esEnergySCEle, &b_esEnergySCEle);
+  fChain->SetBranchStatus("e3x3SCEle", 1);             fChain->SetBranchAddress("e3x3SCEle", &e3x3SCEle, &b_e3x3SCEle);
+  fChain->SetBranchStatus("pAtVtxGsfEle", 1);             fChain->SetBranchAddress("pAtVtxGsfEle", &pAtVtxGsfEle, &b_pAtVtxGsfEle);
+  fChain->SetBranchStatus("fbremEle", 1);             fChain->SetBranchAddress("fbremEle", &fbremEle, &b_fbremEle);
+  fChain->SetBranchStatus("isEBEle", 1);             fChain->SetBranchAddress("isEBEle", &isEBEle, &b_isEBEle);
+  fChain->SetBranchStatus("energyMCEle", 1);             fChain->SetBranchAddress("energyMCEle", &energyMCEle, &b_energyMCEle);
+  fChain->SetBranchStatus("etaMCEle", 1);             fChain->SetBranchAddress("etaMCEle", &etaMCEle, &b_etaMCEle);
+  fChain->SetBranchStatus("phiMCEle", 1);             fChain->SetBranchAddress("phiMCEle", &phiMCEle, &b_phiMCEle);
 
-  fChain->SetBranchStatus("ele1_charge", 1);         fChain->SetBranchAddress("ele1_charge", &ele1_charge, &b_ele1_charge);
-  fChain->SetBranchStatus("ele1_eta", 1);            fChain->SetBranchAddress("ele1_eta", &ele1_eta, &b_ele1_eta);
-  fChain->SetBranchStatus("ele1_pt", 1);             fChain->SetBranchAddress("ele1_pt", &ele1_pt, &b_ele1_pt);
-  fChain->SetBranchStatus("ele1_phi", 1);            fChain->SetBranchAddress("ele1_phi", &ele1_phi, &b_ele1_phi);
-  fChain->SetBranchStatus("ele1_scERaw", 1);         fChain->SetBranchAddress("ele1_scERaw", &ele1_scERaw, &b_ele1_scERaw);
-  fChain->SetBranchStatus("ele1_scE", 1);            fChain->SetBranchAddress("ele1_scE", &ele1_scE, &b_ele1_scE);
-  fChain->SetBranchStatus("ele1_scE_regression", 1); fChain->SetBranchAddress("ele1_scE_regression", &ele1_scE_regression, &b_ele1_scE_regression);
-  
-  fChain->SetBranchStatus("ele1_es", 1);          fChain->SetBranchAddress("ele1_es", &ele1_es, &b_ele1_es);
-  fChain->SetBranchStatus("ele1_e3x3", 1);        fChain->SetBranchAddress("ele1_e3x3", &ele1_e3x3, &b_ele1_e3x3);
-  fChain->SetBranchStatus("ele1_tkP", 1);         fChain->SetBranchAddress("ele1_tkP", &ele1_tkP, &b_ele1_tkP);
-  fChain->SetBranchStatus("ele1_fbrem", 1);       fChain->SetBranchAddress("ele1_fbrem", &ele1_fbrem, &b_ele1_fbrem);
-  fChain->SetBranchStatus("ele1_EOverP", 1);      fChain->SetBranchAddress("ele1_EOverP", &ele1_EOverP, &b_ele1_EOverP);
-  fChain->SetBranchStatus("ele1_isEB", 1);        fChain->SetBranchAddress("ele1_isEB", &ele1_isEB, &b_ele1_isEB);
-  fChain->SetBranchStatus("ele1_isEBEEGap", 1);   fChain->SetBranchAddress("ele1_isEBEEGap", &ele1_isEBEEGap, &b_ele1_isEBEEGap);
-  fChain->SetBranchStatus("ele1_isEBEtaGap", 1);  fChain->SetBranchAddress("ele1_isEBEtaGap", &ele1_isEBEtaGap, &b_ele1_isEBEtaGap);
-  fChain->SetBranchStatus("ele1_isEBPhiGap", 1);  fChain->SetBranchAddress("ele1_isEBPhiGap", &ele1_isEBPhiGap, &b_ele1_isEBPhiGap);
-  fChain->SetBranchStatus("ele1_isEEDeeGap", 1);  fChain->SetBranchAddress("ele1_isEEDeeGap", &ele1_isEEDeeGap, &b_ele1_isEEDeeGap);
-  fChain->SetBranchStatus("ele1_isEERingGap", 1); fChain->SetBranchAddress("ele1_isEERingGap", &ele1_isEERingGap, &b_ele1_isEERingGap);
+  // ele1
+  fChain->SetBranchStatus("energyRecHitSCEle1", 1);           fChain->SetBranchAddress("energyRecHitSCEle1", &energyRecHitSCEle1, &b_energyRecHitSCEle1);
+  fChain->SetBranchStatus("XRecHitSCEle1", 1);    fChain->SetBranchAddress("XRecHitSCEle1", &XRecHitSCEle1, &b_XRecHitSCEle1);
+  fChain->SetBranchStatus("YRecHitSCEle1", 1);    fChain->SetBranchAddress("YRecHitSCEle1", &YRecHitSCEle1, &b_YRecHitSCEle1);
+  fChain->SetBranchStatus("ZRecHitSCEle1", 1);    fChain->SetBranchAddress("ZRecHitSCEle1", &ZRecHitSCEle1, &b_ZRecHitSCEle1);
+  fChain->SetBranchStatus("recoFlagRecHitSCEle1", 1);        fChain->SetBranchAddress("recoFlagRecHitSCEle1", &recoFlagRecHitSCEle1, &b_recoFlagRecHitSCEle1);
   
   // ele2
-  fChain->SetBranchStatus("ele2_recHit_E", 1);           fChain->SetBranchAddress("ele2_recHit_E", &ele2_recHit_E, &b_ele2_recHit_E);
-  fChain->SetBranchStatus("ele2_recHit_hashedIndex", 1); fChain->SetBranchAddress("ele2_recHit_hashedIndex", &ele2_recHit_hashedIndex, &b_ele2_recHit_hashedIndex);
-  fChain->SetBranchStatus("ele2_recHit_iphiORiy", 1);    fChain->SetBranchAddress("ele2_recHit_iphiORiy", &ele2_recHit_iphiORiy, &b_ele2_recHit_iphiORiy);
-  fChain->SetBranchStatus("ele2_recHit_ietaORix", 1);    fChain->SetBranchAddress("ele2_recHit_ietaORix", &ele2_recHit_ietaORix, &b_ele2_recHit_ietaORix);
-  fChain->SetBranchStatus("ele2_recHit_flag", 1);        fChain->SetBranchAddress("ele2_recHit_flag", &ele2_recHit_flag, &b_ele2_recHit_flag);
-  fChain->SetBranchStatus("ele2_E_true", 1);             fChain->SetBranchAddress("ele2_E_true", &ele2_E_true, &b_ele2_E_true);
-  fChain->SetBranchStatus("ele2_DR", 1);                 fChain->SetBranchAddress("ele2_DR", &ele2_DR, &b_ele2_DR);
-  fChain->SetBranchStatus("ele2_charge", 1);             fChain->SetBranchAddress("ele2_charge", &ele2_charge, &b_ele2_charge);
+  fChain->SetBranchStatus("energyRecHitSCEle2", 1);           fChain->SetBranchAddress("energyRecHitSCEle2", &energyRecHitSCEle2, &b_energyRecHitSCEle2);
+  fChain->SetBranchStatus("XRecHitSCEle2", 1);    fChain->SetBranchAddress("XRecHitSCEle2", &XRecHitSCEle2, &b_XRecHitSCEle2);
+  fChain->SetBranchStatus("YRecHitSCEle2", 1);    fChain->SetBranchAddress("YRecHitSCEle2", &YRecHitSCEle2, &b_YRecHitSCEle2);
+  fChain->SetBranchStatus("ZRecHitSCEle2", 1);    fChain->SetBranchAddress("ZRecHitSCEle2", &ZRecHitSCEle2, &b_ZRecHitSCEle2);
+  fChain->SetBranchStatus("recoFlagRecHitSCEle2", 1);        fChain->SetBranchAddress("recoFlagRecHitSCEle2", &recoFlagRecHitSCEle2, &b_recoFlagRecHitSCEle2);
   
-  fChain->SetBranchStatus("ele2_charge", 1);         fChain->SetBranchAddress("ele2_charge", &ele2_charge, &b_ele2_charge);
-  fChain->SetBranchStatus("ele2_eta", 1);            fChain->SetBranchAddress("ele2_eta", &ele2_eta, &b_ele2_eta);
-  fChain->SetBranchStatus("ele2_pt", 1);            fChain->SetBranchAddress("ele2_pt", &ele2_pt, &b_ele2_pt);
-  fChain->SetBranchStatus("ele2_phi", 1);            fChain->SetBranchAddress("ele2_phi", &ele2_phi, &b_ele2_phi);
-  fChain->SetBranchStatus("ele2_scERaw", 1);         fChain->SetBranchAddress("ele2_scERaw", &ele2_scERaw, &b_ele2_scERaw);
-  fChain->SetBranchStatus("ele2_scE", 1);            fChain->SetBranchAddress("ele2_scE", &ele2_scE, &b_ele2_scE);
-  fChain->SetBranchStatus("ele1_scE_regression", 1); fChain->SetBranchAddress("ele1_scE_regression", &ele1_scE_regression, &b_ele1_scE_regression);
-  
-  fChain->SetBranchStatus("ele2_e3x3", 1);        fChain->SetBranchAddress("ele2_e3x3", &ele2_e3x3, &b_ele2_e3x3);
-  fChain->SetBranchStatus("ele2_tkP", 1);         fChain->SetBranchAddress("ele2_tkP", &ele2_tkP, &b_ele2_tkP);
-  fChain->SetBranchStatus("ele2_fbrem", 1);       fChain->SetBranchAddress("ele2_fbrem", &ele2_fbrem, &b_ele2_fbrem);
-  fChain->SetBranchStatus("ele2_EOverP", 1);      fChain->SetBranchAddress("ele2_EOverP", &ele2_EOverP, &b_ele2_EOverP);
-  fChain->SetBranchStatus("ele2_isEB", 1);        fChain->SetBranchAddress("ele2_isEB", &ele2_isEB, &b_ele2_isEB);
-  fChain->SetBranchStatus("ele2_isEBEEGap", 1);   fChain->SetBranchAddress("ele2_isEBEEGap", &ele2_isEBEEGap, &b_ele2_isEBEEGap);
-  fChain->SetBranchStatus("ele2_isEBEtaGap", 1);  fChain->SetBranchAddress("ele2_isEBEtaGap", &ele2_isEBEtaGap, &b_ele2_isEBEtaGap);
-  fChain->SetBranchStatus("ele2_isEBPhiGap", 1);  fChain->SetBranchAddress("ele2_isEBPhiGap", &ele2_isEBPhiGap, &b_ele2_isEBPhiGap);
-  fChain->SetBranchStatus("ele2_isEEDeeGap", 1);  fChain->SetBranchAddress("ele2_isEEDeeGap", &ele2_isEEDeeGap, &b_ele2_isEEDeeGap);
-  fChain->SetBranchStatus("ele2_isEERingGap", 1); fChain->SetBranchAddress("ele2_isEERingGap", &ele2_isEERingGap, &b_ele2_isEERingGap);
 }
 
 //! Declaration of the objects that are save in the output file
@@ -256,6 +228,39 @@ void FastCalibratorEB::BuildEoPeta_ele(int iLoop, int nentries , int useW, int u
    nbytes += nb;
    if (!(jentry%1000000))std::cerr<<"building E/p distribution ----> "<<jentry<<" vs "<<nentries<<std::endl;
 
+
+	///////////
+
+   ele1_charge = chargeEle[0];
+   ele1_eta    = etaEle[0]; 
+   ele1_pt     = PtEle[0];
+   ele1_phi    = phiEle[0];
+   ele1_scERaw = rawEnergySCEle[0];
+   ele1_scE    = energySCEle[0];
+   ele1_es     = esEnergySCEle[0];
+   ele1_e3x3   = e3x3SCEle[0];
+   ele1_tkP    = pAtVtxGsfEle[0];
+   ele1_fbrem  = fbremEle[0];
+   ele1_isEB   = isEBEle[0];
+   ele1_E_true = energyMCEle[0];
+   ele1_DR     = TMath::Sqrt((etaMCEle[0]-etaEle[0])*(etaMCEle[0]-etaEle[0])+(phiMCEle[0]-phiEle[0])*(phiMCEle[0]-phiEle[0])) ; 
+
+
+   ele2_charge = chargeEle[1];
+   ele2_eta    = etaEle[1]; 
+   ele2_pt     = PtEle[1];
+   ele2_phi    = phiEle[1];
+   ele2_scERaw = rawEnergySCEle[1];
+   ele2_scE    = energySCEle[1];
+   ele2_es     = esEnergySCEle[1];
+   ele2_e3x3   = e3x3SCEle[1];
+   ele2_tkP    = pAtVtxGsfEle[1];
+   ele2_fbrem  = fbremEle[1];
+   ele2_isEB   = isEBEle[1];
+   ele2_E_true = energyMCEle[1];
+   ele2_DR     = TMath::Sqrt((etaMCEle[1]-etaEle[1])*(etaMCEle[1]-etaEle[1])+(phiMCEle[1]-phiEle[1])*(phiMCEle[1]-phiEle[1])) ; 
+
+
    float pIn, FdiEta;
 
    ///! Tight electron from W or Z only barrel
@@ -272,37 +277,37 @@ void FastCalibratorEB::BuildEoPeta_ele(int iLoop, int nentries , int useW, int u
     
     /// Cycle on the all the recHits of the Event: to get the old IC and the corrected SC energy
     
-    for (unsigned int iRecHit = 0; iRecHit < ele1_recHit_E->size(); iRecHit++ ) {
+    for (unsigned int iRecHit = 0; iRecHit < energyRecHitSCEle1->size(); iRecHit++ ) {
             
             float thisIC = 1.;
-            int thisIndex = ele1_recHit_hashedIndex -> at(iRecHit);
+            int thisIndex = GetHashedIndexEB(XRecHitSCEle1->at(iRecHit), YRecHitSCEle1->at(iRecHit), ZRecHitSCEle1->at(iRecHit));
            
-            if(ele1_recHit_E -> at(iRecHit) > E_seed &&  ele1_recHit_flag->at(iRecHit) < 4 ) /// control if this recHit is good
+            if(energyRecHitSCEle1 -> at(iRecHit) > E_seed &&  recoFlagRecHitSCEle1->at(iRecHit) < 4 ) /// control if this recHit is good
             {
-              seed_hashedIndex=ele1_recHit_hashedIndex -> at(iRecHit);
+              seed_hashedIndex=GetHashedIndexEB(XRecHitSCEle1->at(iRecHit), YRecHitSCEle1->at(iRecHit), ZRecHitSCEle1->at(iRecHit));
               iseed=iRecHit;
-              E_seed=ele1_recHit_E -> at(iRecHit);  ///! Seed search
+              E_seed=energyRecHitSCEle1 -> at(iRecHit);  ///! Seed search
             }
     
             if (iLoop > 0) thisIC = h_scale_EB_hashedIndex -> GetBinContent(thisIndex+1);
             
-            if(ele1_recHit_flag->at(iRecHit) < 4) ///! SC energy taking only good channels
-            thisE += theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC;
+            if(recoFlagRecHitSCEle1->at(iRecHit) < 4) ///! SC energy taking only good channels
+            thisE += theScalibration[thisIndex]*energyRecHitSCEle1 -> at(iRecHit)*FdiEta*thisIC;
              
     }
 
-    for (unsigned int iRecHit = 0; iRecHit < ele1_recHit_E->size(); iRecHit++ ) {
+    for (unsigned int iRecHit = 0; iRecHit < energyRecHitSCEle1->size(); iRecHit++ ) {
             
             float thisIC = 1.;
-            int thisIndex = ele1_recHit_hashedIndex -> at(iRecHit);
+            int thisIndex = GetHashedIndexEB(XRecHitSCEle1->at(iRecHit), YRecHitSCEle1->at(iRecHit), ZRecHitSCEle1->at(iRecHit));
            
             ///! 3x3 matrix informations in order to apply R9 selection
 	    
             if (iLoop > 0) thisIC = h_scale_EB_hashedIndex -> GetBinContent(thisIndex+1);
          
-            if(fabs(ele1_recHit_ietaORix->at(iRecHit)-ele1_recHit_ietaORix->at(iseed))<=1 && 
-               fabs(ele1_recHit_iphiORiy->at(iRecHit)-ele1_recHit_iphiORiy->at(iseed))<=1 && ele1_recHit_flag->at(iRecHit) < 4)
-              thisE3x3+=theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC;
+            if(fabs(XRecHitSCEle1->at(iRecHit)-XRecHitSCEle1->at(iseed))<=1 && 
+               fabs(YRecHitSCEle1->at(iRecHit)-YRecHitSCEle1->at(iseed))<=1 && recoFlagRecHitSCEle1->at(iRecHit) < 4)
+              thisE3x3+=theScalibration[thisIndex]*energyRecHitSCEle1 -> at(iRecHit)*FdiEta*thisIC;
     }
 
     ///! Eta seed from hashed index
@@ -349,37 +354,37 @@ void FastCalibratorEB::BuildEoPeta_ele(int iLoop, int nentries , int useW, int u
   
     /// Cycle on the all the recHits of the Event: to get the old IC and the corrected SC energy
     
-    for (unsigned int iRecHit = 0; iRecHit < ele2_recHit_E->size(); iRecHit++ ) {
+    for (unsigned int iRecHit = 0; iRecHit < energyRecHitSCEle2->size(); iRecHit++ ) {
             
             float thisIC = 1.;
-            int thisIndex = ele2_recHit_hashedIndex -> at(iRecHit);
+            int thisIndex = GetHashedIndexEB(XRecHitSCEle2->at(iRecHit), YRecHitSCEle2->at(iRecHit), ZRecHitSCEle2->at(iRecHit));
             
-            if(ele2_recHit_E -> at(iRecHit) > E_seed && ele2_recHit_flag->at(iRecHit) < 4)
+            if(energyRecHitSCEle2 -> at(iRecHit) > E_seed && recoFlagRecHitSCEle2->at(iRecHit) < 4)
             {
-              seed_hashedIndex=ele2_recHit_hashedIndex -> at(iRecHit);
+              seed_hashedIndex=GetHashedIndexEB(XRecHitSCEle2->at(iRecHit), YRecHitSCEle2->at(iRecHit), ZRecHitSCEle2->at(iRecHit));
               iseed=iRecHit;
-              E_seed=ele2_recHit_E -> at(iRecHit); ///Seed informations
+              E_seed=energyRecHitSCEle2 -> at(iRecHit); ///Seed informations
             }
     
             
             if (iLoop > 0) thisIC = h_scale_EB_hashedIndex -> GetBinContent(thisIndex+1);
             
-            if (ele2_recHit_flag->at(iRecHit) < 4 ) /// SC Energy only for good channels
-            thisE += theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*thisIC;
+            if (recoFlagRecHitSCEle2->at(iRecHit) < 4 ) /// SC Energy only for good channels
+            thisE += theScalibration[thisIndex]*energyRecHitSCEle2 -> at(iRecHit)*FdiEta*thisIC;
              
     } 
 
-    for (unsigned int iRecHit = 0; iRecHit < ele2_recHit_E->size(); iRecHit++ ) {
+    for (unsigned int iRecHit = 0; iRecHit < energyRecHitSCEle2->size(); iRecHit++ ) {
             
             float thisIC = 1.;
-            int thisIndex = ele2_recHit_hashedIndex -> at(iRecHit);
+            int thisIndex = GetHashedIndexEB(XRecHitSCEle2->at(iRecHit), YRecHitSCEle2->at(iRecHit), ZRecHitSCEle2->at(iRecHit));
            
             if (iLoop > 0) thisIC = h_scale_EB_hashedIndex -> GetBinContent(thisIndex+1);
          
-            if(fabs(ele2_recHit_ietaORix->at(iRecHit)-ele2_recHit_ietaORix->at(iseed))<=1 && 
-               fabs(ele2_recHit_iphiORiy->at(iRecHit)-ele2_recHit_iphiORiy->at(iseed))<=1 &&
-               ele2_recHit_flag->at(iRecHit) < 4)
-              thisE3x3+=theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*thisIC;
+            if(fabs(XRecHitSCEle2->at(iRecHit)-XRecHitSCEle2->at(iseed))<=1 && 
+               fabs(YRecHitSCEle2->at(iRecHit)-YRecHitSCEle2->at(iseed))<=1 &&
+               recoFlagRecHitSCEle2->at(iRecHit) < 4)
+              thisE3x3+=theScalibration[thisIndex]*energyRecHitSCEle2 -> at(iRecHit)*FdiEta*thisIC;
     }
 
   
@@ -524,6 +529,39 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
         if (ientry < 0) break;
         nb = fChain->GetEntry(jentry);   
         nbytes += nb;
+
+
+	///////////
+
+	ele1_charge = chargeEle[0];
+	ele1_eta    = etaEle[0]; 
+	ele1_pt     = PtEle[0];
+	ele1_phi    = phiEle[0];
+	ele1_scERaw = rawEnergySCEle[0];
+	ele1_scE    = energySCEle[0];
+	ele1_es     = esEnergySCEle[0];
+	ele1_e3x3   = e3x3SCEle[0];
+	ele1_tkP    = pAtVtxGsfEle[0];
+	ele1_fbrem  = fbremEle[0];
+	ele1_isEB   = isEBEle[0];
+	ele1_E_true = energyMCEle[0];
+	ele1_DR=1; //DA CREARE!
+
+
+	ele2_charge = chargeEle[1];
+	ele2_eta    = etaEle[1]; 
+	ele2_pt     = PtEle[1];
+	ele2_phi    = phiEle[1];
+	ele2_scERaw = rawEnergySCEle[1];
+	ele2_scE    = energySCEle[1];
+	ele2_es     = esEnergySCEle[1];
+	ele2_e3x3   = e3x3SCEle[1];
+	ele2_tkP    = pAtVtxGsfEle[1];
+	ele2_fbrem  = fbremEle[1];
+	ele2_isEB   = isEBEle[1];
+	ele2_E_true = energyMCEle[1];
+	ele2_DR=2; //DA CREARE!
+
               
         
 	//*********************************
@@ -532,10 +570,10 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
 	bool skipEvent = false;
 	if( isMCTruth == 0 )
         {
-	  if(AcceptEventByRunAndLumiSection(runId,lumiId,jsonMap) == false) skipEvent = true;
+	  if(AcceptEventByRunAndLumiSection(runNumber,lumiBlock,jsonMap) == false) skipEvent = true;
 
-          std::pair<int,Long64_t> eventLSandID(lumiId,eventId);
-          std::pair<int,std::pair<int,Long64_t> > eventRUNandLSandID(runId,eventLSandID);
+          std::pair<int,Long64_t> eventLSandID(lumiBlock,eventNumber);
+          std::pair<int,std::pair<int,Long64_t> > eventRUNandLSandID(runNumber,eventLSandID);
           if( eventsMap[eventRUNandLSandID] == 1 ) skipEvent = true;
           else eventsMap[eventRUNandLSandID] = 1;
         }
@@ -563,38 +601,38 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
           bool skipElectron = false;
          
           /// Cycle on the all the recHits of the Event: to get the old IC and the corrected SC energy
-          for (unsigned int iRecHit = 0; iRecHit < ele1_recHit_E->size(); iRecHit++ ) {
+          for (unsigned int iRecHit = 0; iRecHit < energyRecHitSCEle1->size(); iRecHit++ ) {
             
             float thisIC = 1.;
-            int thisIndex = ele1_recHit_hashedIndex -> at(iRecHit);
+            int thisIndex = GetHashedIndexEB(XRecHitSCEle1->at(iRecHit), YRecHitSCEle1->at(iRecHit), ZRecHitSCEle1->at(iRecHit));
            
             if (iLoop > 0 ) thisIC = h_scale_EB_hashedIndex -> GetBinContent(thisIndex+1);
             
-            if (ele1_recHit_flag->at(iRecHit) < 4) ///! SC Energy
-            thisE += theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC;
+            if (recoFlagRecHitSCEle1->at(iRecHit) < 4) ///! SC Energy
+            thisE += theScalibration[thisIndex]*energyRecHitSCEle1 -> at(iRecHit)*FdiEta*thisIC;
 
-	    if(theScalibration[thisIndex] == 0  && ele1_recHit_E -> at(iRecHit)/ele1_scE >= 0.15 ) ///! not to introduce a bias in the Dead xtal study
+	    if(theScalibration[thisIndex] == 0  && energyRecHitSCEle1 -> at(iRecHit)/ele1_scE >= 0.15 ) ///! not to introduce a bias in the Dead xtal study
 	      skipElectron = true; 
 
-            if(ele1_recHit_E -> at(iRecHit) > E_seed && ele1_recHit_flag->at(iRecHit)<4){
-              E_seed=ele1_recHit_E -> at(iRecHit);
+            if(energyRecHitSCEle1 -> at(iRecHit) > E_seed && recoFlagRecHitSCEle1->at(iRecHit)<4){
+              E_seed=energyRecHitSCEle1 -> at(iRecHit);
               iseed=iRecHit;
-              seed_hashedIndex=ele1_recHit_hashedIndex -> at(iRecHit); //! Seed Infos
+              seed_hashedIndex=GetHashedIndexEB(XRecHitSCEle1->at(iRecHit), YRecHitSCEle1->at(iRecHit), ZRecHitSCEle1->at(iRecHit)); //! Seed Infos
              }
               
           }
           
-         for (unsigned int iRecHit = 0; iRecHit < ele1_recHit_E->size(); iRecHit++ ) {
+         for (unsigned int iRecHit = 0; iRecHit < energyRecHitSCEle1->size(); iRecHit++ ) {
             
             float thisIC = 1.;
-            int thisIndex = ele1_recHit_hashedIndex -> at(iRecHit);
+            int thisIndex = GetHashedIndexEB(XRecHitSCEle1->at(iRecHit), YRecHitSCEle1->at(iRecHit), ZRecHitSCEle1->at(iRecHit));
      
             if (iLoop > 0) thisIC = h_scale_EB_hashedIndex -> GetBinContent(thisIndex+1);
          
-            if(fabs(ele1_recHit_ietaORix->at(iRecHit)-ele1_recHit_ietaORix->at(iseed))<=1 && 
-               fabs(ele1_recHit_iphiORiy->at(iRecHit)-ele1_recHit_iphiORiy->at(iseed))<=1 &&
-               ele1_recHit_flag->at(iRecHit) < 4 )
-              thisE3x3+=theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC;
+            if(fabs(XRecHitSCEle1->at(iRecHit)-XRecHitSCEle1->at(iseed))<=1 && 
+               fabs(YRecHitSCEle1->at(iRecHit)-YRecHitSCEle1->at(iseed))<=1 &&
+               recoFlagRecHitSCEle1->at(iRecHit) < 4 )
+              thisE3x3+=theScalibration[thisIndex]*energyRecHitSCEle1 -> at(iRecHit)*FdiEta*thisIC;
            }
  
   
@@ -624,11 +662,11 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
 	  if( !skipElectron) {
           
             /// Now cycle on the all the recHits and update the numerator and denominator
-            for ( unsigned int iRecHit = 0; iRecHit < ele1_recHit_E->size(); iRecHit++ ) {
+            for ( unsigned int iRecHit = 0; iRecHit < energyRecHitSCEle1->size(); iRecHit++ ) {
 
-              if (ele1_recHit_flag->at(iRecHit) >= 4) continue ;
+              if (recoFlagRecHitSCEle1->at(iRecHit) >= 4) continue ;
            
-              int thisIndex = ele1_recHit_hashedIndex -> at(iRecHit);
+              int thisIndex = GetHashedIndexEB(XRecHitSCEle1->at(iRecHit), YRecHitSCEle1->at(iRecHit), ZRecHitSCEle1->at(iRecHit));
               float thisIC = 1.;
 
               if (iLoop > 0) thisIC = h_scale_EB_hashedIndex -> GetBinContent(thisIndex+1);
@@ -643,21 +681,21 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
               if ( splitStat == 0 ) {
                 
                 int EoPbin = EoPHisto->FindBin(thisE/pIn); /// factor use to reweight the evemts
-                theNumerator[thisIndex] += theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
-                theDenominator[thisIndex] += theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
+                theNumerator[thisIndex] += theScalibration[thisIndex]*energyRecHitSCEle1 -> at(iRecHit)*FdiEta*thisIC/thisE*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
+                theDenominator[thisIndex] += theScalibration[thisIndex]*energyRecHitSCEle1 -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
                 
               }
               /// Use Half Statistic only even   
               else if ( splitStat == 1 && jentry%2 == 0 ) {
                 int EoPbin = EoPHisto->FindBin(thisE/pIn);
-                theNumerator[thisIndex] += theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
-                theDenominator[thisIndex] += theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
+                theNumerator[thisIndex] += theScalibration[thisIndex]*energyRecHitSCEle1 -> at(iRecHit)*FdiEta*thisIC/thisE*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
+                theDenominator[thisIndex] += theScalibration[thisIndex]*energyRecHitSCEle1 -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
               }  
               /// use odd event
               else if ( splitStat == -1 && jentry%2 != 0 ) {
                 int EoPbin = EoPHisto->FindBin(thisE/pIn);
-                theNumerator[thisIndex] += theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
-                theDenominator[thisIndex] += theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
+                theNumerator[thisIndex] += theScalibration[thisIndex]*energyRecHitSCEle1 -> at(iRecHit)*FdiEta*thisIC/thisE*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
+                theDenominator[thisIndex] += theScalibration[thisIndex]*energyRecHitSCEle1 -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
               }
             
             }
@@ -684,39 +722,39 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
           float thisE3x3 = 0;
          
           /// Cycle on the all the recHits of the Event: to get the old IC and the corrected SC energy
-          for (unsigned int iRecHit = 0; iRecHit < ele2_recHit_E->size(); iRecHit++ ) {
+          for (unsigned int iRecHit = 0; iRecHit < energyRecHitSCEle2->size(); iRecHit++ ) {
             
             float thisIC = 1.;
-            int thisIndex = ele2_recHit_hashedIndex -> at(iRecHit);
+            int thisIndex = GetHashedIndexEB(XRecHitSCEle2->at(iRecHit), YRecHitSCEle2->at(iRecHit), ZRecHitSCEle2->at(iRecHit));
             if (iLoop > 0) thisIC = h_scale_EB_hashedIndex -> GetBinContent(thisIndex+1);
             
-            if(ele2_recHit_flag->at(iRecHit) < 4)
-            thisE += theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*thisIC;
+            if(recoFlagRecHitSCEle2->at(iRecHit) < 4)
+            thisE += theScalibration[thisIndex]*energyRecHitSCEle2 -> at(iRecHit)*FdiEta*thisIC;
 
-            if(theScalibration[thisIndex] == 0  && ele2_recHit_E -> at(iRecHit)/ele2_scE >= 0.15 ) ///! not to introduce a bias in the Dead xtal study
+            if(theScalibration[thisIndex] == 0  && energyRecHitSCEle2 -> at(iRecHit)/ele2_scE >= 0.15 ) ///! not to introduce a bias in the Dead xtal study
 	      skipElectron = true;
               
-            if(ele2_recHit_E -> at(iRecHit) > E_seed && ele2_recHit_flag->at(iRecHit) < 4){
-              E_seed=ele2_recHit_E -> at(iRecHit);
+            if(energyRecHitSCEle2 -> at(iRecHit) > E_seed && recoFlagRecHitSCEle2->at(iRecHit) < 4){
+              E_seed=energyRecHitSCEle2 -> at(iRecHit);
               iseed=iRecHit;
-              seed_hashedIndex=ele2_recHit_hashedIndex -> at(iRecHit); /// Seed information
+              seed_hashedIndex=GetHashedIndexEB(XRecHitSCEle2->at(iRecHit), YRecHitSCEle2->at(iRecHit), ZRecHitSCEle2->at(iRecHit)); /// Seed information
              }
           
               
           }
           
-          for (unsigned int iRecHit = 0; iRecHit < ele2_recHit_E->size(); iRecHit++ ) {
+          for (unsigned int iRecHit = 0; iRecHit < energyRecHitSCEle2->size(); iRecHit++ ) {
             
             float thisIC = 1.;
-            int thisIndex = ele2_recHit_hashedIndex -> at(iRecHit);
+            int thisIndex = GetHashedIndexEB(XRecHitSCEle2->at(iRecHit), YRecHitSCEle2->at(iRecHit), ZRecHitSCEle2->at(iRecHit));
             // IC obtained from previous Loops
             if (iLoop > 0) thisIC = h_scale_EB_hashedIndex -> GetBinContent(thisIndex+1);
 
        
-	    if(fabs(ele2_recHit_ietaORix->at(iRecHit)-ele2_recHit_ietaORix->at(iseed))<=1 && 
-              fabs(ele2_recHit_iphiORiy->at(iRecHit)-ele2_recHit_iphiORiy->at(iseed))<=1 &&
-              ele2_recHit_flag->at(iRecHit) < 4)
-             thisE3x3+=theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*thisIC;
+	    if(fabs(XRecHitSCEle2->at(iRecHit)-XRecHitSCEle2->at(iseed))<=1 && 
+              fabs(YRecHitSCEle2->at(iRecHit)-YRecHitSCEle2->at(iseed))<=1 &&
+              recoFlagRecHitSCEle2->at(iRecHit) < 4)
+             thisE3x3+=theScalibration[thisIndex]*energyRecHitSCEle2 -> at(iRecHit)*FdiEta*thisIC;
              
  
           }
@@ -744,11 +782,11 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
           if( !skipElectron ){
           
             /// Now cycle on the all the recHits and update the numerator and denominator
-            for ( unsigned int iRecHit = 0; iRecHit < ele2_recHit_E->size(); iRecHit++ ) {
+            for ( unsigned int iRecHit = 0; iRecHit < energyRecHitSCEle2->size(); iRecHit++ ) {
 
-              if (ele2_recHit_flag->at(iRecHit) >= 4) continue ;
+              if (recoFlagRecHitSCEle2->at(iRecHit) >= 4) continue ;
   
-              int thisIndex = ele2_recHit_hashedIndex -> at(iRecHit);
+              int thisIndex = GetHashedIndexEB(XRecHitSCEle2->at(iRecHit), YRecHitSCEle2->at(iRecHit), ZRecHitSCEle2->at(iRecHit));
               float thisIC = 1.;
            
               if (iLoop > 0) thisIC = h_scale_EB_hashedIndex -> GetBinContent(thisIndex+1);
@@ -763,20 +801,20 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
               if ( splitStat == 0 ) {
                 
                 int EoPbin = EoPHisto->FindBin(thisE/pIn);
-                theNumerator[thisIndex] += theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
-                theDenominator[thisIndex] += theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
+                theNumerator[thisIndex] += theScalibration[thisIndex]*energyRecHitSCEle2 -> at(iRecHit)*FdiEta*thisIC/thisE*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
+                theDenominator[thisIndex] += theScalibration[thisIndex]*energyRecHitSCEle2 -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
               }
               /// use evens    
               else if ( splitStat == 1 && jentry%2 == 0 ) {
                 int EoPbin = EoPHisto->FindBin(thisE/pIn);
-                theNumerator[thisIndex] += theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
-                theDenominator[thisIndex] += theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
+                theNumerator[thisIndex] += theScalibration[thisIndex]*energyRecHitSCEle2 -> at(iRecHit)*FdiEta*thisIC/thisE*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
+                theDenominator[thisIndex] += theScalibration[thisIndex]*energyRecHitSCEle2 -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
               }  
              /// use odds
               else if ( splitStat == -1 && jentry%2 != 0 ) {
                 int EoPbin = EoPHisto->FindBin(thisE/pIn);
-                theNumerator[thisIndex] += theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*(thisIC/thisE)*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
-                theDenominator[thisIndex] += theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
+                theNumerator[thisIndex] += theScalibration[thisIndex]*energyRecHitSCEle2 -> at(iRecHit)*FdiEta*(thisIC/thisE)*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
+                theDenominator[thisIndex] += theScalibration[thisIndex]*energyRecHitSCEle2 -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
               }
             
             }
