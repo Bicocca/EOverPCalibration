@@ -12,6 +12,7 @@
 #include <TChain.h>
 #include <TFile.h>
 #include <TH1F.h>
+#include <TMath.h>
 #include <TProfile.h>
 #include <vector>
 #include "hChain.h"
@@ -65,21 +66,41 @@ class FastCalibratorEE{
     Int_t           fCurrent; //!current Tree number in a TChain
     
     
-    ///! Declaration of leaf types
-    Int_t           runId;
-    Int_t           lumiId;
-    Int_t           eventId;
+     ///! Declaration of leaf types
+    
+    Int_t           runNumber;
+    Int_t           lumiBlock;
+    Int_t           eventNumber;
     Int_t           isW;
     Int_t           isZ;
 
-    ///! Ele1 Variables
-    std::vector<float>   *ele1_recHit_E;
-    std::vector<int>     *ele1_recHit_hashedIndex;
-    std::vector<int>     *ele1_recHit_ietaORix;
-    std::vector<int>     *ele1_recHit_iphiORiy;
-    std::vector<int>     *ele1_recHit_flag;   
+    Int_t           chargeEle[2];
+    Float_t         etaEle[2];
+    Float_t         PtEle[2];
+    Float_t         phiEle[2];
+    Float_t         rawEnergySCEle[2];
+    Float_t         energySCEle[2];
+    Float_t         etaSCEle[2];
+    Float_t         esEnergySCEle[2];
+    Float_t         e3x3SCEle[2];
+    Float_t         pAtVtxGsfEle[2];
+    Float_t         fbremEle[2];
+    Int_t           isEBEle[2];
+    Float_t         energyMCEle[2];
+    Float_t         etaMCEle[2];
+    Float_t         phiMCEle[2];
+
     
-    Float_t         ele1_charge;
+    ///! Ele 1 variables
+    
+    std::vector<float>     *energyRecHitSCEle1;
+    //    std::vector<float>     *ele1_recHit_hashedIndex;
+    std::vector<int>     *XRecHitSCEle1;  
+    std::vector<int>     *YRecHitSCEle1;  
+    std::vector<int>     *ZRecHitSCEle1;
+    std::vector<int>       *recoFlagRecHitSCEle1;    
+
+    Int_t           ele1_charge;
     Float_t         ele1_eta;
     Float_t         ele1_pt;
     Float_t         ele1_phi;
@@ -90,26 +111,20 @@ class FastCalibratorEE{
     Float_t         ele1_e3x3;
     Float_t         ele1_tkP;
     Float_t         ele1_fbrem;
-    Float_t         ele1_EOverP;
     Int_t           ele1_isEB;
-    Int_t           ele1_isEBEEGap;
-    Int_t           ele1_isEBEtaGap;
-    Int_t           ele1_isEBPhiGap;
-    Int_t           ele1_isEEDeeGap;
-    Int_t           ele1_isEERingGap;
     Float_t         ele1_E_true;
     Float_t         ele1_DR;
-    Float_t         ele1_scE_regression;
-    Float_t         ele1_scERaw_PUcleaned;
 
-    ///! Ele1 Variables
-    std::vector<float>   *ele2_recHit_E;
-    std::vector<int>     *ele2_recHit_hashedIndex;
-    std::vector<int>     *ele2_recHit_iphiORiy;
-    std::vector<int>     *ele2_recHit_ietaORix;
-    std::vector<int>     *ele2_recHit_flag;
+    ///! Ele 2 variables
+
+    std::vector<float>     *energyRecHitSCEle2;
+    //    std::vector<float>     *ele1_recHit_hashedIndex;
+    std::vector<int>     *XRecHitSCEle2;  
+    std::vector<int>     *YRecHitSCEle2;  
+    std::vector<int>     *ZRecHitSCEle2;
+    std::vector<int>       *recoFlagRecHitSCEle2;    
     
-    Float_t         ele2_charge;
+    Int_t         ele2_charge;    
     Float_t         ele2_eta;
     Float_t         ele2_pt;
     Float_t         ele2_phi;
@@ -120,83 +135,48 @@ class FastCalibratorEE{
     Float_t         ele2_e3x3;
     Float_t         ele2_tkP;
     Float_t         ele2_fbrem;
-    Float_t         ele2_EOverP;
     Int_t           ele2_isEB;
-    Int_t           ele2_isEBEEGap;
-    Int_t           ele2_isEBEtaGap;
-    Int_t           ele2_isEBPhiGap;
-    Int_t           ele2_isEEDeeGap;
-    Int_t           ele2_isEERingGap;
     Float_t         ele2_E_true;
     Float_t         ele2_DR;
-    Float_t         ele2_scE_regression;
-    Float_t         ele2_scERaw_PUcleaned;
 
 
-    ///!  List of input branches from ntu
-    TBranch        *b_runId;   //!
-    TBranch        *b_lumiId;  //!
-    TBranch        *b_eventId; //!
+
+
+    ///! List of input branches from ntu
+    
+    TBranch        *b_runNumber;   //!
+    TBranch        *b_lumiBlock;  //!
+    TBranch        *b_eventNumber; //!
     TBranch        *b_isW;   //!
     TBranch        *b_isZ;   //!
-    TBranch        *b_ele1_recHit_E;   //!
-    TBranch        *b_ele1_recHit_iphiORiy;
-    TBranch        *b_ele1_recHit_ietaORix;
-    TBranch        *b_ele1_recHit_hashedIndex;   //!
-    TBranch        *b_ele1_recHit_flag;
-    
-    TBranch        *b_ele1_charge;   //!
-    TBranch        *b_ele1_eta;   //!
-    TBranch        *b_ele1_pt;   //!
-    TBranch        *b_ele1_phi;   //!
-    TBranch        *b_ele1_scERaw;   //!
-    TBranch        *b_ele1_scE;   //!
-    TBranch        *b_ele1_scEta;   //!
-    TBranch        *b_ele1_es;   //!
-    TBranch        *b_ele1_E_true;   //!
-    TBranch        *b_ele1_DR;   //!
-    TBranch        *b_ele1_e3x3;   //!
-    TBranch        *b_ele1_tkP;   //!
-    TBranch        *b_ele1_fbrem;   //!
-    TBranch        *b_ele1_EOverP;   //!
-    TBranch        *b_ele1_isEB;   //!
-    TBranch        *b_ele1_scE_regression;
-    TBranch        *b_ele1_scERaw_PUcleaned;
-
-    TBranch        *b_ele1_isEBEEGap;   //!
-    TBranch        *b_ele1_isEBEtaGap;   //!
-    TBranch        *b_ele1_isEBPhiGap;   //!
-    TBranch        *b_ele1_isEEDeeGap;   //!
-    TBranch        *b_ele1_isEERingGap;   //!
-    
-    TBranch        *b_ele2_recHit_E;   //!
-    TBranch        *b_ele2_recHit_hashedIndex;   //!
-    TBranch        *b_ele2_recHit_iphiORiy;
-    TBranch        *b_ele2_recHit_ietaORix;   //!
-    TBranch        *b_ele2_recHit_flag;
-    
-    TBranch        *b_ele2_charge;   //!
-    TBranch        *b_ele2_eta;   //!
-    TBranch        *b_ele2_pt;   //!
-    TBranch        *b_ele2_phi;   //!
-    TBranch        *b_ele2_scERaw;   //!
-    TBranch        *b_ele2_scE;   //!
-    TBranch        *b_ele2_scEta;   //!
-    TBranch        *b_ele2_es;   //!
-    TBranch        *b_ele2_E_true;   //!
-    TBranch        *b_ele2_DR;   //!
-    TBranch        *b_ele2_e3x3;   //!
-    TBranch        *b_ele2_tkP;   //!
-    TBranch        *b_ele2_fbrem;   //!
-    TBranch        *b_ele2_EOverP;   //!
-    TBranch        *b_ele2_isEB;   //!
-    TBranch        *b_ele2_isEBEEGap;   //!
-    TBranch        *b_ele2_isEBEtaGap;   //!
-    TBranch        *b_ele2_isEBPhiGap;   //!
-    TBranch        *b_ele2_isEEDeeGap;   //!
-    TBranch        *b_ele2_isEERingGap;   //!
-    TBranch        *b_ele2_scE_regression;
-    TBranch        *b_ele2_scERaw_PUcleaned;
+   
+    TBranch        *b_chargeEle;
+    TBranch        *b_etaEle;
+    TBranch        *b_PtEle;    
+    TBranch        *b_phiEle;
+    TBranch        *b_rawEnergySCEle;
+    TBranch        *b_energySCEle;
+    TBranch        *b_etaSCEle;
+    TBranch        *b_esEnergySCEle;
+    TBranch        *b_e3x3SCEle;
+    TBranch        *b_pAtVtxGsfEle;
+    TBranch        *b_fbremEle;
+    TBranch        *b_isEBEle;
+    TBranch        *b_energyMCEle;
+    TBranch        *b_etaMCEle;
+    TBranch        *b_phiMCEle;
+ 
+    TBranch        *b_energyRecHitSCEle1;   //!
+    TBranch        *b_XRecHitSCEle1;
+    TBranch        *b_YRecHitSCEle1;
+    TBranch        *b_ZRecHitSCEle1;
+    TBranch        *b_recoFlagRecHitSCEle1;
+ 
+    TBranch        *b_energyRecHitSCEle2;   //!
+    TBranch        *b_XRecHitSCEle2;
+    TBranch        *b_YRecHitSCEle2;
+    TBranch        *b_ZRecHitSCEle2;
+    TBranch        *b_recoFlagRecHitSCEle2;
 
 
     /// Output informations
