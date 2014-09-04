@@ -545,7 +545,7 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
 	ele1_fbrem  = fbremEle[0];
 	ele1_isEB   = isEBEle[0];
 	ele1_E_true = energyMCEle[0];
-	ele1_DR=1; //DA CREARE!
+	ele1_DR     = TMath::Sqrt((etaMCEle[0]-etaEle[0])*(etaMCEle[0]-etaEle[0])+(phiMCEle[0]-phiEle[0])*(phiMCEle[0]-phiEle[0]));
 
 
 	ele2_charge = chargeEle[1];
@@ -560,7 +560,7 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
 	ele2_fbrem  = fbremEle[1];
 	ele2_isEB   = isEBEle[1];
 	ele2_E_true = energyMCEle[1];
-	ele2_DR=2; //DA CREARE!
+	ele2_DR     = TMath::Sqrt((etaMCEle[1]-etaEle[1])*(etaMCEle[1]-etaEle[1])+(phiMCEle[1]-phiEle[1])*(phiMCEle[1]-phiEle[1]));
 
               
         
