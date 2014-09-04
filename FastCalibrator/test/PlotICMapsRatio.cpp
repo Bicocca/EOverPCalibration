@@ -78,7 +78,7 @@ int main(int argc, char **argv)
 
   for (int e=0; e<86; e++) {
     sprintf(histoName,"h_ratio_%d",e);
-    histoEtaRing[e] = new TH1F(histoName,"",50,0.99,1.01);
+    histoEtaRing[e] = new TH1F(histoName,"",50,0.9,1.1);
 
     /*    sprintf(histoName4,"h_ratio4_%d",e);
     histoEtaRing4[e] = new TH1F(histoName4,"",50,0.99,1.01);
@@ -177,7 +177,7 @@ int main(int argc, char **argv)
     phiCount2=0.;
   }
 
-  TFile f1 ("confronti_etalinear2.root", "RECREATE");
+  TFile f1 ("confronti_etabin2.root", "RECREATE");
   f1.cd();
 
   for (int e=1; e<86; e++) {
