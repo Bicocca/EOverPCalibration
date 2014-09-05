@@ -97,9 +97,9 @@ class FastCalibratorEB {
     
     std::vector<float>     *energyRecHitSCEle1;
     //    std::vector<float>     *ele1_recHit_hashedIndex;
-    std::vector<float>     *XRecHitSCEle1;  //ETA
-    std::vector<float>     *YRecHitSCEle1;  //PHI
-    std::vector<float>     *ZRecHitSCEle1;
+    std::vector<int>     *XRecHitSCEle1;  //ETA
+    std::vector<int>     *YRecHitSCEle1;  //PHI
+    std::vector<int>     *ZRecHitSCEle1;
     std::vector<int>       *recoFlagRecHitSCEle1;    
 
     Int_t           ele1_charge;
@@ -120,9 +120,9 @@ class FastCalibratorEB {
 
     std::vector<float>     *energyRecHitSCEle2;
     //    std::vector<float>     *ele1_recHit_hashedIndex;
-    std::vector<float>     *XRecHitSCEle2;  //ETA
-    std::vector<float>     *YRecHitSCEle2;  //PHI
-    std::vector<float>     *ZRecHitSCEle2;
+    std::vector<int>     *XRecHitSCEle2;  //ETA
+    std::vector<int>     *YRecHitSCEle2;  //PHI
+    std::vector<int>     *ZRecHitSCEle2;
     std::vector<int>       *recoFlagRecHitSCEle2;    
     
     Int_t         ele2_charge;    
