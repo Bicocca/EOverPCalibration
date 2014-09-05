@@ -724,6 +724,7 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
               if (recoFlagRecHitSCEle2->at(iRecHit) >= 4) continue ;
   
               int thisIndex = GetHashedIndexEB(XRecHitSCEle2->at(iRecHit), YRecHitSCEle2->at(iRecHit), ZRecHitSCEle2->at(iRecHit));
+	      //  std::cout<<"DEBUG: "<<thisIndex<<" "<<XRecHitSCEle2->at(iRecHit)<<" "<<YRecHitSCEle2->at(iRecHit)<<" "<<ZRecHitSCEle2->at(iRecHit)<<std::endl;
               float thisIC = 1.;
            
               if (iLoop > 0) thisIC = h_scale_EB_hashedIndex -> GetBinContent(thisIndex+1);
@@ -775,9 +776,9 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
 
    ///Fill the histo of IntercalibValues before the solve
     for ( int iIndex = 0; iIndex < 61200; iIndex++ ){
-      
+
       if ( h_Occupancy_hashedIndex -> GetBinContent(iIndex+1) > 0 ){
-	
+
         float thisIntercalibConstant = 1.;
         /// Solve the cases where the recHit energy is always 0 (dead Xtal?)
         bool isDeadXtal = false ;
