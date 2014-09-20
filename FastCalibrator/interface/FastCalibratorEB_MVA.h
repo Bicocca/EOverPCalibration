@@ -14,8 +14,8 @@
 #include <TH1F.h>
 #include <TProfile.h>
 #include <vector>
-#include "hChain.h"
-#include "h2Chain.h"
+#include "EOverPCalibration/NtuplePackage/interface/hChain.h"
+#include "EOverPCalibration/NtuplePackage/interface/h2Chain.h"
 #include <TGraphErrors.h>
 
 #include <TLorentzVector.h>

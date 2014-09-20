@@ -1,4 +1,4 @@
-#include "GetHashedIndexEB.h"
+#include "../interface/GetHashedIndexEB.h"
 
 int GetHashedIndexEB(int iEta, int iPhi, int Zside)
 {

@@ -1,5 +1,5 @@
-#include "FastCalibratorEB_MVA.h"
-#include "GetHashedIndexEB.h"
+#include "../interface/FastCalibratorEB_MVA.h"
+#include "../interface/GetHashedIndexEB.h"
 #include <TH2.h>
 #include <TF1.h>
 #include <TStyle.h>

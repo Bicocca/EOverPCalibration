@@ -15,8 +15,8 @@
 #include <TH1F.h>
 #include <TProfile.h>
 #include <vector>
-#include "hChain.h"
-#include "h2Chain.h"
+#include "EOverPCalibration/NtuplePackage/interface/hChain.h"
+#include "EOverPCalibration/NtuplePackage/interface/h2Chain.h"
 #include <TGraphErrors.h>
 
 #include <TLorentzVector.h>
@@ -24,8 +24,8 @@
 #include "Math/PtEtaPhiM4D.h"
 #include "Math/LorentzVector.h"
 
-#include "CalibrationUtils.h"
-#include "readJSONFile.h"
+#include "../interface/CalibrationUtils.h"
+#include "../../NtuplePackage/interface/readJSONFile.h"
 
 class FastCalibratorEB {
 

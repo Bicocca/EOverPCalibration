@@ -1,4 +1,4 @@
-#include "geometryUtils.h"
+#include "../interface/geometryUtils.h"
 
 // --- EE ---
 // default constructor, reading the map from file                                                                                                                          

@@ -1,5 +1,5 @@
-#include "XtalAlphaEE.h"
-#include "GetHashedIndexEE.h"
+#include "../interface/XtalAlphaEE.h"
+#include "../interface/GetHashedIndexEE.h"
 #include <TH2.h>
 #include <TF1.h>
 #include <TStyle.h>
@@ -281,14 +281,14 @@ void XtalAlphaEE::BuildEoPeta_ele(int iLoop, int nentries , int useW, int useZ, 
        hC_EoP_ir_ele = new hChain (name,name, 250,0.1,3.0,41);
   }
 
-  Long64_t nb = 0;
+  //  Long64_t nb = 0;
 
   for(Long64_t jentry=0; jentry<nentries;jentry++) {
 
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
 
-    nb = fChain->GetEntry(jentry);
+    //    nb = fChain->GetEntry(jentry);
 
     if (!(jentry%1000000))std::cerr<<"building E/p distribution ----> "<<jentry<<" vs "<<nentries<<std::endl;
 

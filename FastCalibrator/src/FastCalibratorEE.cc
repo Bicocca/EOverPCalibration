@@ -1,5 +1,5 @@
-#include "FastCalibratorEE.h"
-#include "GetHashedIndexEE.h"
+#include "../interface/FastCalibratorEE.h"
+#include "../interface/GetHashedIndexEE.h"
 #include <TH2.h>
 #include <TF1.h>
 #include <TStyle.h>
@@ -956,9 +956,9 @@ void FastCalibratorEE::Loop( int nentries, int useZ, int useW, int splitStat, in
    {
      if ( h_occupancy_hashedIndex_EE -> GetBinContent(iIndex+1) > 0 )
      {
-       int thisCaliBlock = -1;
-       if (GetZsideFromHashedIndex(iIndex) < 0) thisCaliBlock = 0;
-       else thisCaliBlock = 1;
+       //       int thisCaliBlock = -1;
+       //       if (GetZsideFromHashedIndex(iIndex) < 0) thisCaliBlock = 0;
+       //       else thisCaliBlock = 1;
        
        int thisIx = GetIxFromHashedIndex(iIndex);
        int thisIy = GetIyFromHashedIndex(iIndex);

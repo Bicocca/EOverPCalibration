@@ -1,4 +1,4 @@
-#include "TSicCrystals.h"
+#include "../interface/TSicCrystals.h"
 
 // default constructor, reading the map from file
 TSicCrystals::TSicCrystals() 
