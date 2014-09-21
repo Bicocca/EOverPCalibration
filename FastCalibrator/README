@@ -46,11 +46,15 @@ Paramters to set in the cfg file:   -> inputFile = Root file input data to analy
                                     -> nLoops = number of L3 iteration
 
 
+1b-2b) CalibrationPlots.cpp -->    draw results of calibration (run it after FastCalibratorEB (EE))
+
+Run the code: CalibrationPlots cfg/calibrationPlots_EB_cfg.py
 
 
-3) test/CompareSCalibMCTruth_EB.cpp --> Comaparison beetween scalib MC with the truth in EB
 
-Run the code: ./bin/CompareSCalibMCTruth_EB.exe cfg/comparisonEB_cfg.cfg
+3) CompareSCalibMCTruth_EB.cpp --> Comaparison beetween scalib MC with the truth in EB
+
+Run the code: CompareSCalibMCTruth_EB.exe cfg/comparisonEB_cfg.py
 
 Paramters to set in the cfg file:   -> inputFile = Root file input MC scalib to analyse
                                     -> fileMCTruth = MC truth IC map for EB
@@ -59,9 +63,9 @@ Paramters to set in the cfg file:   -> inputFile = Root file input MC scalib to 
 
 
 
-4) test/CompareSCalibMCTruth_EE.cpp --> Comaparison beetween scalib MC with the truth in EE
+4) CompareSCalibMCTruth_EE.cpp --> Comaparison beetween scalib MC with the truth in EE
 
-Run the code: ./bin/CompareSCalibMCTruth_EE.exe cfg/comparisonEE_cfg.cfg
+Run the code: CompareSCalibMCTruth_EE cfg/comparisonEE_cfg.py
 
 Paramters to set in the cfg file:   -> inputFile = Root file input MC scalib to analyse
                                     -> fileMCTruth = MC truth IC map for EE
@@ -71,15 +75,15 @@ Paramters to set in the cfg file:   -> inputFile = Root file input MC scalib to 
 
 
 
-5) test/CompareICSet.cpp  --> compare two set of ICs taken by repository 
+5) CompareICSet.cpp  --> compare two set of ICs taken by repository 
 
-Run the code: ./bin/CompareICSet.exe file1_IC_Set.txt file2_IC_Set.txt
+Run the code: CompareICSet.exe file1_IC_Set.txt file2_IC_Set.txt
 
 
 
-6) test/CalibrationMomentum.cpp --> study momentum scale vs phi in EB and EE
+6) CalibrationMomentum.cpp --> study momentum scale vs phi in EB and EE
 
-Run the code: ./bin/CalibrationMomentum.exe cfg/calibrationMomentum_cfg.cfg
+Run the code: CalibrationMomentum cfg/calibrationMomentum_cfg.py
 
 Paramters to set in the cfg file:   -> TreeName = name of the tree contained in each root file input
                                     -> infileDATA = txt file with the list of .root data files
@@ -94,23 +98,6 @@ Paramters to set in the cfg file:   -> TreeName = name of the tree contained in 
                                     -> rebinEB = rebin Template, MC and Data in EB
                                     -> rebinEE = rebin Template, MC and Data in EE
                                     -> outputFile = path of .root output file
-
-
-6) test/CalibrationBarrel.cpp --> make precision plot + normalization + momentum and crack correction in EB
-                                  make .txt IC output file
-
-Run the code: ./bin/CalibrationBarrel.exe cfg/calibrationEB_cfg.cfg
-
-Paramters to set in the cfg file:   -> Inputfile1 = L3 calib output on full stat
-                                    -> Inputfile2 = L3 calib output on half stat (even or odd)
-                                    -> Inputfile3 = L3 calib output on half stat (even or odd)
-                                    -> inputMomentumScale = momentum scale correction
-                                    -> evalStat = 0 -> no statistical precision 1 -> stat prec
-                                    -> isMC = true -> calib mC false -> calib data
-                                    -> fileType = for plot image production
-                                    -> dirName = dir for output plots
-                                    -> printPlots = true -> print false -> no print
-                                    -> outputTxt = output IC txt file
 
 
 
@@ -128,6 +115,26 @@ Paramters to set in the cfg file:   -> Inputfile1 = L3 calib output on full stat
                                     -> printPlots = true -> print false -> no print
 
 Normalized map are insert in the input root file with the name h_scale_map_EEP h_scale_map_EEM
+
+
+
+#####################  OBSOLETE  ##########
+
+8) test/CalibrationBarrel.cpp --> make precision plot + normalization + momentum and crack correction in EB
+                                  make .txt IC output file
+
+Run the code: ./bin/CalibrationBarrel.exe cfg/calibrationEB_cfg.cfg
+
+Paramters to set in the cfg file:   -> Inputfile1 = L3 calib output on full stat
+                                    -> Inputfile2 = L3 calib output on half stat (even or odd)
+                                    -> Inputfile3 = L3 calib output on half stat (even or odd)
+                                    -> inputMomentumScale = momentum scale correction
+                                    -> evalStat = 0 -> no statistical precision 1 -> stat prec
+                                    -> isMC = true -> calib mC false -> calib data
+                                    -> fileType = for plot image production
+                                    -> dirName = dir for output plots
+                                    -> printPlots = true -> print false -> no print
+                                    -> outputTxt = output IC txt file
 
 
 
