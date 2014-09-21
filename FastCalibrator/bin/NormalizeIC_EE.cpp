@@ -15,9 +15,12 @@
 #include "TROOT.h"
 #include "TStyle.h"
 #include <cmath>
-#include "ConfigParser.h"
-#include "ntpleUtils.h"
+#include "../../NtuplePackage/interface/ntpleUtils.h"
 #include "TApplication.h"
+
+#include "FWCore/ParameterSet/interface/ProcessDesc.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
 
 using namespace std;
 
@@ -65,13 +68,27 @@ int main( int argc, char **argv){
  return 1;
  }
 
- parseConfigFile (argv[1]) ;
- 
- std::string infile1  = gConfigParser -> readStringOption("Input::Inputfile1");
- std::string infile2 = gConfigParser -> readStringOption("Input::Inputfile2");
- std::string infile3 = gConfigParser -> readStringOption("Input::Inputfile3");
- int evalStat = gConfigParser -> readIntOption("Input::evalStat");
- bool isMC = gConfigParser -> readBoolOption("Input::isMC");
+
+ std::string configFileName = argv[1];
+ boost::shared_ptr<edm::ParameterSet> parameterSet = edm::readConfig(configFileName);
+ edm::ParameterSet Options = parameterSet -> getParameter<edm::ParameterSet>("Options");
+ //  parameterSet.reset();
+
+ std::string infile1 = "NULL";
+ if(Options.existsAs<std::string>("infile1"))
+   infile1 = Options.getParameter<std::string>("infile1");
+
+ std::string infile2 = "NULL";
+ if(Options.existsAs<std::string>("infile2"))
+   infile2 = Options.getParameter<std::string>("infile2");
+
+ std::string infile3 = "NULL";
+ if(Options.existsAs<std::string>("infile3"))
+   infile3 = Options.getParameter<std::string>("infile3");
+
+ int evalStat = 1;
+ if(Options.existsAs<int>("evalStat"))
+   evalStat = Options.getParameter<int>("evalStat");
  
  if ( infile1.empty()) {
    cout << " No input file specified !" << endl;
@@ -83,11 +100,16 @@ int main( int argc, char **argv){
    return 1;
  }
 
+ std::string fileType = "NULL";
+ if(Options.existsAs<std::string>("fileType"))
+   fileType = Options.getParameter<std::string>("fileType");
+
+ std::string dirName = "NULL";
+ if(Options.existsAs<std::string>("dirName"))
+   dirName = Options.getParameter<std::string>("dirName");
+
  cout << "Making Eta ring Normalization for: " << infile1 << endl;
  
- std::string fileType = gConfigParser -> readStringOption("Output::fileType");
- std::string dirName = gConfigParser -> readStringOption("Output::dirName");
- bool printPlots = gConfigParser -> readBoolOption("Output::printPlots");
 
  TApplication* theApp = new TApplication("Application",&argc, argv);
 
@@ -183,7 +205,22 @@ int main( int argc, char **argv){
 
   TH2F* h_scale_EE_Even[2],*hcmap_EE_Even[2];
   TH2F* h_scale_EE_Odd[2],*hcmap_EE_Odd[2];
-  TFile *f2, *f3;
+
+  h_scale_EE_Even[1] = new TH2F();
+  h_scale_EE_Even[0] = new TH2F();
+
+  h_scale_EE_Odd[1] = new TH2F();
+  h_scale_EE_Odd[0] = new TH2F();
+
+  hcmap_EE_Even[1] = new TH2F();
+  hcmap_EE_Even[0] = new TH2F();
+
+  hcmap_EE_Odd[1] = new TH2F();
+  hcmap_EE_Odd[0] = new TH2F();
+
+  TFile *f2 = new TFile();
+  TFile *f3 = new TFile();
+
   /// if evalstat --> apply also to the other file Odd and Even
   if(evalStat){
 

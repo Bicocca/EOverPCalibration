@@ -1,4 +1,4 @@
-/// Comparison between two IC sets
+//Plot map ratio between two IC sets (used in miscalib studies)
 
 #include <vector>
 #include <utility>
@@ -33,7 +33,7 @@ int main(int argc, char **argv)
   //  io3.open ("output_runD_10ITER_SISCALIB_ETABIN3/IC_Run2012ABC_22JanuaryRereco_WZ_Fbrem_EB_SISCALIB_relative.txt");
   //  io4.open ("output_runD_10ITER_SISCALIB_ETABIN4/IC_Run2012ABC_22JanuaryRereco_WZ_Fbrem_EB_SISCALIB_relative.txt");
   //  io6.open ("output_runD_10ITER_SISCALIB_ETABIN6/IC_Run2012ABC_22JanuaryRereco_WZ_Fbrem_EB_SISCALIB_relative.txt");
-  //  rms1.open ("output_runD_10ITER_SISCALIB_ETALINEAR/RMSFile.txt");
+  //  rms1.open ("output_runD_10ITER_SISCALIB_ETALINEAR/RMSFile.txt"); 
   //  rms2.open ("output_runD_10ITER_NOSCALIB/RMSFile.txt");
   
   float status, IC, err;
@@ -98,7 +98,6 @@ int main(int argc, char **argv)
 
   //  mapRatio->SetDrawOption ("colz");
   
-  int i=0, j=0;
   eta=0;
 
 

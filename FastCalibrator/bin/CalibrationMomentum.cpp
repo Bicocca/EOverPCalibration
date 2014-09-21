@@ -1,7 +1,7 @@
-#include "TEndcapRings.h"
-#include "ntpleUtils.h"
-#include "treeReader.h"
-#include "CalibrationUtils.h"
+#include "../interface/TEndcapRings.h"
+#include "../../NtuplePackage/interface/ntpleUtils.h"
+#include "../../NtuplePackage/interface/treeReader.h"
+#include "../interface/CalibrationUtils.h"
 #include "../CommonTools/histoFunc.h"
 
 #include <iostream>
@@ -27,8 +27,11 @@
 #include "TLegend.h"
 #include "TChain.h"
 #include "TVirtualFitter.h"
-#include "ConfigParser.h"
 #include "TMath.h"
+
+#include "FWCore/ParameterSet/interface/ProcessDesc.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
 
 using namespace std;
 
@@ -58,28 +61,77 @@ int main(int argc, char** argv)
     std::cerr << ">>>>> CalibrationMomentum.cpp::usage:   " << argv[0] << " configFileName" << std::endl;
     return 1;
   }
-  
-  parseConfigFile(argv[1]);
-  
-  std::string TreeName    = gConfigParser -> readStringOption("Input::TreeName");
-  std::string infileDATA  = gConfigParser -> readStringOption("Input::infileDATA");
-  std::string infileMC    = gConfigParser -> readStringOption("Input::infileMC");
-  std::string WeightforMC = gConfigParser -> readStringOption("Input::WeightforMC");
-  
-  std::string typeEB = gConfigParser -> readStringOption("Input::typeEB");
-  std::string typeEE = gConfigParser -> readStringOption("Input::typeEE");
-  int  nPhiBinsEB = gConfigParser -> readIntOption("Input::nPhiBinsEB");
-  int  nPhiBinsEE = gConfigParser -> readIntOption("Input::nPhiBinsEE");
-  int  nPhiBinsTempEB = gConfigParser -> readIntOption("Input::nPhiBinsTempEB");
-  int  nPhiBinsTempEE = gConfigParser -> readIntOption("Input::nPhiBinsTempEE");
-  int  rebinEB = gConfigParser -> readIntOption("Input::rebinEB");
-  int  rebinEE = gConfigParser -> readIntOption("Input::rebinEE");
-  bool usePUweights = gConfigParser -> readBoolOption("Input::usePUweights");
-  std::string outputFile = gConfigParser -> readStringOption("Output::outputFile");
-  
-  int nRegionsEB = GetNRegionsEB(typeEB);
-  int nRegionsEE = GetNRegionsEE(typeEE);
-  
+    
+
+  std::string configFileName = argv[1];
+  boost::shared_ptr<edm::ParameterSet> parameterSet = edm::readConfig(configFileName);
+  edm::ParameterSet Options = parameterSet -> getParameter<edm::ParameterSet>("Options");
+  //  parameterSet.reset();
+
+  std::string TreeName = "NULL";
+  if(Options.existsAs<std::string>("TreeName"))
+    TreeName = Options.getParameter<std::string>("TreeName");
+
+  std::string infileDATA = "NULL";
+  if(Options.existsAs<std::string>("infileDATA"))
+    infileDATA = Options.getParameter<std::string>("infileDATA");
+
+  std::string infileMC = "NULL";
+  if(Options.existsAs<std::string>("infileMC"))
+    infileMC = Options.getParameter<std::string>("infileMC");
+
+  std::string WeightforMC = "NULL";
+  if(Options.existsAs<std::string>("WeightforMC"))
+    WeightforMC = Options.getParameter<std::string>("WeightforMC");
+
+  std::string typeEB = "NULL";
+  if(Options.existsAs<std::string>("typeEB"))
+    typeEB = Options.getParameter<std::string>("typeEB");
+
+  std::string typeEE = "NULL";
+  if(Options.existsAs<std::string>("typeEE"))
+    typeEE = Options.getParameter<std::string>("typeEE");
+
+  int nPhiBinsEB = 1;
+  if(Options.existsAs<int>("nPhiBinsEB"))
+    nPhiBinsEB = Options.getParameter<int>("nPhiBinsEB");
+
+  int nPhiBinsEE = 1;
+  if(Options.existsAs<int>("nPhiBinsEE"))
+    nPhiBinsEE = Options.getParameter<int>("nPhiBinsEE");
+
+  int nPhiBinsTempEB = 1;
+  if(Options.existsAs<int>("nPhiBinsTempEB"))
+    nPhiBinsTempEB = Options.getParameter<int>("nPhiBinsTempEB");
+
+  int nPhiBinsTempEE = 1;
+  if(Options.existsAs<int>("nPhiBinsTempEE"))
+    nPhiBinsTempEE = Options.getParameter<int>("nPhiBinsTempEE");
+
+  int rebinEB = 1;
+  if(Options.existsAs<int>("rebinEB"))
+    rebinEB = Options.getParameter<int>("rebinEB");
+
+  int rebinEE = 1;
+  if(Options.existsAs<int>("rebinEE"))
+    rebinEE = Options.getParameter<int>("rebinEE");
+
+  int nRegionsEB = 1;
+  if(Options.existsAs<int>("nRegionsEB"))
+    nRegionsEB = Options.getParameter<int>("nRegionsEB");
+
+  int nRegionsEE = 1;
+  if(Options.existsAs<int>("nRegionsEE"))
+    nRegionsEE = Options.getParameter<int>("nRegionsEE");
+
+  std::string outputFile = "NULL";
+  if(Options.existsAs<std::string>("outputFile"))
+    outputFile = Options.getParameter<std::string>("outputFile");
+
+  bool usePUweights = false;
+  if(Options.existsAs<bool>("usePUweights"))
+    usePUweights = Options.getParameter<bool>("usePUweights");
+    
   cout <<" Basic Configuration " <<endl;
   cout <<" Tree Name = "<<TreeName<<endl;
   cout <<" infileDATA = "<<infileDATA<<endl;

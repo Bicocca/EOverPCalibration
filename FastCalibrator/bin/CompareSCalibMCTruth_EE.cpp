@@ -13,10 +13,12 @@
 #include "TGraphErrors.h"
 #include "TF1.h"
 #include "TApplication.h"
-#include "ConfigParser.h"
-#include "ntpleUtils.h"
-#include "TEndcapRings.h"
+#include "../../NtuplePackage/interface/ntpleUtils.h"
+#include "../interface/TEndcapRings.h"
 
+#include "FWCore/ParameterSet/interface/ProcessDesc.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
 
 using namespace std;
 
@@ -30,16 +32,34 @@ int main (int argc, char **argv) {
  return 1;
  }
 
- parseConfigFile (argv[1]) ;
 
- std::string inputFile = gConfigParser -> readStringOption("Input::inputFile");  
- std::string inputMomentumScale =  gConfigParser -> readStringOption("Input::inputMomentumScale");
- std::string fileMCTruth = gConfigParser -> readStringOption("Input::fileMCTruth");  
- std::string fileMCRecoIC = gConfigParser -> readStringOption("Input::fileMCRecoIC");  
- std::string fileStatPrecision = gConfigParser -> readStringOption("Input::fileStatPrecision");  
- 
- std::string outputFile = gConfigParser -> readStringOption("Output::outputFile");  
- 
+ std::string configFileName = argv[1];
+ boost::shared_ptr<edm::ParameterSet> parameterSet = edm::readConfig(configFileName);
+ edm::ParameterSet Options = parameterSet -> getParameter<edm::ParameterSet>("Options");
+
+ std::string inputFile = "NULL";
+ if(Options.existsAs<std::string>("inputFile"))
+   inputFile = Options.getParameter<std::string>("inputFile");
+
+ std::string inputMomentumScale = "NULL";
+ if(Options.existsAs<std::string>("inputMomentumScale"))
+   inputMomentumScale = Options.getParameter<std::string>("inputMomentumScale");
+
+ std::string fileMCTruth = "NULL";
+ if(Options.existsAs<std::string>("fileMCTruth"))
+   fileMCTruth = Options.getParameter<std::string>("fileMCTruth");
+
+ std::string fileMCRecoIC = "NULL";
+ if(Options.existsAs<std::string>("fileMCRecoIC"))
+   fileMCRecoIC = Options.getParameter<std::string>("fileMCRecoIC");
+
+ std::string fileStatPrecision = "NULL";
+ if(Options.existsAs<std::string>("fileStatPrecision"))
+   fileStatPrecision = Options.getParameter<std::string>("fileStatPrecision");
+
+ std::string outputFile = "NULL";
+ if(Options.existsAs<std::string>("outputFile"))
+   outputFile = Options.getParameter<std::string>("outputFile"); 
 
  TApplication* theApp = new TApplication("Application",&argc, argv);
 
