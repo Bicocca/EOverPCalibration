@@ -12,7 +12,7 @@
 
 
 /// Default constructor 
-FastCalibratorEE::FastCalibratorEE(TTree *tree, std::vector<TGraphErrors*> & inputMomentumScale, const std::string& typeEE, TString outEPDistribution):
+FastCalibratorEE::FastCalibratorEE(TTree *tree, std::vector<TGraphErrors*> & inputMomentumScale, std::vector<TGraphErrors*> & correctionMomentum, const std::string& typeEE, TString outEPDistribution):
 outEPDistribution_p(outEPDistribution){
 
 // if parameter tree is not specified (or zero), connect the file
@@ -39,6 +39,7 @@ outEPDistribution_p(outEPDistribution){
 
   // Set my momentum scale using the input graphs
   myMomentumScale = inputMomentumScale;
+  myCorrectionMomentum = correctionMomentum;
   myTypeEE = typeEE;
 }
 
@@ -226,6 +227,8 @@ void FastCalibratorEE::bookHistos(int nLoops){
 
 void FastCalibratorEE::BuildEoPeta_ele(int iLoop, int nentries , int useW, int useZ, std::vector<float> theScalibration, bool isSaveEPDistribution, bool isR9selection, float R9Min, bool isfbrem, float fbremMax, bool isPtCut, float PtMin, bool isMCTruth){
 
+  TRandom genRand;
+
   if(iLoop ==0){
    TString name = Form ("hC_EoP_eta_%d",iLoop);
    hC_EoP_ir_ele = new hChain (name,name, 250,0.1,3.0,41);
@@ -304,7 +307,12 @@ void FastCalibratorEE::BuildEoPeta_ele(int iLoop, int nentries , int useW, int u
     if(!isMCTruth){ 
        pIn = ele1_tkP;
        int regionId = templIndexEE(myTypeEE,ele1_eta,ele1_charge,thisE3x3/thisE);
-       pIn /= myMomentumScale[regionId] -> Eval( ele1_phi );
+       int index=-1;
+       if (iz_seed==1)  index=0;
+       if (iz_seed==-1) index=1;
+
+       //       pIn /= myMomentumScale[regionId] -> Eval( ele1_phi );
+       //       pIn /= myCorrectionMomentum[index] -> Eval( ele1_phi );       
     }
     else{ 
        pIn = ele1_E_true;
@@ -379,7 +387,12 @@ void FastCalibratorEE::BuildEoPeta_ele(int iLoop, int nentries , int useW, int u
     if(!isMCTruth){
        pIn = ele2_tkP;
        int regionId = templIndexEE(myTypeEE,ele2_eta,ele2_charge,thisE3x3/thisE);
-       pIn /= myMomentumScale[regionId] -> Eval( ele2_phi );
+       int index=-1;
+       if (iz_seed==1)  index=0;
+       if (iz_seed==-1) index=1;
+
+       //       pIn /= myMomentumScale[regionId] -> Eval( ele2_phi );
+       //       pIn /= myCorrectionMomentum[index] -> Eval( ele2_phi );       
     }
     else{ 
        pIn = ele2_E_true;
@@ -565,7 +578,12 @@ void FastCalibratorEE::Loop( int nentries, int useZ, int useW, int splitStat, in
          if(!isMCTruth) {
            pIn = ele1_tkP;
 	   int regionId = templIndexEE(myTypeEE,ele1_eta,ele1_charge,thisE3x3/thisE);
-           pIn /= myMomentumScale[regionId] -> Eval( ele1_phi );
+	   int index=-1;
+	   if (iz_seed==1)  index=0;
+	   if (iz_seed==-1) index=1;
+
+	   //	   pIn /= myMomentumScale[regionId] -> Eval( ele1_phi );
+	   //	   pIn /= myCorrectionMomentum[index] -> Eval( ele1_phi );       
          }
          else{
            pIn = ele1_E_true;
@@ -730,7 +748,12 @@ void FastCalibratorEE::Loop( int nentries, int useZ, int useW, int splitStat, in
           if(!isMCTruth)  {
             pIn = ele2_tkP;
 	    int regionId = templIndexEE(myTypeEE,ele2_eta,ele2_charge,thisE3x3/thisE);
-            pIn /= myMomentumScale[regionId] -> Eval( ele2_phi );
+	    int index=-1;
+	    if (iz_seed==1)  index=0;
+	    if (iz_seed==-1) index=1;
+
+	    //	    pIn /= myMomentumScale[regionId] -> Eval( ele2_phi );
+	    //	    pIn /= myCorrectionMomentum[index] -> Eval( ele2_phi );       
           }
           else{
             pIn = ele2_E_true;
@@ -824,7 +847,7 @@ void FastCalibratorEE::Loop( int nentries, int useZ, int useW, int splitStat, in
                 if( thisCaliBlock == 1 ){
                   int EoPbin = EoPHisto->FindBin(thisE/(pIn-ele2_es));
                   theNumerator_EEP[thisIndex]   += theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*thisIC /
-                                                   thisE*(pIn-ele1_es)/thisE*EoPHisto->GetBinContent(EoPbin);
+                                                   thisE*(pIn-ele2_es)/thisE*EoPHisto->GetBinContent(EoPbin);
                   theDenominator_EEP[thisIndex] += theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*thisIC /
                                                    thisE*EoPHisto->GetBinContent(EoPbin);
                 }
