@@ -82,7 +82,9 @@ int main(int argc, char **argv)
   }
 
   /// open momentum correction graph                                                                                                                             
-  TFile* f4 = new TFile("correzP/corrP_deg_binWidth3.root");
+  std::string corrPFile = gConfigParser -> readStringOption("Input::corrPFile");
+  
+  TFile* f4 = new TFile(corrPFile.c_str());
   std::vector<TGraphErrors*> corrMomentum;
 
   for(int i = 0; i < 2; ++i){
