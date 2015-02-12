@@ -342,11 +342,233 @@ void NormalizeIC_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP,
 
 
 
-
-
-
-
 //-------------------------------------------------------------------------------------------------------------
+
+
+void DrawCorr_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP,
+                    TH2F* hcmap_EEM, TH2F* hcmap_EEP,
+                    const std::vector< std::pair<int,int> >& TT_centre_EEM,
+                    const std::vector< std::pair<int,int> >& TT_centre_EEP,
+		 std::vector<TGraphErrors*> & correctionMomentum, TEndcapRings* eRings, bool skip)
+{
+  std::map<int,TH2F*> h_scale_EE;
+  std::map<int,TH2F*> hcmap_EE;
+  
+  h_scale_EE[0] = h_scale_EEM;
+  h_scale_EE[1] = h_scale_EEP;
+  
+  hcmap_EE[0] = hcmap_EEM;
+  hcmap_EE[1] = hcmap_EEP;
+  
+  
+  
+  std::map<int,std::vector<float> > sumIC;
+  std::map<int,std::vector<int> > numIC;
+  
+  (sumIC[0]).assign(40,0.);
+  (sumIC[1]).assign(40,0.);
+  
+  (numIC[0]).assign(40,0);
+  (numIC[1]).assign(40,0);
+  
+  
+  
+  // mean over phi corrected skipping dead channel 
+  for(int k = 0; k < 2; ++k)
+    for(int ix = 1; ix <= h_scale_EE[k] -> GetNbinsX(); ++ix)
+      for(int iy = 1; iy <= h_scale_EE[k] -> GetNbinsY(); ++iy)
+      {
+        int ring = eRings->GetEndcapRing(ix,iy,k);
+        if( ring == -1 ) continue;
+        
+        bool isGood = CheckxtalIC_EE(h_scale_EE[k],ix,iy,ring);
+        bool isGoodTT;
+        if( k == 0 ) isGoodTT = CheckxtalTT_EE(ix,iy,ring,TT_centre_EEM);
+        else         isGoodTT = CheckxtalTT_EE(ix,iy,ring,TT_centre_EEP);
+        
+        if( isGoodTT && isGood )
+        {
+          (sumIC[k]).at(ring) += h_scale_EE[k]->GetBinContent(ix,iy);
+          (numIC[k]).at(ring) += 1;
+        }
+      }
+  
+  // normalize IC skipping bad channels and bad TTs  
+  for(int k = 0; k < 2; ++k)
+    for(int ix = 1; ix <= h_scale_EE[k]->GetNbinsX(); ++ix)
+      for(int iy = 1; iy <= h_scale_EE[k]->GetNbinsY(); ++iy)
+      {
+        int ring = eRings->GetEndcapRing(ix,iy,k);
+        if( ring == -1 ) continue;
+        
+        if( !skip )
+        {
+          if( ring > 33 )
+          {
+            hcmap_EE[k] -> Fill(ix,iy,0.);
+            continue;
+          }
+          else
+          {
+            if( (numIC[k]).at(ring) != 0 && (sumIC[k]).at(ring) != 0 ) {
+	      int zside=0;
+	      if (k==0) zside=-1;
+	      if (k==1) zside=1;
+	      int iPhi = eRings->GetEndcapIphi(ix,iy,zside);
+              hcmap_EE[k] -> Fill(ix,iy,correctionMomentum.at(k)->Eval(iPhi));
+	    }
+          }
+        }
+        
+        if( skip )
+        {
+          bool isGood = CheckxtalIC_EE(h_scale_EE[k],ix,iy,ring);
+          bool isGoodTT;
+          
+          if( k == 0 ) isGoodTT = CheckxtalTT_EE(ix,iy,ring,TT_centre_EEM);
+          else         isGoodTT = CheckxtalTT_EE(ix,iy,ring,TT_centre_EEP);
+          
+          if( isGood && isGoodTT )
+          {
+            if( ring > 33 )
+            {
+              hcmap_EE[k] -> Fill(ix,iy,0.);
+              continue;
+            }
+            else
+            {
+            if( (numIC[k]).at(ring) != 0 && (sumIC[k]).at(ring) != 0 ) {
+	      int zside=0;
+	      if (k==0) zside=-1;
+	      if (k==1) zside=1;
+	      int iPhi = eRings->GetEndcapIphi(ix,iy,zside);
+              hcmap_EE[k] -> Fill(ix,iy,correctionMomentum.at(k)->Eval(iPhi));
+	      std::cout<<ix<<" "<<iy<<" "<<iPhi<<" "<<correctionMomentum.at(k)->Eval(iPhi)<<std::endl;
+	    }
+            }
+          }
+        }
+      }
+  
+}
+
+
+
+
+
+void DrawICCorr_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP,
+                    TH2F* hcmap_EEM, TH2F* hcmap_EEP,
+                    const std::vector< std::pair<int,int> >& TT_centre_EEM,
+                    const std::vector< std::pair<int,int> >& TT_centre_EEP,
+		 std::vector<TGraphErrors*> & correctionMomentum, TEndcapRings* eRings, bool skip)
+{
+  std::map<int,TH2F*> h_scale_EE;
+  std::map<int,TH2F*> hcmap_EE;
+  
+  h_scale_EE[0] = h_scale_EEM;
+  h_scale_EE[1] = h_scale_EEP;
+  
+  hcmap_EE[0] = hcmap_EEM;
+  hcmap_EE[1] = hcmap_EEP;
+  
+  
+  
+  std::map<int,std::vector<float> > sumIC;
+  std::map<int,std::vector<int> > numIC;
+  
+  (sumIC[0]).assign(40,0.);
+  (sumIC[1]).assign(40,0.);
+  
+  (numIC[0]).assign(40,0);
+  (numIC[1]).assign(40,0);
+  
+  int shift = 0;
+  
+  // mean over phi corrected skipping dead channel 
+  for(int k = 0; k < 2; ++k)
+    for(int ix = 1; ix <= h_scale_EE[k] -> GetNbinsX(); ++ix)
+      for(int iy = 1; iy <= h_scale_EE[k] -> GetNbinsY(); ++iy)
+      {
+        int ring = eRings->GetEndcapRing(ix,iy,k);
+        if( ring == -1 ) continue;
+        
+        bool isGood = CheckxtalIC_EE(h_scale_EE[k],ix,iy,ring);
+        bool isGoodTT;
+        if( k == 0 ) isGoodTT = CheckxtalTT_EE(ix,iy,ring,TT_centre_EEM);
+        else         isGoodTT = CheckxtalTT_EE(ix,iy,ring,TT_centre_EEP);
+        
+        if( isGoodTT && isGood )
+        {
+	  int zside=0;
+	  if (k==0) zside=-1;
+	  if (k==1) zside=1;
+	  int iPhi = eRings->GetEndcapIphi(ix,iy,zside);
+	  if (iPhi+shift>=360)  iPhi-=360;
+          (sumIC[k]).at(ring) += h_scale_EE[k]->GetBinContent(ix,iy)/correctionMomentum.at(k)->Eval(iPhi+shift);
+          (numIC[k]).at(ring) += 1;
+        }
+      }
+  
+  // normalize IC skipping bad channels and bad TTs  
+  for(int k = 0; k < 2; ++k)
+    for(int ix = 1; ix <= h_scale_EE[k]->GetNbinsX(); ++ix)
+      for(int iy = 1; iy <= h_scale_EE[k]->GetNbinsY(); ++iy)
+      {
+        int ring = eRings->GetEndcapRing(ix,iy,k);
+        if( ring == -1 ) continue;
+        
+        if( !skip )
+        {
+          if( ring > 33 )
+          {
+            hcmap_EE[k] -> Fill(ix,iy,0.);
+            continue;
+          }
+          else
+          {
+            if( (numIC[k]).at(ring) != 0 && (sumIC[k]).at(ring) != 0 ) {
+	      int zside=0;
+	      if (k==0) zside=-1;
+	      if (k==1) zside=1;
+	      int iPhi = eRings->GetEndcapIphi(ix,iy,zside);
+	      if (iPhi+shift>=360)  iPhi-=360;
+              hcmap_EE[k] -> Fill(ix,iy,(h_scale_EE[k]->GetBinContent(ix,iy)/correctionMomentum.at(k)->Eval(iPhi+shift))/((sumIC[k]).at(ring)/(numIC[k]).at(ring)));
+	    }
+          }
+        }
+        
+        if( skip )
+        {
+          bool isGood = CheckxtalIC_EE(h_scale_EE[k],ix,iy,ring);
+          bool isGoodTT;
+          
+          if( k == 0 ) isGoodTT = CheckxtalTT_EE(ix,iy,ring,TT_centre_EEM);
+          else         isGoodTT = CheckxtalTT_EE(ix,iy,ring,TT_centre_EEP);
+          
+          if( isGood && isGoodTT )
+          {
+            if( ring > 33 )
+            {
+              hcmap_EE[k] -> Fill(ix,iy,0.);
+              continue;
+            }
+            else
+            {
+            if( (numIC[k]).at(ring) != 0 && (sumIC[k]).at(ring) != 0 ) {
+	      int zside=0;
+	      if (k==0) zside=-1;
+	      if (k==1) zside=1;
+	      int iPhi = eRings->GetEndcapIphi(ix,iy,zside);
+	      if (iPhi+shift>=360)  iPhi-=360;
+	      hcmap_EE[k] -> Fill(ix,iy,(h_scale_EE[k]->GetBinContent(ix,iy)/correctionMomentum.at(k)->Eval(iPhi+shift))/((sumIC[k]).at(ring)/(numIC[k]).at(ring)));
+	      //std::cout<<ix<<" "<<iy<<" "<<iPhi<<" "<<correctionMomentum.at(k)->Eval(iPhi)<<std::endl;
+	    }
+            }
+          }
+        }
+      }
+  
+}
 
 
 
@@ -457,6 +679,70 @@ void BookSpreadHistos_EB(TH1F* h_spread, std::vector<TH1F*>& h_spread_vsEta, TGr
 
 ///////////////////////////////////////////////////////////////////////////////
 void PhiProfile(TH1F* h_phiAvgICSpread, TGraphErrors* g_avgIC_vsPhi, const int& phiRegionWidth,
+                TH2F* hcmap, std::vector<TGraphErrors*> & correctionMomentum, TEndcapRings* eRings, int zside )
+{
+  // define the number of phi regions
+  int nPhiRegions = 360/phiRegionWidth;
+  if( 360%phiRegionWidth > 0 ) nPhiRegions += 1;
+  
+  std::vector<TH1F*> h_IC_vsPhi(nPhiRegions);
+  for(int i = 0; i < nPhiRegions; ++i)
+  {  
+    char histoName[50];
+    sprintf(histoName,"h_IC_vsPhi%03d",i);
+    h_IC_vsPhi.at(i) = new TH1F(histoName,"",1000,0.,2.);
+  }
+  
+  
+  for(int ibin = 1; ibin <= hcmap->GetNbinsX(); ++ibin)
+    for(int jbin = 1; jbin <= hcmap->GetNbinsY(); ++jbin)
+    {
+      float IC = hcmap->GetBinContent(ibin,jbin);
+      if( IC <= 0. || IC >= 2. ) continue;
+      
+      float phiRegionMin = hcmap->GetXaxis()->GetBinLowEdge(ibin);
+      if( eRings != NULL ) phiRegionMin = eRings -> GetEndcapIphi(ibin,jbin,1);
+
+      //      std::cout<<phiRegionMin<<" "<<ibin<<" "<<jbin<<std::endl;
+     
+      int phiRegion = int( (fabs(phiRegionMin) - 1.)/phiRegionWidth );
+      if (phiRegion>=nPhiRegions) phiRegion-=nPhiRegions;
+
+      IC/=correctionMomentum.at(zside)->Eval(phiRegionMin); //correzione!!
+      h_IC_vsPhi.at(phiRegion) -> Fill(IC);
+    }
+  
+  
+  for(int i = 0; i < nPhiRegions; ++i)
+  {
+    int phiMin = 1 + i * phiRegionWidth;
+    
+    h_phiAvgICSpread -> Fill(h_IC_vsPhi.at(i)->GetMean());
+    
+    g_avgIC_vsPhi -> SetPoint(i,phiMin,h_IC_vsPhi.at(i)->GetMean());
+    g_avgIC_vsPhi -> SetPointError(i,0.5*phiRegionWidth,h_IC_vsPhi.at(i)->GetMeanError());
+  }
+  
+  
+  TF1* fgaus = new TF1("f_phiAvgICSpread","gaus",0.,2.);
+  fgaus -> SetNpx(10000);
+  fgaus -> SetLineColor(kBlack);
+  
+  fgaus -> SetParameter(1,h_phiAvgICSpread->GetMean());
+  fgaus -> SetParameter(2,h_phiAvgICSpread->GetRMS());
+  h_phiAvgICSpread -> Fit("f_phiAvgICSpread","QLS+","",1.-3.*h_phiAvgICSpread->GetRMS(),1.+3.*h_phiAvgICSpread->GetRMS());
+  
+  
+  
+  for(int i = 0; i < nPhiRegions; ++i)
+  {  
+    delete h_IC_vsPhi.at(i);
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+void PhiProfile(TH1F* h_phiAvgICSpread, TGraphErrors* g_avgIC_vsPhi, const int& phiRegionWidth,
                 TH2F* hcmap, TEndcapRings* eRings)
 {
   // define the number of phi regions
@@ -480,9 +766,10 @@ void PhiProfile(TH1F* h_phiAvgICSpread, TGraphErrors* g_avgIC_vsPhi, const int& 
       
       float phiRegionMin = hcmap->GetXaxis()->GetBinLowEdge(ibin);
       if( eRings != NULL ) phiRegionMin = eRings -> GetEndcapIphi(ibin,jbin,1);
-      
+     
       int phiRegion = int( (fabs(phiRegionMin) - 1.)/phiRegionWidth );
-      
+      if (phiRegion>=nPhiRegions) phiRegion-=120;
+
       h_IC_vsPhi.at(phiRegion) -> Fill(IC);
     }
   
