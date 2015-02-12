@@ -97,6 +97,10 @@ int main (int argc, char ** argv) {
   try{ inputMomentumScale =  gConfigParser -> readStringOption("Input::inputMomentumScale"); }
   catch( char const* exceptionString ) { inputMomentumScale = "output/MomentumCalibrationCombined_2011AB-2012ABC.root";}
 
+  std::string correctionMomentum;
+  try{ correctionMomentum =  gConfigParser -> readStringOption("Input::correctionMomentum"); }
+  catch( char const* exceptionString ) { correctionMomentum = "correzP/MomentumCalibrationCombined_2011AB-2012ABC.root";}
+
   std::string typeEB ;
   try{ typeEB = gConfigParser -> readStringOption("Input::typeEB"); }
   catch( char const* exceptionString ) { typeEB = "none" ; }
@@ -106,6 +110,7 @@ int main (int argc, char ** argv) {
   catch( char const* exceptionString ) { typeEE = "none" ; }
 
   int nRegionsEE = GetNRegionsEE(typeEE);
+  std::cout<<"nregionsEE: "<<nRegionsEE<<std::endl;
 
   // Name of the output calib file                                                                                                                                                                
   std::string outputPath;
@@ -153,6 +158,14 @@ int main (int argc, char ** argv) {
   for(int i = 0; i < nRegionsEE; ++i){
     TString Name = Form("g_EoC_EE_%d",i);
     g_EoC_EE.push_back( (TGraphErrors*)(f4->Get(Name)) );
+  }
+
+  TFile* f5 = new TFile((correctionMomentum+"_"+typeEB+"_"+typeEE+".root").c_str());
+  std::vector<TGraphErrors*> g_EoC_EE2;
+
+  for(int i = 0; i < 2; ++i){
+    TString Name = Form("g_EoC_EE_%d",i);
+    g_EoC_EE2.push_back( (TGraphErrors*)(f5->Get(Name)) );
   }
   
   ///Use the whole sample statistics if numberOfEvents < 0
@@ -221,14 +234,14 @@ int main (int argc, char ** argv) {
 
     
     if(isSaveEPDistribution == true){
-      FastCalibratorEE analyzer(tree, g_EoC_EE, typeEE, outEPDistribution);
+      FastCalibratorEE analyzer(tree, g_EoC_EE, g_EoC_EE2, typeEE, outEPDistribution);
       analyzer.bookHistos(nLoops);
       analyzer.AcquireDeadXtal(DeadXtal,isDeadTriggerTower);
       analyzer.Loop(numberOfEvents, useZ, useW, splitStat, nLoops, isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
       analyzer.saveHistos(f1);
     }
     else{
-      FastCalibratorEE analyzer(tree, g_EoC_EE, typeEE);
+      FastCalibratorEE analyzer(tree, g_EoC_EE, g_EoC_EE2, typeEE);
       analyzer.bookHistos(nLoops);
       analyzer.AcquireDeadXtal(DeadXtal,isDeadTriggerTower);  
       analyzer.Loop(numberOfEvents, useZ, useW, splitStat, nLoops, isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
@@ -345,14 +358,14 @@ int main (int argc, char ** argv) {
   
      
     /// Run on odd
-    FastCalibratorEE analyzer_even(tree, g_EoC_EE, typeEE);
+    FastCalibratorEE analyzer_even(tree, g_EoC_EE, g_EoC_EE2, typeEE);
     analyzer_even.bookHistos(nLoops);
     analyzer_even.AcquireDeadXtal(DeadXtal,isDeadTriggerTower);
     analyzer_even.Loop(numberOfEvents, useZ, useW, splitStat, nLoops,isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
     analyzer_even.saveHistos(outputName1);
   
     /// Run on even
-    FastCalibratorEE analyzer_odd(tree, g_EoC_EE, typeEE);
+    FastCalibratorEE analyzer_odd(tree, g_EoC_EE, g_EoC_EE2, typeEE);
     analyzer_odd.bookHistos(nLoops);
     analyzer_odd.AcquireDeadXtal(DeadXtal,isDeadTriggerTower);
     analyzer_odd.Loop(numberOfEvents, useZ, useW, splitStat*(-1), nLoops,isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
