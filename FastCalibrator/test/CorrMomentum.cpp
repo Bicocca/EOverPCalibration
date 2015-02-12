@@ -81,7 +81,6 @@ int main(int argc, char** argv)
   int nRegionsEE = GetNRegionsEE(typeEE);
 
   std::cout<<"REGIONI: "<<nRegionsEE<<std::endl;
-  getchar();
 
   cout <<" Basic Configuration " <<endl;
   cout <<" Tree Name = "<<TreeName<<endl;
@@ -408,7 +407,6 @@ int main(int argc, char** argv)
       
       std::cout << std::endl;
     }
-    getchar();
 
 	///////
     float pMean[2];
@@ -432,7 +430,6 @@ int main(int argc, char** argv)
 
 	std::cout<<"pMEan: "<<pMean[jc]<<std::endl;
 	std::cout<<"pMeanErr: "<<pMeanErr[jc]<<std::endl;
-	getchar();
       }
 
 
@@ -441,7 +438,7 @@ int main(int argc, char** argv)
 	for (int c=0; c<nPhiBinsEE; c++)
 	  {
 	    float flPhi = hPhiBinEE->GetXaxis()->GetBinCenter(c);
-	    g_EoC_EE[jc] -> SetPoint(c,c,pVector[c][jc]/pMean[jc]);
+	    g_EoC_EE[jc] -> SetPoint(c,c*(int(360/nPhiBinsEE)),pVector[c][jc]/pMean[jc]);
 	    float err=(pVectorErr[c][jc]/pMean[jc])*(pVectorErr[c][jc]/pMean[jc])+(pVector[c][jc]/(pMean[jc]*pMean[jc])*(pMeanErr[jc]*pMeanErr[jc]))*(pVector[c][jc]/(pMean[jc]*pMean[jc])*(pMeanErr[jc]*pMeanErr[jc]));
 	    g_EoC_EE[jc] -> SetPointError(c,0,err);
 	    std::cout<<flPhi<<" "<<pVector[c][jc]/pMean[jc]<<" "<<err<<std::endl;
