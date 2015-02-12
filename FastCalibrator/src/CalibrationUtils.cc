@@ -443,7 +443,7 @@ void DrawCorr_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP,
 	      if (k==1) zside=1;
 	      int iPhi = eRings->GetEndcapIphi(ix,iy,zside);
               hcmap_EE[k] -> Fill(ix,iy,correctionMomentum.at(k)->Eval(iPhi));
-	      std::cout<<ix<<" "<<iy<<" "<<iPhi<<" "<<correctionMomentum.at(k)->Eval(iPhi)<<std::endl;
+	      //	      std::cout<<ix<<" "<<iy<<" "<<iPhi<<" "<<correctionMomentum.at(k)->Eval(iPhi)<<std::endl;
 	    }
             }
           }
