@@ -32,7 +32,7 @@ class FastCalibratorEE{
   public :
 
     ///! Class methods
-    FastCalibratorEE(TTree *tree, std::vector<TGraphErrors*> & inputMomentumScale, const std::string& typeEE, TString outEPDistribution="NULL");
+    FastCalibratorEE(TTree *tree, std::vector<TGraphErrors*> & inputMomentumScale, std::vector<TGraphErrors*> & correctionMomentum, const std::string& typeEE, TString outEPDistribution="NULL");
 
     virtual ~FastCalibratorEE();
 
@@ -57,6 +57,7 @@ class FastCalibratorEE{
 
 
     std::vector<TGraphErrors*> myMomentumScale;
+    std::vector<TGraphErrors*> myCorrectionMomentum;
     std::string myTypeEE;
     
     TTree          *fChain;   //!pointer to the analyzed TTree or TChain
