@@ -88,7 +88,7 @@ int main(int argc, char **argv)
   std::vector<TGraphErrors*> corrMomentum;
 
   for(int i = 0; i < 2; ++i){
-    TString Name = Form("g_EoC_EE_%d",i);
+    TString Name = Form("g_pData_EE_%d",i);
     corrMomentum.push_back( (TGraphErrors*)(f4->Get(Name)) );
   }
   
