@@ -1,0 +1,11 @@
+*~
+*/*~
+*/*/*~
+FastCalibrator/output*
+FastCalibrator/*png
+*.o
+*/*/*.o
+*/*.o
+*.exe
+*/*.exe
+*/*/*.exe
