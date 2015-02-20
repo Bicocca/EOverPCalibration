@@ -69,3 +69,16 @@ int TEndcapRings::GetEndcapIphi(int ix, int iy, int iz)
   
   return iPhi;
 }
+
+float TEndcapRings::GetEtaFromIRing(const int& iRing)
+{
+  if( (iRing >= 1) && (iRing <= 85) )
+    return ( 0.0174*(iRing-0.5) );
+  if( (iRing >= -85) && (iRing <= -1) )
+    return ( 0.0174*(iRing+0.5) );
+  if( iRing >= 86 )
+    return ( 1.47135 + 0.0281398*(iRing-86) - 0.00059926*pow(iRing-86,2) + 2.23632e-05*pow(iRing-86,3) );
+  if( iRing <= -86 )
+    return -1 * ( 1.47135 + 0.0281398*(fabs(iRing)-86) - 0.00059926*pow(fabs(iRing)-86,2) + 2.23632e-05*pow(fabs(iRing)-86,3) );
+  return -1.;
+}

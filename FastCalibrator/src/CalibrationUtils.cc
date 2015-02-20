@@ -349,7 +349,7 @@ void DrawCorr_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP,
                     TH2F* hcmap_EEM, TH2F* hcmap_EEP,
                     const std::vector< std::pair<int,int> >& TT_centre_EEM,
                     const std::vector< std::pair<int,int> >& TT_centre_EEP,
-		 std::vector<TGraphErrors*> & correctionMomentum, TEndcapRings* eRings, bool skip)
+		 std::vector<std::vector<TGraphErrors*> >& correctionMomentum, TEndcapRings* eRings, bool skip , int nEtaBinsEE, float etaMin, float etaMax)
 {
   std::map<int,TH2F*> h_scale_EE;
   std::map<int,TH2F*> hcmap_EE;
@@ -415,7 +415,16 @@ void DrawCorr_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP,
 	      if (k==0) zside=-1;
 	      if (k==1) zside=1;
 	      int iPhi = eRings->GetEndcapIphi(ix,iy,zside);
-              hcmap_EE[k] -> Fill(ix,iy,correctionMomentum.at(k)->Eval(iPhi));
+
+	      int iRing = 85 + eRings -> GetEndcapRing(ix,iy,zside);
+	      float eta = eRings -> GetEtaFromIRing(iRing);
+
+	      int etaBin = int((fabs(eta)-etaMin)/float((etaMax-etaMin)/nEtaBinsEE));
+	      if (fabs(eta)<etaMin)  etaBin=0;
+	      else if (fabs(eta)>etaMax)  etaBin=nEtaBinsEE-1;
+	      //      std::cout<<ix<<" "<<iy<<" "<<zside<<" "<<iRing<<" "<<fabs(eta)<<" "<<etaBin<<std::endl;    
+
+              hcmap_EE[k] -> Fill(ix,iy,correctionMomentum.at(etaBin).at(k)->Eval(iPhi));
 	    }
           }
         }
@@ -442,7 +451,16 @@ void DrawCorr_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP,
 	      if (k==0) zside=-1;
 	      if (k==1) zside=1;
 	      int iPhi = eRings->GetEndcapIphi(ix,iy,zside);
-              hcmap_EE[k] -> Fill(ix,iy,correctionMomentum.at(k)->Eval(iPhi));
+
+	      int iRing = 85 + eRings -> GetEndcapRing(ix,iy,zside);
+	      float eta = eRings -> GetEtaFromIRing(iRing);
+
+	      int etaBin = int((fabs(eta)-etaMin)/float((etaMax-etaMin)/nEtaBinsEE));
+	      if (fabs(eta)<etaMin)  etaBin=0;
+	      else if (fabs(eta)>etaMax)  etaBin=nEtaBinsEE-1;
+	      //      std::cout<<ix<<" "<<iy<<" "<<zside<<" "<<iRing<<" "<<fabs(eta)<<" "<<etaBin<<std::endl;    
+
+              hcmap_EE[k] -> Fill(ix,iy,correctionMomentum.at(etaBin).at(k)->Eval(iPhi));
 	      //	      std::cout<<ix<<" "<<iy<<" "<<iPhi<<" "<<correctionMomentum.at(k)->Eval(iPhi)<<std::endl;
 	    }
             }
@@ -460,7 +478,8 @@ void DrawICCorr_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP,
                     TH2F* hcmap_EEM, TH2F* hcmap_EEP,
                     const std::vector< std::pair<int,int> >& TT_centre_EEM,
                     const std::vector< std::pair<int,int> >& TT_centre_EEP,
-		 std::vector<TGraphErrors*> & correctionMomentum, TEndcapRings* eRings, bool skip)
+		   std::vector<std::vector<TGraphErrors*> > & correctionMomentum, TEndcapRings* eRings, bool skip , int nEtaBinsEE, float etaMin, float etaMax, 
+		   int shift)
 {
   std::map<int,TH2F*> h_scale_EE;
   std::map<int,TH2F*> hcmap_EE;
@@ -482,8 +501,6 @@ void DrawICCorr_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP,
   (numIC[0]).assign(40,0);
   (numIC[1]).assign(40,0);
   
-  int shift = 0;
-  
   // mean over phi corrected skipping dead channel 
   for(int k = 0; k < 2; ++k)
     for(int ix = 1; ix <= h_scale_EE[k] -> GetNbinsX(); ++ix)
@@ -504,7 +521,16 @@ void DrawICCorr_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP,
 	  if (k==1) zside=1;
 	  int iPhi = eRings->GetEndcapIphi(ix,iy,zside);
 	  if (iPhi+shift>=360)  iPhi-=360;
-          (sumIC[k]).at(ring) += h_scale_EE[k]->GetBinContent(ix,iy)/correctionMomentum.at(k)->Eval(iPhi+shift);
+
+	  int iRing = 85 + eRings -> GetEndcapRing(ix,iy,zside);
+	  float eta = eRings -> GetEtaFromIRing(iRing);
+
+	  int etaBin = int((fabs(eta)-etaMin)/float((etaMax-etaMin)/nEtaBinsEE));
+	  if (fabs(eta)<etaMin)  etaBin=0;
+	  else if (fabs(eta)>etaMax)  etaBin=nEtaBinsEE-1;
+	  //      std::cout<<ix<<" "<<iy<<" "<<zside<<" "<<iRing<<" "<<fabs(eta)<<" "<<etaBin<<std::endl;    
+
+          (sumIC[k]).at(ring) += h_scale_EE[k]->GetBinContent(ix,iy)/correctionMomentum.at(etaBin).at(k)->Eval(iPhi+shift);
           (numIC[k]).at(ring) += 1;
         }
       }
@@ -532,7 +558,16 @@ void DrawICCorr_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP,
 	      if (k==1) zside=1;
 	      int iPhi = eRings->GetEndcapIphi(ix,iy,zside);
 	      if (iPhi+shift>=360)  iPhi-=360;
-              hcmap_EE[k] -> Fill(ix,iy,(h_scale_EE[k]->GetBinContent(ix,iy)/correctionMomentum.at(k)->Eval(iPhi+shift))/((sumIC[k]).at(ring)/(numIC[k]).at(ring)));
+
+	      int iRing = 85 + eRings -> GetEndcapRing(ix,iy,zside);
+	      float eta = eRings -> GetEtaFromIRing(iRing);
+
+	      int etaBin = int((fabs(eta)-etaMin)/float((etaMax-etaMin)/nEtaBinsEE));
+	      if (fabs(eta)<etaMin)  etaBin=0;
+	      else if (fabs(eta)>etaMax)  etaBin=nEtaBinsEE-1;
+	      //      std::cout<<ix<<" "<<iy<<" "<<zside<<" "<<iRing<<" "<<fabs(eta)<<" "<<etaBin<<std::endl;    
+
+              hcmap_EE[k] -> Fill(ix,iy,(h_scale_EE[k]->GetBinContent(ix,iy)/correctionMomentum.at(etaBin).at(k)->Eval(iPhi+shift))/((sumIC[k]).at(ring)/(numIC[k]).at(ring)));
 	    }
           }
         }
@@ -560,7 +595,16 @@ void DrawICCorr_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP,
 	      if (k==1) zside=1;
 	      int iPhi = eRings->GetEndcapIphi(ix,iy,zside);
 	      if (iPhi+shift>=360)  iPhi-=360;
-	      hcmap_EE[k] -> Fill(ix,iy,(h_scale_EE[k]->GetBinContent(ix,iy)/correctionMomentum.at(k)->Eval(iPhi+shift))/((sumIC[k]).at(ring)/(numIC[k]).at(ring)));
+
+	      int iRing = 85 + eRings -> GetEndcapRing(ix,iy,zside);
+	      float eta = eRings -> GetEtaFromIRing(iRing);
+
+	      int etaBin = int((fabs(eta)-etaMin)/float((etaMax-etaMin)/nEtaBinsEE));
+	      if (fabs(eta)<etaMin)  etaBin=0;
+	      else if (fabs(eta)>etaMax)  etaBin=nEtaBinsEE-1;
+	      //      std::cout<<ix<<" "<<iy<<" "<<zside<<" "<<iRing<<" "<<fabs(eta)<<" "<<etaBin<<std::endl;    
+
+	      hcmap_EE[k] -> Fill(ix,iy,(h_scale_EE[k]->GetBinContent(ix,iy)/correctionMomentum.at(etaBin).at(k)->Eval(iPhi+shift))/((sumIC[k]).at(ring)/(numIC[k]).at(ring)));
 	      //std::cout<<ix<<" "<<iy<<" "<<iPhi<<" "<<correctionMomentum.at(k)->Eval(iPhi)<<std::endl;
 	    }
             }
@@ -679,7 +723,7 @@ void BookSpreadHistos_EB(TH1F* h_spread, std::vector<TH1F*>& h_spread_vsEta, TGr
 
 ///////////////////////////////////////////////////////////////////////////////
 void PhiProfile(TH1F* h_phiAvgICSpread, TGraphErrors* g_avgIC_vsPhi, const int& phiRegionWidth,
-                TH2F* hcmap, std::vector<TGraphErrors*> & correctionMomentum, TEndcapRings* eRings, int zside )
+                TH2F* hcmap, std::vector<std::vector<TGraphErrors*> > & correctionMomentum, TEndcapRings* eRings, int zside , int nEtaBinsEE, float etaMin, float etaMax)
 {
   // define the number of phi regions
   int nPhiRegions = 360/phiRegionWidth;
@@ -692,7 +736,6 @@ void PhiProfile(TH1F* h_phiAvgICSpread, TGraphErrors* g_avgIC_vsPhi, const int& 
     sprintf(histoName,"h_IC_vsPhi%03d",i);
     h_IC_vsPhi.at(i) = new TH1F(histoName,"",1000,0.,2.);
   }
-  
   
   for(int ibin = 1; ibin <= hcmap->GetNbinsX(); ++ibin)
     for(int jbin = 1; jbin <= hcmap->GetNbinsY(); ++jbin)
@@ -708,7 +751,15 @@ void PhiProfile(TH1F* h_phiAvgICSpread, TGraphErrors* g_avgIC_vsPhi, const int& 
       int phiRegion = int( (fabs(phiRegionMin) - 1.)/phiRegionWidth );
       if (phiRegion>=nPhiRegions) phiRegion-=nPhiRegions;
 
-      IC/=correctionMomentum.at(zside)->Eval(phiRegionMin); //correzione!!
+      int iRing = 85 + eRings -> GetEndcapRing(ibin,jbin,zside);
+      float eta = eRings -> GetEtaFromIRing(iRing);
+
+      int etaBin = int((fabs(eta)-etaMin)/float((etaMax-etaMin)/nEtaBinsEE));
+      if (fabs(eta)<etaMin)  etaBin=0;
+      else if (fabs(eta)>etaMax)  etaBin=nEtaBinsEE-1;
+      //      std::cout<<ibin<<" "<<jbin<<" "<<zside<<" "<<iRing<<" "<<fabs(eta)<<" "<<etaBin<<std::endl;
+
+      IC/=correctionMomentum.at(etaBin).at(zside)->Eval(phiRegionMin); //correzione!!
       h_IC_vsPhi.at(phiRegion) -> Fill(IC);
     }
   
