@@ -1,3 +1,5 @@
-/gwteray/users/gerosa/ECALNTUPLES/22JanReReco/SingleElectron_RUN2012A_22Jan2013-v1.root
-/gwteray/users/gerosa/ECALNTUPLES/22JanReReco/SingleElectron_RUN2012B_22Jan2013-v1.root
+#/gwteray/users/brianza/calibrazioni/DYJets.root
 /gwteray/users/gerosa/ECALNTUPLES/22JanReReco/SingleElectron_RUN2012D_22Jan2013-v1.root
+#/gwteray/users/gerosa/ECALNTUPLES/22JanReReco/SingleElectron_RUN2012A_22Jan2013-v1.root
+#/gwteray/users/gerosa/ECALNTUPLES/22JanReReco/SingleElectron_RUN2012B_22Jan2013-v1.root
+#/gwteray/users/gerosa/ECALNTUPLES/22JanReReco/SingleElectron_RUN2012C_22Jan2013-v1.root
