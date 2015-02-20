@@ -72,6 +72,10 @@ int main(int argc, char **argv)
   std::string outputTxt = gConfigParser -> readStringOption("Output::outputTxt");
   std::string fileType  = gConfigParser -> readStringOption("Output::fileType");
   std::string outFileName  = gConfigParser -> readStringOption("Output::outFileName");
+
+  int nRegionsEE = gConfigParser -> readIntOption("Input::nRegionsEE");
+  int nEtaBinsEE = gConfigParser -> readIntOption("Input::nEtaBinsEE");
+  int shift = gConfigParser -> readIntOption("Input::shift");
   
   int evalStat = gConfigParser -> readIntOption("Input::evalStat");
   std::string inFileNameEven, inFileNameOdd;
@@ -85,13 +89,15 @@ int main(int argc, char **argv)
   std::string corrPFile = gConfigParser -> readStringOption("Input::corrPFile");
   
   TFile* f4 = new TFile(corrPFile.c_str());
-  std::vector<TGraphErrors*> corrMomentum;
+  std::vector<std::vector<TGraphErrors*> > corrMomentum(nEtaBinsEE);
 
-  for(int i = 0; i < 2; ++i){
-    TString Name = Form("g_pData_EE_%d",i);
-    corrMomentum.push_back( (TGraphErrors*)(f4->Get(Name)) );
+  for (int k=0; k<nEtaBinsEE; k++) {
+    for(int i = 0; i < nRegionsEE; ++i){
+      std::cout<<k<<" "<<i<<std::endl;
+      TString Name = Form("g_pData_EE_%d_%d",k,i);
+      (corrMomentum.at(k)).push_back( (TGraphErrors*)(f4->Get(Name)) );
+    }
   }
-  
   
   //------------
   // check files
@@ -309,8 +315,8 @@ int main(int argc, char **argv)
   else
   {
     NormalizeIC_EE(h2_IC_raw[-1],h2_IC_raw[1],h2_IC_raw_phiNorm[-1],h2_IC_raw_phiNorm[1],TT_centre[-1],TT_centre[1],eRings);
-    DrawCorr_EE(h2_IC_raw[-1],h2_IC_raw[1],h2_corrP[-1],h2_corrP[1],TT_centre[-1],TT_centre[1],corrMomentum,eRings);
-    DrawICCorr_EE(h2_IC_raw[-1],h2_IC_raw[1],h2_IC_corr[-1],h2_IC_corr[1],TT_centre[-1],TT_centre[1],corrMomentum,eRings);
+    DrawCorr_EE(h2_IC_raw[-1],h2_IC_raw[1],h2_corrP[-1],h2_corrP[1],TT_centre[-1],TT_centre[1],corrMomentum,eRings,true, nEtaBinsEE, 1.4, 2.5);
+    DrawICCorr_EE(h2_IC_raw[-1],h2_IC_raw[1],h2_IC_corr[-1],h2_IC_corr[1],TT_centre[-1],TT_centre[1],corrMomentum,eRings,true, nEtaBinsEE, 1.4, 2.5, shift);
     if( evalStat )
     {
       NormalizeIC_EE(h2_ICEven_raw[-1],h2_ICEven_raw[1],h2_IC_raw_phiNorm_even[-1],h2_IC_raw_phiNorm_even[1],TT_centre[-1],TT_centre[1],eRings);
@@ -429,8 +435,8 @@ int main(int argc, char **argv)
     
     PhiProfile(h_phiAvgICSpread[-1],g_avgIC_vsPhi[-1],phiRegionWidth,h2_IC_raw_phiNorm[-1], eRings);
     PhiProfile(h_phiAvgICSpread[+1],g_avgIC_vsPhi[+1],phiRegionWidth,h2_IC_raw_phiNorm[+1], eRings);
-    PhiProfile(h_phiAvgICSpread_corr[-1],g_avgIC_vsPhi_corr[-1],phiRegionWidth,h2_IC_raw_phiNorm[-1], corrMomentum,eRings, 0);
-    PhiProfile(h_phiAvgICSpread_corr[+1],g_avgIC_vsPhi_corr[+1],phiRegionWidth,h2_IC_raw_phiNorm[+1], corrMomentum,eRings, 1);
+    PhiProfile(h_phiAvgICSpread_corr[-1],g_avgIC_vsPhi_corr[-1],phiRegionWidth,h2_IC_raw_phiNorm[-1], corrMomentum,eRings, 0, nEtaBinsEE, 1.4, 2.5);
+    PhiProfile(h_phiAvgICSpread_corr[+1],g_avgIC_vsPhi_corr[+1],phiRegionWidth,h2_IC_raw_phiNorm[+1], corrMomentum,eRings, 1, nEtaBinsEE, 1.4, 2.5);
     
     h_phiAvgICSpread[-1] -> Write();
     h_phiAvgICSpread[+1] -> Write();

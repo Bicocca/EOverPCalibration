@@ -50,12 +50,15 @@ int main(int argc, char** argv)
   std::string infileMC    = gConfigParser -> readStringOption("Input::infileMC");
   
   std::string typeEE = gConfigParser -> readStringOption("Input::typeEE");
+  int  nRegionsEE = gConfigParser -> readIntOption("Input::nRegionsEE");
   int  nPhiBinsEE = gConfigParser -> readIntOption("Input::nPhiBinsEE");
   int  nPhiBinsTempEE = gConfigParser -> readIntOption("Input::nPhiBinsTempEE");
+  int  nEtaBinsEE = gConfigParser -> readIntOption("Input::nEtaBinsEE");
+  int  nEtaBinsTempEE = gConfigParser -> readIntOption("Input::nEtaBinsTempEE");
   int  rebinEE = gConfigParser -> readIntOption("Input::rebinEE");
   std::string outputFile = gConfigParser -> readStringOption("Output::outputFile");
   
-  int nRegionsEE = GetNRegionsEE(typeEE);
+  //  int nRegionsEE = GetNRegionsEE(typeEE);
 
   std::cout<<"REGIONI: "<<nRegionsEE<<std::endl;
 
@@ -66,6 +69,8 @@ int main(int argc, char** argv)
   cout <<" nRegionsEE = "<<nRegionsEE<<endl;
   cout <<" nPhiBinsEE = "<<nPhiBinsEE<<endl;
   cout <<" nPhiBinsTempEE = "<<nPhiBinsTempEE<<endl;
+  cout <<" nEtaBinsEE = "<<nEtaBinsEE<<endl;
+  cout <<" nEtaBinsTempEE = "<<nEtaBinsTempEE<<endl;
   cout <<" rebinEE = "<<rebinEE<<endl;
   
   cout << "Momentum correction "<< endl;
@@ -76,9 +81,13 @@ int main(int argc, char** argv)
   float etaMax  = 2.5;
   float eta2Max = 2.5;
 
+  float etaMin = 1.479;
+
+  //  nEtaBinsEE=5;
 
   //histos to get the bin in phi given the electron phi
   TH1F* hPhiBinEE = new TH1F("hphiEE","hphiEE",nPhiBinsEE, -1.*TMath::Pi(),1.*TMath::Pi());
+  TH1F* hEtaBinEE = new TH1F("hetaEE","hetaEE",nEtaBinsEE, 1.4,2.5);
   
   //----- NTUPLES--------------------
   TChain *ntu_DA = new TChain(TreeName.c_str());  
@@ -173,57 +182,81 @@ int main(int argc, char** argv)
   ntu_MC->SetBranchStatus("ele2_seedIy", 1);         ntu_MC->SetBranchAddress("ele2_seedIy", &ele2_iy);
   ntu_MC->SetBranchStatus("ele1_seedZside", 1);      ntu_MC->SetBranchAddress("ele1_seedZside", &ele1_iz);
   ntu_MC->SetBranchStatus("ele2_seedZside", 1);      ntu_MC->SetBranchAddress("ele2_seedZside", &ele2_iz);
-  
+
+  std::cout<<"QUI"<<std::endl;  
 
   // histogram definition in EE and fit functions                                                                      
-  std::vector<std::vector<TH1F*> > h_Phi_EE(nPhiBinsEE); // used to map iEta (as defined for Barrel and Endcap geom) into eta          
-  std::vector<std::vector<TH1F*> > h_pData_EE(nPhiBinsEE);
-  std::vector<std::vector<TF1*> > f_pData_EE(nPhiBinsEE);
+  //  std::vector<std::vector<TH1F*> > h_Phi_EE(nPhiBinsEE); // used to map iEta (as defined for Barrel and Endcap geom) into eta          
+  //  std::vector<std::vector<TH1F*> > h_Eta_EE(nEtaBinsEE); // used to map iEta (as defined for Barrel and Endcap geom) into eta          
+  TH1F* h_pData_EE[nPhiBinsEE][nEtaBinsEE][nRegionsEE];
+  //  std::vector<std::vector<std::vector<TH1F*> > > h_pData_EE(nPhiBinsEE);
+  TF1* f_pData_EE[nPhiBinsEE][nEtaBinsEE][nRegionsEE];
   
     
-  nRegionsEE=2; //EE- and EE+
-  
+  //  nRegionsEE=2; //EE- and EE+
+  //  std::vector<TH1F* > vect1(nEtaBinsEE);
+
   // Initializate histos in EE
   std::cout << ">>> Initialize EE histos" << std::endl;
   for(int i = 0; i < nPhiBinsEE; ++i)
   {
+    //    std::vector<std::vector<TH1F*> >tempVect(nEtaBinsEE);
+    for (int k=0; k<nEtaBinsEE; ++k)
+      {
+      TString histoName;
+      TH1F* temp;
+      
     for(int j = 0; j < nRegionsEE; ++j)
     {
-      TString histoName;
-      histoName= Form("EE_pData_%d_%d", i,j);
-      TH1F* temp = new TH1F (histoName, histoName, 1000, 0., 500.);
+      //      std::cout<<i<<" "<<k<<" "<<j<<std::endl;
+
+      histoName= Form("EE_pData_%d_%d_%d", i,k,j);
+      temp = new TH1F (histoName, histoName, 1000, 0., 500.);
       temp->Sumw2();
       temp->SetFillColor(kGreen+2);
       temp->SetLineColor(kGreen+2);
       temp->SetFillStyle(3004);
-      (h_pData_EE.at(i)).push_back(temp);
+      h_pData_EE[i][k][j] = temp;
+      //      (tempVect.at(k)).push_back(temp);
       
-      histoName=Form("EE_Phi_%d_%d", i,j);
-      temp = new TH1F(histoName, histoName, 360, 0., 360.); 
-      (h_Phi_EE.at(i)).push_back(temp); 
+      //      histoName=Form("EE_Phi_%d_%d_%d", i,k,j);
+      //      temp = new TH1F(histoName, histoName, 360, 0., 360.); 
+      //      (h_Phi_EE.at(i)).push_back(temp); 
     }
+
+    //    std::cout<<"qui?"<<std::endl;
+    //      histoName=Form("EE_Eta_%d_%d", i,k);
+    //  temp = new TH1F(histoName, histoName, nEtaBinsEE, 1.479, 2.5); 
+      //      (h_Eta_EE.at(k)).push_back(temp); 
+      //    std::cout<<"qui2?"<<std::endl;
+      }
+    //    (h_pData_EE).push_back(tempVect);
+
   }
-  
+
 
  // Template in EE
-  std::vector<std::vector<TH1F*> > h_template_EE(nPhiBinsTempEE);
+  //  std::vector<std::vector<TH1F*> > h_template_EE(nPhiBinsTempEE);
+  TH1F* h_template_EE[nPhiBinsTempEE][nEtaBinsTempEE][nRegionsEE];
     
   std::cout << ">>> Initialize EE template" << std::endl;
   for(int mod = 0; mod < nPhiBinsTempEE; ++mod)
   {
+  for(int k = 0; k < nEtaBinsEE; ++k)
+  {
     for(int j = 0; j < nRegionsEE; ++j)
     {
       TString histoName;
-      histoName=Form("EE_template_%d_%d",mod,j);
+      histoName=Form("EE_template_%d_%d_%d",mod,k,j);
       TH1F* temp = new TH1F(histoName,"",1000,0.,500.);
-      (h_template_EE.at(mod)).push_back(temp);
-      std::cout<<"mah: "<<mod<<" "<<j<<std::endl;
+      h_template_EE[mod][k][j] = temp;
+      //      std::cout<<"mah: "<<mod<<" "<<j<<std::endl;
     }
   }  
-  
- 
+  }  
  
   TH1F** h_phi_data_EE = new TH1F*[nRegionsEE];
+  TH1F** h_eta_data_EE = new TH1F*[nRegionsEE];
   TH1F** h_phi_mc_EE = new TH1F*[nRegionsEE];
 
   for(int index = 0; index < nRegionsEE; ++index)
@@ -233,6 +266,8 @@ int main(int argc, char** argv)
     h_phi_data_EE[index] = new TH1F(name,"h_phi_data",100,-TMath::Pi(),TMath::Pi());
     name=Form("EE_h_phi_mc_%d",index);
     h_phi_mc_EE[index] =  new TH1F(name,"h_phi_mc",100,-TMath::Pi(),TMath::Pi());
+    name=Form("EE_h_eta_data_%d",index);
+    h_eta_data_EE[index] = new TH1F(name,"h_eta_data",100,1.479,2.5);
   }
   
   TH1F* h_et_data = new TH1F("h_et_data","h_et_data",100,0.,100.);
@@ -254,7 +289,6 @@ int main(int argc, char** argv)
     }
   
   
-  
   // fill MC templates
   
   std::vector<int> refIdEE;
@@ -272,7 +306,6 @@ int main(int argc, char** argv)
     refIdEE.at(iphi) = modPhi;
     //    std::cout<<iphi<<" "<<modPhi<<std::endl;
   }
-  
     
  //**************************** loop on MC
   
@@ -281,7 +314,8 @@ int main(int argc, char** argv)
   for(int entry = 0; entry < ntu_MC->GetEntries(); ++entry)
   //  for(int entry = 0; entry < 100000; ++entry)
   {
-    if( entry%10000 == 0 ) std::cout << "reading saved entry " << entry << "\r" << std::flush;
+    if( entry%10000 == 0 ) 
+      std::cout << "reading saved entry " << entry << "\r" << std::flush;
     
     ntu_MC->GetEntry(entry);
     //    std::cout<<fabs(scEta)<<" "<<fabs(scEta2)<<" "<<scEt<<" "<<scEt2<<std::endl;
@@ -289,6 +323,10 @@ int main(int argc, char** argv)
     //    if( isW == 1 )               continue;
     if( fabs(scEta)  > etaMax )  continue;
     if( fabs(scEta2) > eta2Max ) continue;
+
+    if(fabs(eleEta)<etaMin) continue;
+    if(fabs(eleEta2)<etaMin) continue;
+
     if( scEt  < 20. ) continue;
     if( scEt2 < 20. ) continue;    
     
@@ -307,10 +345,12 @@ int main(int argc, char** argv)
       
       int iphi = eRings->GetEndcapIphi(ele1_ix,ele1_iy,ele1_iz);
       
-      
       // fill MC templates
       int modPhi = int (iphi/(360./nPhiBinsTempEE));
       if( modPhi == nPhiBinsTempEE ) modPhi = 0;
+
+      int EtabinEE = hEtaBinEE->FindBin(fabs(eleEta)) - 1;
+      if( EtabinEE == nEtaBinsEE ) EtabinEE = 0;
       
 //      int regionId =  templIndexEE(typeEE,eleEta1,charge2,R92);
 //      if(regionId == -1) continue;
@@ -318,8 +358,7 @@ int main(int argc, char** argv)
       if (ele1_iz==1)  index = 0;
       if (ele1_iz==-1) index = 1;
      
-      (h_template_EE.at(modPhi)).at(index) ->  Fill(pTK,ww);
-      
+      h_template_EE[modPhi][EtabinEE][index] ->  Fill(pTK,ww);
       
       // fill MC histos in eta bins
       int PhibinEE = hPhiBinEE->FindBin(elePhi) - 1;
@@ -338,19 +377,20 @@ int main(int argc, char** argv)
       
       int iphi = eRings->GetEndcapIphi(ele2_ix,ele2_iy,ele2_iz);
       
-      
       // fill MC templates
       int modPhi = int (iphi/(360./nPhiBinsTempEE));
       if( modPhi == nPhiBinsTempEE ) modPhi = 0;
+
+      int EtabinEE = hEtaBinEE->FindBin(fabs(eleEta2)) - 1;
+      if( EtabinEE == nEtaBinsEE ) EtabinEE = 0;
       
 //      int regionId =  templIndexEE(typeEE,eleEta1,charge2,R92);
 //      if(regionId == -1) continue;
  
       if (ele2_iz==1)  index = 0;
       if (ele2_iz==-1) index = 1;
-     
-      (h_template_EE.at(modPhi)).at(index) ->  Fill(pTK2,ww);
-      
+
+      h_template_EE[modPhi][EtabinEE][index] ->  Fill(pTK2,ww);
       
       // fill MC histos in eta bins
       int PhibinEE = hPhiBinEE->FindBin(elePhi2) - 1;
@@ -359,7 +399,6 @@ int main(int argc, char** argv)
       //      (h_pMC_EE.at(PhibinEE)).at(index) -> Fill(pTK2,ww);  // This is MC
       h_phi_mc_EE[index]->Fill(scPhi2,ww);
     }
-    
     
     h_et_mc ->Fill(scEt, ww);
     h_et_mc ->Fill(scEt2,ww);
@@ -371,17 +410,30 @@ int main(int argc, char** argv)
   //**************************** loop on DATA
   
   std::cout << "Loop in Data events " << endl; 
-  
+
+  /*  for (int i=0; i<nPhiBinsEE; ++i) {
+    for (int k=0; k<nEtaBinsEE; ++k) {
+      for (int j=0; j<nRegionsEE; ++j) {
+	std::cout<<i<<" "<<j<<" "<<k<<std::endl;
+	((h_pData_EE.at(i)).at(k)).at(j) -> Fill(0);  // This is DATA
+      }
+    }
+  }
+  */
   for(int entry = 0; entry < ntu_DA->GetEntries(); ++entry)
-  //  for(int entry = 0; entry < 100000; ++entry)
+  //    for(int entry = 0; entry < 100000; ++entry)
   {
-    if( entry%10000 == 0 ) std::cout << "reading saved entry " << entry << "\r" << std::flush;
-    
+    if( entry%10000 == 0 ) 
+      std::cout << "reading saved entry " << entry << "\r" << std::flush;
+      
     ntu_DA->GetEntry(entry);
-    
     //    if( isW == 1 )               continue;
     if( fabs(scEta)  > etaMax )  continue;
     if( fabs(scEta2) > eta2Max ) continue;
+
+    if(fabs(eleEta)<etaMin) continue;
+    if(fabs(eleEta2)<etaMin) continue;
+
     if( scEt  < 20. ) continue;
     if( scEt2 < 20. ) continue;    
     
@@ -399,6 +451,9 @@ int main(int argc, char** argv)
       
       int PhibinEE = hPhiBinEE->FindBin(elePhi) - 1;
       if( PhibinEE == nPhiBinsEE ) PhibinEE = 0;
+
+      int EtabinEE = hEtaBinEE->FindBin(fabs(eleEta)) - 1;
+      if( EtabinEE == nEtaBinsEE ) EtabinEE = 0;
       
       //      int regionId = templIndexEE(typeEE,eleEta,charge,R9);
       //      if( regionId == -1 ) continue;
@@ -406,11 +461,12 @@ int main(int argc, char** argv)
       if (ele1_iz==1)  index = 0;
       if (ele1_iz==-1) index = 1;
       
-      (h_pData_EE.at(PhibinEE)).at(index) -> Fill(pTK,ww);  // This is DATA
-      (h_Phi_EE.at(PhibinEE)).at(index) -> Fill(elePhi); 
+      h_pData_EE[PhibinEE][EtabinEE][index] -> Fill(pTK,ww);  // This is DATA
+      //      (h_Phi_EE.at(PhibinEE)).at(index) -> Fill(elePhi); 
+
       h_phi_data_EE[index] -> Fill(elePhi);
+      h_eta_data_EE[index] -> Fill(fabs(eleEta));
     }
-    
     
         
     // DATA  - ele2
@@ -421,16 +477,21 @@ int main(int argc, char** argv)
       
       int PhibinEE = hPhiBinEE->FindBin(elePhi2) - 1;
       if( PhibinEE == nPhiBinsEE ) PhibinEE = 0;
+
+      int EtabinEE = hEtaBinEE->FindBin(fabs(eleEta2)) - 1;
+      if( EtabinEE == nEtaBinsEE ) EtabinEE = 0;
       
       //      int regionId = templIndexEE(typeEE,eleEta2,charge2,R92);
       //      if( regionId == -1 ) continue;
 
       if (ele2_iz==1)  index = 0;
       if (ele2_iz==-1) index = 1;
+      //      std::cout<<"qui2 "<<EtabinEE<<" "<<fabs(eleEta2)<<std::endl;
       
-      (h_pData_EE.at(PhibinEE)).at(index) -> Fill(pTK2,ww);  // This is DATA
-      (h_Phi_EE.at(PhibinEE)).at(index) -> Fill(elePhi2); 
+      h_pData_EE[PhibinEE][EtabinEE][index] -> Fill(pTK2,ww);  // This is DATA
+      //      (h_Phi_EE.at(PhibinEE)).at(index) -> Fill(elePhi2); 
       h_phi_data_EE[index] ->Fill(elePhi2);
+      h_eta_data_EE[index] -> Fill(fabs(eleEta2));
     }
     
     h_et_data ->Fill(scEt);
@@ -450,26 +511,30 @@ int main(int argc, char** argv)
   // initialize TGraphs
   TFile* o = new TFile((outputFile+"_"+typeEE+".root").c_str(),"RECREATE");
     
-  TGraphErrors** g_pData_EE = new TGraphErrors*[nRegionsEE];
-  TGraphErrors** g_pMC_EE = new TGraphErrors*[nRegionsEE];
- 
+  TGraphErrors* g_pData_EE[nEtaBinsEE][nRegionsEE];// = new TGraphErrors**[nEtaBinsEE][nRegionsEE];
+
+  for (int a=0; a<nEtaBinsEE; ++a)
+    {
   for(int j = 0; j < nRegionsEE; ++j)
   {
-    g_pData_EE[j]= new TGraphErrors();
-    g_pMC_EE[j]= new TGraphErrors();
+    g_pData_EE[a][j]= new TGraphErrors();
   }
- 
+    } 
   
   // initialize template functions  
-  std::vector<std::vector<histoFunc*> > templateHistoFuncEE(nPhiBinsTempEE);
+  //  std::vector<std::vector<histoFunc*> > templateHistoFuncEE(nPhiBinsTempEE);
+  histoFunc* templateHistoFuncEE[nPhiBinsTempEE][nEtaBinsEE][nRegionsEE];
 
   for(int mod = 0; mod < nPhiBinsTempEE; ++mod)
   {
+  for(int k = 0; k < nEtaBinsEE; ++k)
+  {
     for(int j = 0; j < nRegionsEE; ++j)
     {
-      (h_template_EE.at(mod)).at(j) -> Rebin(rebinEE);
-      (templateHistoFuncEE.at(mod)).push_back( new histoFunc((h_template_EE.at(mod)).at(j)) );
+      h_template_EE[mod][k][j] -> Rebin(rebinEE);
+      templateHistoFuncEE[mod][k][j] = new histoFunc(h_template_EE[mod][k][j]);
     }
+  }
   }
 
   //-------------------
@@ -477,17 +542,19 @@ int main(int argc, char** argv)
   
   if( typeEE != "none" )
   {
-    float pVector[nPhiBinsEE][2];
-    float pVectorErr[nPhiBinsEE][2];
+    float pVector[nPhiBinsEE][nEtaBinsEE][2];
+    float pVectorErr[nPhiBinsEE][nEtaBinsEE][2];
 
     for(int i = 0; i < nPhiBinsEE; ++i)
+    {
+    for(int k = 0; k < nEtaBinsEE; ++k)
     {
       for(int j = 0; j < nRegionsEE; ++j)
       {
         float flPhi = hPhiBinEE->GetXaxis()->GetBinCenter(i);
         
 	//        (h_pMC_EE.at(i)).at(j) -> Rebin(rebinEE);
-        (h_pData_EE.at(i)).at(j) -> Rebin(rebinEE);    
+        h_pData_EE[i][k][j] -> Rebin(rebinEE);    
         
         
         // define the fitting function
@@ -495,22 +562,24 @@ int main(int argc, char** argv)
         
         char funcName[50];        
         
-        sprintf(funcName,"f_pData_%d_%d_Ref_%d_%d_EE",i,j,refIdEE.at(i),j);
-        (f_pData_EE.at(i)).push_back( new TF1(funcName, (templateHistoFuncEE.at(refIdEE.at(i))).at(j), 0., 500, 3, "histoFunc") );
+        sprintf(funcName,"f_pData_%d_%d_%d_Ref_%d_%d_%d_EE",i,k,j,refIdEE.at(i),k,j);
+	TF1* temp;
+	temp = new TF1(funcName, templateHistoFuncEE[refIdEE.at(i)][k][j], 0., 500, 3, "histoFunc");
+        f_pData_EE[i][k][j] =  temp;
         
-        (f_pData_EE.at(i)).at(j) -> SetParName(0,"Norm"); 
-        (f_pData_EE.at(i)).at(j) -> SetParName(1,"Scale factor"); 
+        f_pData_EE[i][k][j] -> SetParName(0,"Norm"); 
+        f_pData_EE[i][k][j] -> SetParName(1,"Scale factor"); 
         
-        (f_pData_EE.at(i)).at(j) -> SetLineWidth(1); 
-        (f_pData_EE.at(i)).at(j) -> SetLineColor(kGreen+2); 
-        (f_pData_EE.at(i)).at(j) -> SetNpx(10000);
+        f_pData_EE[i][k][j] -> SetLineWidth(1); 
+        f_pData_EE[i][k][j] -> SetLineColor(kGreen+2); 
+        f_pData_EE[i][k][j] -> SetNpx(10000);
         
-	//	(f_pData_EE.at(i)).at(j) -> SetParameter(0, xNorm);
-	(f_pData_EE.at(i)).at(j) -> SetParameter(0, 1.);
-	(f_pData_EE.at(i)).at(j) -> SetParameter(1, 1);
+	//	f_pData_EE[i][k][j] -> SetParameter(0, xNorm);
+	f_pData_EE[i][k][j] -> SetParameter(0, 1.);
+	f_pData_EE[i][k][j] -> SetParameter(1, 1);
 
 	float shift=8.;
-	(f_pData_EE.at(i)).at(j) -> SetParameter(2, shift);
+	f_pData_EE[i][k][j] -> SetParameter(2, shift);
                                
         std::cout << "***** Fitting DATA EE " << flPhi << " (" << i << "," << j << "):   ";
 
@@ -519,87 +588,103 @@ int main(int argc, char** argv)
 
         for(int trial = 0; trial < 100; ++trial)
         {
-          rp = (h_pData_EE.at(i)).at(j) -> Fit(funcName, "QR+");
+          rp = h_pData_EE[i][k][j] -> Fit(funcName, "QR+");
           fStatus = rp;
 
-          if( fStatus !=4 && (f_pData_EE.at(i)).at(j)->GetParError(1) != 0. && (f_pData_EE.at(i)).at(j) -> GetMaximumX(0.,500.)>30. )
+          if( fStatus !=4 && f_pData_EE[i][k][j]->GetParError(1) != 0. && f_pData_EE[i][k][j] -> GetMaximumX(0.,500.)>30. )
           {
             std::cout << "fit OK    ";
             
-            double k = (f_pData_EE.at(i)).at(j)->GetParameter(1);
-            double eee = (f_pData_EE.at(i)).at(j)->GetParError(1);
-	    pVector[i][j] = k;
+            double coeff = f_pData_EE[i][k][j]->GetParameter(1);
+            double eee = f_pData_EE[i][k][j]->GetParError(1);
+	    pVector[i][k][j] = coeff;
 
             break;
           }
           else if( trial %10 == 0 )
           {
-	    pVector[i][j]=-1;
+	    pVector[i][k][j]=-1;
 	    //	    std::cout<<" BAD FIT. Make another try with different parameters.. "<<std::endl;
 	    shift-=5;
-	    (f_pData_EE.at(i)).at(j) -> SetParameter(2, shift);
+	    f_pData_EE[i][k][j] -> SetParameter(2, shift);
 	    if (shift==-25)  shift+=50.;
 	    //	    trial = 0;
 	    //	    getchar();
           }
         }
 
-	std::cout<<"media "<<(f_pData_EE.at(i)).at(j) -> GetMaximumX(0.,500.)<<std::endl;
+	std::cout<<"media "<<f_pData_EE[i][k][j] -> GetMaximumX(0.,500.)<<std::endl;
 	//(f_pData_EE.at(0)).at(0)->GetParameter(2)*(f_pData_EE.at(0)).at(0)->GetParameter(1)+(h_template_EE.at(0)).at(j)->GetMean()<<std::endl;
 
-	if( fStatus !=4 && (f_pData_EE.at(i)).at(j)->GetParError(1) != 0. && (f_pData_EE.at(i)).at(j) -> GetMaximumX(0.,500.)>30. ) {
-	  pVector[i][j] = (f_pData_EE.at(i)).at(j) -> GetMaximumX(0.,500.);
-	  pVectorErr[i][j] = ((h_pData_EE.at(i)).at(j) -> GetRMS())/sqrt((h_pData_EE.at(i)).at(j) -> GetEntries());
+	if( fStatus !=4 && f_pData_EE[i][k][j]->GetParError(1) != 0. && f_pData_EE[i][k][j] -> GetMaximumX(0.,500.)>30. ) {
+	  pVector[i][k][j] = f_pData_EE[i][k][j] -> GetMaximumX(0.,500.);
+	  pVectorErr[i][k][j] = (h_pData_EE[i][k][j] -> GetRMS())/sqrt(h_pData_EE[i][k][j] -> GetEntries());
 	}
 	else {
 	  std::cout<<"BAD FIT!!!"<<std::endl;
-	  pVector[i][j] = -1;  //if fit fails
-	  pVectorErr[i][j] = 0;
+	  pVector[i][k][j] = -1;  //if fit fails
+	  pVectorErr[i][k][j] = 0;
 	}
-
       }
+    
+  }
       
       std::cout << std::endl;
     }
 
 	///////
-    float pMean[2];
-    float pMeanErr[2];
+    float pMean[nEtaBinsEE][2];
+    float pMeanErr[nEtaBinsEE][2];
 
     for(int jc = 0; jc < nRegionsEE; ++jc)
       {	
 	float sum=0.;
 	float sumErr=0.;
 	int n=0;
+	for (int a=0; a<nEtaBinsEE; a++)
+	  {
+	sum=0.;
+	sumErr=0.;
+	n=0;
 
 	for (int c=0; c<nPhiBinsEE; c++)
 	  {
-	    if (pVector[c][jc]==-1) continue;
-	    sum+=pVector[c][jc];
-	    sumErr+=(1/(pVectorErr[c][jc]*pVectorErr[c][jc]));
+	    if (pVector[c][a][jc]==-1) continue;
+	    sum+=pVector[c][a][jc];
+	    sumErr+=(1/(pVectorErr[c][a][jc]*pVectorErr[c][a][jc]));
 	    n++;  
 	  }
-	pMean[jc] = sum/(float)n;
-	pMeanErr[jc] = sqrt(1/sumErr);
+	pMean[a][jc] = sum/(float)n;
+	pMeanErr[a][jc] = sqrt(1/sumErr);
+	std::cout<<"pMEan: "<<pMean[a][jc]<<std::endl;
+	std::cout<<"pMeanErr: "<<pMeanErr[a][jc]<<std::endl;
 
-	std::cout<<"pMEan: "<<pMean[jc]<<std::endl;
-	std::cout<<"pMeanErr: "<<pMeanErr[jc]<<std::endl;
+	  }
       }
 
 
     for(int jc = 0; jc < nRegionsEE; ++jc)
       {	
+	for (int a=0; a<nEtaBinsEE; a++)
+	  {
 	for (int c=0; c<nPhiBinsEE; c++)
 	  {
 	    float flPhi = hPhiBinEE->GetXaxis()->GetBinCenter(c);
-	    if (pVector[c][jc]==-1) {
-	      pVector[c][jc]=pMean[jc]; //if fit has failed, fill with the mean value
-	      std::cout<<"be careful!! ("<<c<<","<<jc<<" has a bad value! Fill with default value (1)."<<std::endl;
+	    if (pVector[c][a][jc]==-1) {
+	      pVector[c][a][jc]=pMean[a][jc]; //if fit has failed, fill with the mean value
+	      std::cout<<"be careful!! ("<<c<<","<<a<<","<<jc<<") has a bad value! Fill with default value (1)."<<std::endl;
 	    }
-	    g_pData_EE[jc] -> SetPoint(c,c*(int(360/nPhiBinsEE)),pVector[c][jc]/pMean[jc]);
-	    float err=(pVectorErr[c][jc]/pMean[jc])*(pVectorErr[c][jc]/pMean[jc])+(pVector[c][jc]/(pMean[jc]*pMean[jc])*(pMeanErr[jc]*pMeanErr[jc]))*(pVector[c][jc]/(pMean[jc]*pMean[jc])*(pMeanErr[jc]*pMeanErr[jc]));
-	    g_pData_EE[jc] -> SetPointError(c,0,err);
-	    //	    std::cout<<flPhi<<" "<<pVector[c][jc]/pMean[jc]<<" "<<err<<std::endl;
+	    if ( (pVector[c][a][jc]/pMean[a][jc])>1.1) 
+	      g_pData_EE[a][jc] -> SetPoint(c,c*(int(360/nPhiBinsEE)),1.1);
+	    else if ( (pVector[c][a][jc]/pMean[a][jc])<0.9 )
+	      g_pData_EE[a][jc] -> SetPoint(c,c*(int(360/nPhiBinsEE)),0.9);
+	    else
+	      g_pData_EE[a][jc] -> SetPoint(c,c*(int(360/nPhiBinsEE)),pVector[c][a][jc]/pMean[a][jc]);
+            
+	    float err=(pVectorErr[c][a][jc]/pMean[a][jc])*(pVectorErr[c][a][jc]/pMean[a][jc])+(pVector[c][a][jc]/(pMean[a][jc]*pMean[a][jc])*(pMeanErr[a][jc]*pMeanErr[a][jc]))*(pVector[c][a][jc]/(pMean[a][jc]*pMean[a][jc])*(pMeanErr[a][jc]*pMeanErr[a][jc]));
+	    g_pData_EE[a][jc] -> SetPointError(c,0,err);
+	    //	    std::cout<<flPhi<<" "<<pVector[c][a][jc]/pMean[a][jc]<<" "<<err<<std::endl;
+	  }
 	  }
       }  
   ////////        
@@ -610,11 +695,14 @@ int main(int argc, char** argv)
   {
     for(int i = 0; i < nPhiBinsEE; ++i)
     {  
+      for (int a=0; a<nEtaBinsEE; ++a)
+	{
       for(int j = 0; j < nRegionsEE; ++j)
       {
         float flPhi = hPhiBinEE->GetXaxis()->GetBinCenter(i+1);
-        g_pData_EE[j] -> SetPoint(i, flPhi, 1.);
+        g_pData_EE[a][j] -> SetPoint(i, flPhi, 1.);
       }
+	}
     }
   }
   
@@ -628,17 +716,19 @@ int main(int argc, char** argv)
    
   o -> cd();
   
-  
+  for (int a=0; a<nEtaBinsEE; ++a)
+    {  
   for(int j = 0; j < nRegionsEE; ++j)
   {
     TString Name;
     //Name = Form("g_pMC_EE_%d",j);
     //if(g_pMC_EE[j]->GetN()!=0) g_pMC_EE[j] -> Write(Name);
-    Name = Form("g_pData_EE_%d",j);
-    if(g_pData_EE[j]->GetN()!=0) g_pData_EE[j] -> Write(Name);
+    Name = Form("g_pData_EE_%d_%d",a,j);
+    if(g_pData_EE[a][j]->GetN()!=0) g_pData_EE[a][j] -> Write(Name);
     //Name = Form("g_Rat_EE_%d",j);
     //if(g_Rat_EE[j]->GetN()!=0) g_Rat_EE[j] -> Write(Name);
   }
+    }
     
   for(int j =0; j< nRegionsEE; ++j)
   {
@@ -650,15 +740,24 @@ int main(int argc, char** argv)
   mapConversionEEp -> Write();
   mapConversionEEm -> Write();
 
-  (h_template_EE.at(0)).at(0) -> Write();
-  (h_template_EE.at(0)).at(1) -> Write();
+  h_template_EE[0][0][0] -> Write();
+  h_template_EE[0][0][1] -> Write();
+  h_template_EE[0][1][0] -> Write();
+  h_template_EE[0][1][1] -> Write();
+  h_template_EE[0][2][0] -> Write();
+  h_template_EE[0][2][1] -> Write();
+  h_template_EE[0][4][0] -> Write();
+  h_template_EE[0][4][1] -> Write();
 
   for(int i = 0; i < nPhiBinsEE; ++i)
     {  
-      for(int j = 0; j < nRegionsEE; ++j)
+      for (int k=0; k<nEtaBinsEE; ++k)
+	{
+     for(int j = 0; j < nRegionsEE; ++j)
       {
-	h_pData_EE.at(i).at(j) -> Write();
+	h_pData_EE[i][k][j] -> Write();
       }
+	}
     }
 
   o -> Close();
