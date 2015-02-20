@@ -43,6 +43,7 @@ class TEndcapRings
   int GetEndcapRing(int,int,int);
   int GetEndcapIeta(int,int,int);
   int GetEndcapIphi(int,int,int);
+  float GetEtaFromIRing(const int& iRing);
   // ClassDef(TEndcapRings,1); //ring class
 };
 
