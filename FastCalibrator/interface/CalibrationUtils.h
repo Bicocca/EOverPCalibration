@@ -54,6 +54,9 @@ void PhiProfile(TH1F* h_phiAvgICSpread, TGraphErrors* g_avgIC_vsPhi, const int& 
 void PhiProfile(TH1F* h_phiAvgICSpread, TGraphErrors* g_avgIC_vsPhi, const int& phiRegionWidth,
                 TH2F* hcmap, TEndcapRings* eRings = NULL);
 
+void PhiProfileFit(TH1F* h_phiAvgICSpread, TGraphErrors* g_avgIC_vsPhi, const int& phiRegionWidth,
+		   TH2F* hcmap, TEndcapRings* eRings = NULL);
+
 void PhiFoldProfile_EB(TGraphErrors* g_avgIC_vsPhiFold_EBM, TGraphErrors* g_avgIC_vsPhiFold_EBP, const int& phiRegionWidth,
                        TH2F* hcmap);
 
@@ -84,6 +87,12 @@ void NormalizeIC_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP, TH2F* hcmap_EEM, TH2F*
 void DrawCorr_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP, TH2F* hcmap_EEM, TH2F* hcmap_EEP, const std::vector< std::pair<int,int> > & TT_centre_EEM, const  std::vector< std::pair<int,int> > & TT_centre_EEP, std::vector<std::vector<TGraphErrors*> > & correctionMomentum, TEndcapRings *eRings, bool skip = true, int nEtaBinsEE=5, float etaMin=1.4, float etaMax=2.5);
 
 void DrawICCorr_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP, TH2F* hcmap_EEM, TH2F* hcmap_EEP, const std::vector< std::pair<int,int> > & TT_centre_EEM, const  std::vector< std::pair<int,int> > & TT_centre_EEP, std::vector<std::vector<TGraphErrors*> > & correctionMomentum, TEndcapRings *eRings, bool skip = true, int nEtaBinsEE=5, float etaMin=1.4, float etaMax=2.5, int shift=0);
+
+void DrawICCorrFit_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP,
+		      TH2F* hcmap_EEM, TH2F* hcmap_EEP,
+		      const std::vector< std::pair<int,int> >& TT_centre_EEM,
+		      const std::vector< std::pair<int,int> >& TT_centre_EEP,
+		      TEndcapRings* eRings, bool skip);
 
 /// Book spread  Histos
 void BookSpreadHistos_EE(std::map<int,TH1F*>& h_spread, std::map<int,std::vector<TH1F*> >& h_spread_vsEtaFold, std::map<int,TGraphErrors*>& g_spread_vsEtaFold,
