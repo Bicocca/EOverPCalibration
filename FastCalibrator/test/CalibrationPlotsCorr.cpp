@@ -202,6 +202,7 @@ int main(int argc, char **argv)
   std::map<int, TH2F*> h2_IC_raw_phiNorm;
   std::map<int, TH2F*> h2_corrP;
   std::map<int, TH2F*> h2_IC_corr;
+  std::map<int, TH2F*> h2_IC_corrFit;
   std::map<int, TH2F*> h2_IC_crackCorr;
   std::map<int, TH2F*> h2_IC_crackCorr_phiNorm;
   
@@ -276,6 +277,13 @@ int main(int argc, char **argv)
     h2_IC_corr[1]  -> Reset("ICEMS");
     h2_IC_corr[-1] -> ResetStats();
     h2_IC_corr[1]  -> ResetStats();
+
+    h2_IC_corrFit[-1] = (TH2F*)( h2_IC_raw[-1]->Clone("h2_IC_corrFit_EEM") );
+    h2_IC_corrFit[1]  = (TH2F*)( h2_IC_raw[1] ->Clone("h2_IC_corrFit_EEP") );
+    h2_IC_corrFit[-1] -> Reset("ICEMS");
+    h2_IC_corrFit[1]  -> Reset("ICEMS");
+    h2_IC_corrFit[-1] -> ResetStats();
+    h2_IC_corrFit[1]  -> ResetStats();
     
     if( evalStat )
     {
@@ -317,6 +325,8 @@ int main(int argc, char **argv)
     NormalizeIC_EE(h2_IC_raw[-1],h2_IC_raw[1],h2_IC_raw_phiNorm[-1],h2_IC_raw_phiNorm[1],TT_centre[-1],TT_centre[1],eRings);
     DrawCorr_EE(h2_IC_raw[-1],h2_IC_raw[1],h2_corrP[-1],h2_corrP[1],TT_centre[-1],TT_centre[1],corrMomentum,eRings,true, nEtaBinsEE, 1.4, 2.5);
     DrawICCorr_EE(h2_IC_raw[-1],h2_IC_raw[1],h2_IC_corr[-1],h2_IC_corr[1],TT_centre[-1],TT_centre[1],corrMomentum,eRings,true, nEtaBinsEE, 1.4, 2.5, shift);
+    DrawICCorrFit_EE(h2_IC_raw[-1],h2_IC_raw[1],h2_IC_corrFit[-1],h2_IC_corrFit[1],TT_centre[-1],TT_centre[1],eRings, true);
+
     if( evalStat )
     {
       NormalizeIC_EE(h2_ICEven_raw[-1],h2_ICEven_raw[1],h2_IC_raw_phiNorm_even[-1],h2_IC_raw_phiNorm_even[1],TT_centre[-1],TT_centre[1],eRings);
@@ -347,8 +357,16 @@ int main(int argc, char **argv)
   
   outFile -> mkdir("raw");
   outFile -> cd("raw");
-  
-  
+
+  h2_IC_raw_phiNorm[1]->Write();  
+  h2_IC_raw_phiNorm[-1]->Write();  
+  h2_corrP[1]->Write();
+  h2_corrP[-1]->Write();
+  h2_IC_corr[1]->Write();
+  h2_IC_corr[-1]->Write();
+  h2_IC_corrFit[1]->Write();
+  h2_IC_corrFit[-1]->Write();
+
   
   //--------------
   // spread histos
@@ -410,7 +428,9 @@ int main(int argc, char **argv)
   std::map<int,TH1F*> h_phiAvgICSpread;
   std::map<int,TGraphErrors*> g_avgIC_vsPhi; 
   std::map<int,TH1F*> h_phiAvgICSpread_corr;
+  std::map<int,TH1F*> h_phiAvgICSpread_corrFit;
   std::map<int,TGraphErrors*> g_avgIC_vsPhi_corr; 
+  std::map<int,TGraphErrors*> g_avgIC_vsPhi_corrFit; 
   
   if( isEB == true )
   {
@@ -430,13 +450,19 @@ int main(int argc, char **argv)
     g_avgIC_vsPhi[+1] = new TGraphErrors();
     h_phiAvgICSpread_corr[-1] = new TH1F("h_phiAvgICSpread_EEM_corr","",nBins_spread,spreadMin,spreadMax);
     h_phiAvgICSpread_corr[+1] = new TH1F("h_phiAvgICSpread_EEP_corr","",nBins_spread,spreadMin,spreadMax);
+    h_phiAvgICSpread_corrFit[-1] = new TH1F("h_phiAvgICSpread_EEM_corrFit","",nBins_spread,spreadMin,spreadMax);
+    h_phiAvgICSpread_corrFit[+1] = new TH1F("h_phiAvgICSpread_EEP_corrFit","",nBins_spread,spreadMin,spreadMax);
     g_avgIC_vsPhi_corr[-1] = new TGraphErrors();
     g_avgIC_vsPhi_corr[+1] = new TGraphErrors();
+    g_avgIC_vsPhi_corrFit[-1] = new TGraphErrors();
+    g_avgIC_vsPhi_corrFit[+1] = new TGraphErrors();
     
     PhiProfile(h_phiAvgICSpread[-1],g_avgIC_vsPhi[-1],phiRegionWidth,h2_IC_raw_phiNorm[-1], eRings);
     PhiProfile(h_phiAvgICSpread[+1],g_avgIC_vsPhi[+1],phiRegionWidth,h2_IC_raw_phiNorm[+1], eRings);
     PhiProfile(h_phiAvgICSpread_corr[-1],g_avgIC_vsPhi_corr[-1],phiRegionWidth,h2_IC_raw_phiNorm[-1], corrMomentum,eRings, 0, nEtaBinsEE, 1.4, 2.5);
     PhiProfile(h_phiAvgICSpread_corr[+1],g_avgIC_vsPhi_corr[+1],phiRegionWidth,h2_IC_raw_phiNorm[+1], corrMomentum,eRings, 1, nEtaBinsEE, 1.4, 2.5);
+    PhiProfileFit(h_phiAvgICSpread_corrFit[-1],g_avgIC_vsPhi_corrFit[-1],phiRegionWidth,h2_IC_raw_phiNorm[-1], eRings);
+    PhiProfileFit(h_phiAvgICSpread_corrFit[+1],g_avgIC_vsPhi_corrFit[+1],phiRegionWidth,h2_IC_raw_phiNorm[+1], eRings);
     
     h_phiAvgICSpread[-1] -> Write();
     h_phiAvgICSpread[+1] -> Write();
@@ -446,6 +472,10 @@ int main(int argc, char **argv)
     h_phiAvgICSpread_corr[+1] -> Write();
     g_avgIC_vsPhi_corr[-1] -> Write("g_avgIC_vsPhi_EEM_corr");
     g_avgIC_vsPhi_corr[+1] -> Write("g_avgIC_vsPhi_EEP_corr");
+    h_phiAvgICSpread_corrFit[-1] -> Write();
+    h_phiAvgICSpread_corrFit[+1] -> Write();
+    g_avgIC_vsPhi_corrFit[-1] -> Write("g_avgIC_vsPhi_EEM_corrFit");
+    g_avgIC_vsPhi_corrFit[+1] -> Write("g_avgIC_vsPhi_EEP_corrFit");
   }
   
   
@@ -747,6 +777,9 @@ int main(int argc, char **argv)
 
     DrawICMap(h2_IC_corr[-1],outputFolder+"/EEM_h2_IC_corr","png",isEB);
     DrawICMap(h2_IC_corr[+1],outputFolder+"/EEP_h2_IC_corr","png",isEB);
+
+    DrawICMap(h2_IC_corrFit[-1],outputFolder+"/EEM_h2_IC_corrFit","png",isEB);
+    DrawICMap(h2_IC_corrFit[+1],outputFolder+"/EEP_h2_IC_corrFit","png",isEB);
     
     DrawSpreadHisto(h_spread[-1],outputFolder+"/EEM_h_spread","f_EE_spread_vsEta_EEM","png",isEB);
     DrawSpreadHisto(h_spread[0],  outputFolder+"/EE_h_spread","f_EE_spread_vsEta_EE", "png",isEB);
@@ -764,11 +797,15 @@ int main(int argc, char **argv)
     DrawPhiAvgICSpread(h_phiAvgICSpread[+1],outputFolder+"/EEP_h_phiAvgICSpread","png",isEB);
     DrawPhiAvgICSpread(h_phiAvgICSpread_corr[-1],outputFolder+"/EEM_h_phiAvgICSpread_corr","png",isEB);
     DrawPhiAvgICSpread(h_phiAvgICSpread_corr[+1],outputFolder+"/EEP_h_phiAvgICSpread_corr","png",isEB);
+    DrawPhiAvgICSpread(h_phiAvgICSpread_corrFit[-1],outputFolder+"/EEM_h_phiAvgICSpread_corrFit","png",isEB);
+    DrawPhiAvgICSpread(h_phiAvgICSpread_corrFit[+1],outputFolder+"/EEP_h_phiAvgICSpread_corrFit","png",isEB);
     
     DrawAvgICVsPhiGraph(g_avgIC_vsPhi[-1],outputFolder+"/EEM_g_avgIC_vsPhi","png",kRed+2,isEB);
     DrawAvgICVsPhiGraph(g_avgIC_vsPhi[+1],outputFolder+"/EEP_g_avgIC_vsPhi","png",kRed+2,isEB);
     DrawAvgICVsPhiGraph(g_avgIC_vsPhi_corr[-1],outputFolder+"/EEM_g_avgIC_vsPhi_corr","png",kRed+2,isEB);
     DrawAvgICVsPhiGraph(g_avgIC_vsPhi_corr[+1],outputFolder+"/EEP_g_avgIC_vsPhi_corr","png",kRed+2,isEB);
+    DrawAvgICVsPhiGraph(g_avgIC_vsPhi_corrFit[-1],outputFolder+"/EEM_g_avgIC_vsPhi_corrFit","png",kRed+2,isEB);
+    DrawAvgICVsPhiGraph(g_avgIC_vsPhi_corrFit[+1],outputFolder+"/EEP_g_avgIC_vsPhi_corrFit","png",kRed+2,isEB);
   }
   
   outFile -> Close();
