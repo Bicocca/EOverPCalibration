@@ -203,6 +203,7 @@ int main(int argc, char **argv)
   std::map<int, TH2F*> h2_corrP;
   std::map<int, TH2F*> h2_IC_corr;
   std::map<int, TH2F*> h2_IC_corrFit;
+  std::map<int, TH2F*> h2_IC_smear;
   std::map<int, TH2F*> h2_IC_crackCorr;
   std::map<int, TH2F*> h2_IC_crackCorr_phiNorm;
   
@@ -284,6 +285,13 @@ int main(int argc, char **argv)
     h2_IC_corrFit[1]  -> Reset("ICEMS");
     h2_IC_corrFit[-1] -> ResetStats();
     h2_IC_corrFit[1]  -> ResetStats();
+
+    h2_IC_smear[-1] = (TH2F*)( h2_IC_raw[-1]->Clone("h2_IC_smear_EEM") );
+    h2_IC_smear[1]  = (TH2F*)( h2_IC_raw[1] ->Clone("h2_IC_smear_EEP") );
+    h2_IC_smear[-1] -> Reset("ICEMS");
+    h2_IC_smear[1]  -> Reset("ICEMS");
+    h2_IC_smear[-1] -> ResetStats();
+    h2_IC_smear[1]  -> ResetStats();
     
     if( evalStat )
     {
@@ -326,6 +334,7 @@ int main(int argc, char **argv)
     DrawCorr_EE(h2_IC_raw[-1],h2_IC_raw[1],h2_corrP[-1],h2_corrP[1],TT_centre[-1],TT_centre[1],corrMomentum,eRings,true, nEtaBinsEE, 1.4, 2.5);
     DrawICCorr_EE(h2_IC_raw[-1],h2_IC_raw[1],h2_IC_corr[-1],h2_IC_corr[1],TT_centre[-1],TT_centre[1],corrMomentum,eRings,true, nEtaBinsEE, 1.4, 2.5, shift);
     DrawICCorrFit_EE(h2_IC_raw[-1],h2_IC_raw[1],h2_IC_corrFit[-1],h2_IC_corrFit[1],TT_centre[-1],TT_centre[1],eRings, true);
+    DrawICSmear_EE(h2_IC_raw[-1],h2_IC_raw[1],h2_IC_smear[-1],h2_IC_smear[1],TT_centre[-1],TT_centre[1],eRings);
 
     if( evalStat )
     {
@@ -345,7 +354,7 @@ int main(int argc, char **argv)
   std::cout << ">>> Draw plots for raw IC" << std::endl;
   
   int etaRingWidth   = 1;
-  int phiRegionWidth = 3;
+  int phiRegionWidth = 1;
   
   int nBins_spread = 2000;
   float spreadMin = 0.;
@@ -366,6 +375,8 @@ int main(int argc, char **argv)
   h2_IC_corr[-1]->Write();
   h2_IC_corrFit[1]->Write();
   h2_IC_corrFit[-1]->Write();
+  h2_IC_smear[1]->Write();
+  h2_IC_smear[-1]->Write();
 
   
   //--------------
@@ -780,6 +791,9 @@ int main(int argc, char **argv)
 
     DrawICMap(h2_IC_corrFit[-1],outputFolder+"/EEM_h2_IC_corrFit","png",isEB);
     DrawICMap(h2_IC_corrFit[+1],outputFolder+"/EEP_h2_IC_corrFit","png",isEB);
+
+    DrawICMap(h2_IC_smear[-1],outputFolder+"/EEM_h2_IC_smear","png",isEB);
+    DrawICMap(h2_IC_smear[+1],outputFolder+"/EEP_h2_IC_smear","png",isEB);
     
     DrawSpreadHisto(h_spread[-1],outputFolder+"/EEM_h_spread","f_EE_spread_vsEta_EEM","png",isEB);
     DrawSpreadHisto(h_spread[0],  outputFolder+"/EE_h_spread","f_EE_spread_vsEta_EE", "png",isEB);

@@ -87,6 +87,10 @@ int main (int argc, char ** argv) {
   try{ R9Min = gConfigParser -> readFloatOption("Input::R9Min");}
   catch( char const* exceptionString ){ R9Min = 0.; }
 
+  float EPmin ;
+  try{ EPmin = gConfigParser -> readFloatOption("Input::EPmin");}
+  catch( char const* exceptionString ){ EPmin = -1.;}
+
   // Run Calibration on E/Etrue instead of E/P --> MC only                                                                                                                                        
   bool isMCTruth ;
   try { isMCTruth = gConfigParser -> readBoolOption("Input::isMCTruth"); }
@@ -223,7 +227,11 @@ int main (int argc, char ** argv) {
       name_tmp = Form ("%s_W_EP_EE",outputFile.c_str());
     else if(isMiscalib == false && useZ == 0 && isEPselection ==false && isR9selection==false && isPtCut ==false && isfbrem ==false  )
       name_tmp =Form ("%s_W_noEP_EE",outputFile.c_str());
-    else { std::cout<<" Option not considered --> exit "<<std::endl; return -1 ;}
+    else if(isMiscalib == false && useZ == 1 && isEPselection ==false && isR9selection==true && isPtCut ==false && isfbrem ==true  )
+      name_tmp =Form ("%s_WZ_R9_Fbrem_EE",outputFile.c_str());
+    else
+      name_tmp =Form ("%s_WZ_EP_EE",outputFile.c_str());
+    //    else { std::cout<<" Option not considered --> exit "<<std::endl; return -1 ;}
 
     name = Form("%s%s.root",outputPath.c_str(),name_tmp.Data());
     TFile *f1 = new TFile(name,"RECREATE");
@@ -237,14 +245,14 @@ int main (int argc, char ** argv) {
       FastCalibratorEE analyzer(tree, g_EoC_EE, g_EoC_EE2, typeEE, outEPDistribution);
       analyzer.bookHistos(nLoops);
       analyzer.AcquireDeadXtal(DeadXtal,isDeadTriggerTower);
-      analyzer.Loop(numberOfEvents, useZ, useW, splitStat, nLoops, isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
+      analyzer.Loop(numberOfEvents, useZ, useW, splitStat, nLoops, isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap,EPmin);
       analyzer.saveHistos(f1);
     }
     else{
       FastCalibratorEE analyzer(tree, g_EoC_EE, g_EoC_EE2, typeEE);
       analyzer.bookHistos(nLoops);
       analyzer.AcquireDeadXtal(DeadXtal,isDeadTriggerTower);  
-      analyzer.Loop(numberOfEvents, useZ, useW, splitStat, nLoops, isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
+      analyzer.Loop(numberOfEvents, useZ, useW, splitStat, nLoops, isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap,EPmin);
       analyzer.saveHistos(f1);
     }
    
@@ -361,14 +369,14 @@ int main (int argc, char ** argv) {
     FastCalibratorEE analyzer_even(tree, g_EoC_EE, g_EoC_EE2, typeEE);
     analyzer_even.bookHistos(nLoops);
     analyzer_even.AcquireDeadXtal(DeadXtal,isDeadTriggerTower);
-    analyzer_even.Loop(numberOfEvents, useZ, useW, splitStat, nLoops,isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
+    analyzer_even.Loop(numberOfEvents, useZ, useW, splitStat, nLoops,isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap,EPmin);
     analyzer_even.saveHistos(outputName1);
   
     /// Run on even
     FastCalibratorEE analyzer_odd(tree, g_EoC_EE, g_EoC_EE2, typeEE);
     analyzer_odd.bookHistos(nLoops);
     analyzer_odd.AcquireDeadXtal(DeadXtal,isDeadTriggerTower);
-    analyzer_odd.Loop(numberOfEvents, useZ, useW, splitStat*(-1), nLoops,isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap);
+    analyzer_odd.Loop(numberOfEvents, useZ, useW, splitStat*(-1), nLoops,isMiscalib,isSaveEPDistribution,isEPselection,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,jsonMap,EPmin);
     analyzer_odd.saveHistos(outputName2);
     
   }

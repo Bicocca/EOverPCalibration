@@ -1,4 +1,3 @@
-
 #include <vector>
 #include <utility>
 #include <fstream>
@@ -114,6 +113,7 @@ gStyle->SetTitleYOffset(1.4);
 gROOT->ForceStyle();
 
 
+
 int iPhi, iEta, iz;
 double ic, eic;
 
@@ -222,9 +222,7 @@ if(iz==-1) map6_EEm->Fill(iEta,iPhi,ic);
 }
 std::cout<<" End 6th file "<<std::endl;
 
-//TApplication* theApp = new TApplication("Application",&argc, argv);
-
- TFile* output = new TFile("istogrammi.root","RECREATE");
+TApplication* theApp = new TApplication("Application",&argc, argv);
 
 
 /// Set of two ic sets
@@ -254,15 +252,15 @@ TH2F * ratiomap_EEm = (TH2F*) map1_EEm->Clone("ratiomapEEm");
 ratiomap_EEm->Reset();
 
 Name = Form("diffHistEB");
-TH1F * diffHistEB = new TH1F(Name,Name,1000,-0.1,0.1);
+TH1F * diffHistEB = new TH1F(Name,Name,1000,-0.06,0.06);
 diffHistEB->SetLineWidth(2);
 
 Name = Form("diffHistEEp");
- TH1F * diffHistEEp = new TH1F(Name,Name,200,-0.1,0.1);
+TH1F * diffHistEEp = new TH1F(Name,Name,200,-0.06,0.06);
 diffHistEEp->SetLineWidth(2);
 
 Name = Form("diffHistEEm");
-TH1F * diffHistEEm = new TH1F(Name,Name,200,-0.1,0.1);
+TH1F * diffHistEEm = new TH1F(Name,Name,200,-0.06,0.06);
 diffHistEEm->SetLineWidth(2);
 
 Name = Form("ratioHistEB");
@@ -278,7 +276,7 @@ TH1F * ratioHistEEm = new TH1F(Name,Name,100,-1.6,1.6);
 ratioHistEEm->SetLineWidth(2);
 
 Name = Form("correlationEB");
-TH2F * correlationEB = new TH2F(Name,Name,100,0.9,1.1,100,0.9,1.1);
+TH2F * correlationEB = new TH2F(Name,Name,100,0.2,2.,100,0.2,2.);
 
 Name = Form("correlationEEp");
 TH2F * correlationEEp= new TH2F(Name,Name,100,0.2,2.,100,0.2,2.);
@@ -294,16 +292,16 @@ TH1F * statHistEB = new TH1F(Name,Name,1000,-0.06,0.06);
 statHistEB->SetLineWidth(2);
 
 Name = Form("statHistEEp");
-TH1F * statHistEEp = new TH1F(Name,Name,200,-1,1);
+TH1F * statHistEEp = new TH1F(Name,Name,200,-0.06,0.06);
 statHistEEp->SetLineWidth(2);
 
 Name = Form("statHistEEm");
-TH1F * statHistEEm = new TH1F(Name,Name,200,-1,1);
+TH1F * statHistEEm = new TH1F(Name,Name,200,-0.06,0.06);
 statHistEEm->SetLineWidth(2);
 
 TH1F *etaHistEB[200];
 TH1F *etaStatHistEB[200];
- for (int iEta=1; iEta<map1_EB->GetNbinsY()+2; iEta++)
+ for (int iEta=1; iEta<map1_EB->GetNbinsY()+1; iEta++)
    {
      Name = Form("EB_%d",iEta-1);
      etaHistEB[iEta-1] = new TH1F(Name,Name,500,-0.5,0.5);
@@ -338,43 +336,6 @@ TH1F *etaStatHistEEm[200];
    }
 
 
-TH1F *phiHistEB[360];
-TH1F *phiStatHistEB[360];
- for (int iPhi=1; iPhi<361; iPhi++)
-   {
-     Name = Form("EB_%d",iPhi-1);
-     phiHistEB[iPhi-1] = new TH1F(Name,Name,500,-0.5,0.5);
-     phiHistEB[iPhi-1]->SetLineWidth(2);
-     Name = Form("EB_%d_stat",iPhi-1);
-     phiStatHistEB[iPhi-1] = new TH1F(Name,Name,1000,-0.5,0.5);
-     phiStatHistEB[iPhi-1]->SetLineWidth(2);
-   }
-
-TH1F *phiHistEEp[360];
-TH1F *phiStatHistEEp[360];
- for (int iPhi=1; iPhi<361; iPhi++)
-   {
-     Name = Form("EEp_%d",iPhi-1);
-     phiHistEEp[iPhi-1] = new TH1F(Name,Name,50,-0.1,0.1);
-     phiHistEEp[iPhi-1]->SetLineWidth(2);
-     Name = Form("EEp_%d_stat",iPhi-1);
-     phiStatHistEEp[iPhi-1] = new TH1F(Name,Name,50,-0.5,0.5);
-     phiStatHistEEp[iPhi-1]->SetLineWidth(2);
-   }
-
-TH1F *phiHistEEm[360];
-TH1F *phiStatHistEEm[200];
- for (int iPhi=1; iPhi<361; iPhi++)
-   {
-     Name = Form("EEm_%d",iPhi-1);
-     phiHistEEm[iPhi-1] = new TH1F(Name,Name,50,-0.1,0.1);
-     phiHistEEm[iPhi-1]->SetLineWidth(2);
-     Name = Form("EEm_%d_stat",iPhi-1);
-     phiStatHistEEm[iPhi-1] = new TH1F(Name,Name,50,-0.5,0.5);
-     phiStatHistEEm[iPhi-1]->SetLineWidth(2);
-   }
-
-
 
 for(int iPhi =1; iPhi<map1_EB->GetNbinsX()+1; iPhi++){
  for(int iEta=1; iEta<map1_EB->GetNbinsY()+1; iEta++){
@@ -389,11 +350,8 @@ for(int iPhi =1; iPhi<map1_EB->GetNbinsX()+1; iPhi++){
  ratiomap_EB->SetBinContent(iPhi,iEta,-1.);
  continue;}
 
- int etaBin = iEta;
-  std::cout<<"debug "<<iPhi<<std::endl;
- etaHistEB[etaBin]->Fill(map1_EB->GetBinContent(iPhi,iEta)-map2_EB->GetBinContent(iPhi,iEta));
- phiHistEB[iPhi-1]->Fill(map1_EB->GetBinContent(iPhi,iEta)-map2_EB->GetBinContent(iPhi,iEta));
- etaStatHistEB[etaBin]->Fill(((map3_EB->GetBinContent(iPhi,iEta)-map4_EB->GetBinContent(iPhi,iEta))-(map5_EB->GetBinContent(iPhi,iEta)-map6_EB->GetBinContent(iPhi,iEta)))/2);
+ etaHistEB[iEta-1]->Fill(map1_EB->GetBinContent(iPhi,iEta)-map2_EB->GetBinContent(iPhi,iEta));
+ etaStatHistEB[iEta-1]->Fill(((map3_EB->GetBinContent(iPhi,iEta)-map4_EB->GetBinContent(iPhi,iEta))-(map5_EB->GetBinContent(iPhi,iEta)-map6_EB->GetBinContent(iPhi,iEta)))/2);
  diffmap_EB->SetBinContent(iPhi,iEta,map1_EB->GetBinContent(iPhi,iEta)-map2_EB->GetBinContent(iPhi,iEta));
  diffHistEB->Fill(map1_EB->GetBinContent(iPhi,iEta)-map2_EB->GetBinContent(iPhi,iEta));
  statHistEB->Fill(((map3_EB->GetBinContent(iPhi,iEta)-map4_EB->GetBinContent(iPhi,iEta))-(map5_EB->GetBinContent(iPhi,iEta)-map6_EB->GetBinContent(iPhi,iEta)))/2);
@@ -401,9 +359,9 @@ for(int iPhi =1; iPhi<map1_EB->GetNbinsX()+1; iPhi++){
  ratiomap_EB->SetBinContent(iPhi,iEta,map1_EB->GetBinContent(iPhi,iEta)/map2_EB->GetBinContent(iPhi,iEta));
  correlationEB->Fill(map1_EB->GetBinContent(iPhi,iEta),map2_EB->GetBinContent(iPhi,iEta));
    correlationEB_EvenOdd->Fill(map3_EB->GetBinContent(iPhi,iEta)-map4_EB->GetBinContent(iPhi,iEta),map5_EB->GetBinContent(iPhi,iEta)-map6_EB->GetBinContent(iPhi,iEta));
+   std::cout<<map3_EB->GetBinContent(iPhi,iEta)-map4_EB->GetBinContent(iPhi,iEta)<<" "<<map5_EB->GetBinContent(iPhi,iEta)-map6_EB->GetBinContent(iPhi,iEta)<<std::endl;
  }
 }
- std::cout<<"end "<<std::endl;
 
 //fit the eta histograms
 /* TF1 *fgausStat = new TF1("fgausStat","gaus",-10,10);
@@ -418,49 +376,33 @@ for(int iPhi =1; iPhi<map1_EB->GetNbinsX()+1; iPhi++){
  etaTrendEB->SetMarkerStyle(20);
  etaTrendEB->SetMarkerSize(1);
  etaTrendEB->SetMarkerColor(kBlue);
- TGraphErrors *phiTrendEB = new TGraphErrors();
- phiTrendEB->SetMarkerStyle(20);
- phiTrendEB->SetMarkerSize(1);
- phiTrendEB->SetMarkerColor(kBlue);
 
- for (int iPhiBin=1; iPhiBin<map1_EB->GetNbinsX()+1; iPhiBin++){
-   std::cout<<"inside "<<iPhiBin<<std::endl;
-  phiTrendEB->SetPoint(iPhiBin, iPhiBin-1, (phiHistEB[iPhiBin-1]->GetMean()));
- }
-
- //for(int iEta=1; iEta<map1_EB->GetNbinsY()+1; iEta++){
- for (int iEtaBin=0; iEtaBin<map1_EB->GetNbinsY()+1; iEtaBin++){
-
-   // std::cout<<"debug "<<iEtaBin<<std::endl;
+for(int iEta=1; iEta<map1_EB->GetNbinsY()+1; iEta++){
   
   TF1 *fgaus = new TF1("fgaus","gaus",-10,10);
   fgaus->SetParameter(1,0);
-  fgaus->SetParameter(2,etaHistEB[iEtaBin]->GetRMS());
-  fgaus->SetRange(0-2*etaHistEB[iEtaBin]->GetRMS(),0+2*etaHistEB[iEtaBin]->GetRMS());
+  fgaus->SetParameter(2,etaHistEB[iEta-1]->GetRMS());
+  fgaus->SetRange(0-2*etaHistEB[iEta-1]->GetRMS(),0+2*etaHistEB[iEta-1]->GetRMS());
   fgaus->SetLineColor(kBlue);
-  etaHistEB[iEtaBin]->Fit("fgaus","QRME");
+  etaHistEB[iEta-1]->Fit("fgaus","QRME");
 
 //fit the eta histograms
   TF1 *fgausStat = new TF1("fgausStat","gaus",-1,1);
   fgausStat->SetParameter(1,0);
-  fgausStat->SetParameter(2,etaStatHistEB[iEtaBin]->GetRMS());
-  fgausStat->SetRange(0-1*etaStatHistEB[iEtaBin]->GetRMS(),0+1*etaStatHistEB[iEtaBin]->GetRMS());
+  fgausStat->SetParameter(2,etaStatHistEB[iEta-1]->GetRMS());
+  fgausStat->SetRange(0-1*etaStatHistEB[iEta-1]->GetRMS(),0+1*etaStatHistEB[iEta-1]->GetRMS());
   fgausStat->SetLineColor(kBlue);
-  etaStatHistEB[iEtaBin]->Fit("fgausStat","QRME");
+  etaStatHistEB[iEta-1]->Fit("fgausStat","QRME");
 
   /*  if (fgausStat->GetParameter(2)<fgaus->GetParameter(2))
     etaTrendEB->SetPoint(iEta-1, iEta, sqrt(fgaus->GetParameter(2)*fgaus->GetParameter(2)-fgausStat->GetParameter(2)*fgausStat->GetParameter(2)));
   else
+    etaTrendEB->SetPoint(iEta-1, iEta, fgaus->GetParameter(2));
   */
   //  etaTrendEB->SetPoint(iEta-1, iEta, sqrt(fgaus->GetParameter(2)*fgaus->GetParameter(2)-0.0045*0.0045));
-  //  std::cout<<"qui: "<<std::endl;
-  //    etaTrendEB->SetPoint(iEtaBin, iEtaBin, (fgaus->GetParameter(2)));
-  //  if (iEtaBin==86 || iEtaBin==0) continue;
-  etaTrendEB->SetPoint(iEtaBin, iEtaBin-85, (etaHistEB[iEtaBin]->GetMean()));
-  // std::cout<<iEtaBin<<" diff: "<<fgaus->GetParameter(2)<<" stat: "<<fgausStat->GetParameter(2)<<" entries: "<<etaHistEB[iEtaBin]->GetEntries()<<std::endl;
+  etaTrendEB->SetPoint(iEta-1, iEta, (fgaus->GetParameter(2)));
+  std::cout<<iEta<<" "<<fgaus->GetParameter(2)<<" "<<fgausStat->GetParameter(2)<<std::endl;
  }
-
-   std::cout<<"outside "<<std::endl;
 
 TEndcapRings *eRings = new TEndcapRings();
 
@@ -478,14 +420,9 @@ for(int ix =1; ix<map1_EEp->GetNbinsX()+1; ix++){
   continue;}
 
   int iEta = int(eRings->GetEndcapRing(ix,iy,1));
-  int iPhi = int(eRings->GetEndcapIphi(ix,iy,1));
-  //  std::cout<<ix<<" "<<iy<<" "<<iEta<<std::endl;
-
   etaHistEEp[iEta]->Fill(map1_EEp->GetBinContent(ix,iy)-map2_EEp->GetBinContent(ix,iy));
-  phiHistEEp[iPhi]->Fill(map1_EEp->GetBinContent(ix,iy)-map2_EEp->GetBinContent(ix,iy));
   //  if (iEta==3)
-  // std::cout<<"DEBUG: "<<ix<<" "<<iy<<" "<<iEta<<" EEP "<<map1_EEp->GetBinContent(ix,iy)<<" "<<map2_EEp->GetBinContent(ix,iy)<<" "<<map3_EEp->GetBinContent(iPhi,iEta)<<" "<<map4_EEp->GetBinContent(iPhi,iEta)<<" "<<map5_EEp->GetBinContent(iPhi,iEta)<<" "<<map6_EEp->GetBinContent(iPhi,iEta)<<std::endl;
-  // getchar();
+  //   std::cout<<"DEBUG: "<<iEta<<" EEP "<<map1_EEp->GetBinContent(ix,iy)<<" "<<map2_EEp->GetBinContent(ix,iy)<<" "<<map3_EEp->GetBinContent(iPhi,iEta)<<" "<<map4_EEp->GetBinContent(iPhi,iEta)<<" "<<map5_EEp->GetBinContent(iPhi,iEta)<<" "<<map6_EEp->GetBinContent(iPhi,iEta)<<std::endl;
    etaStatHistEEp[iEta]->Fill(((map3_EEp->GetBinContent(iPhi,iEta)-map4_EEp->GetBinContent(iPhi,iEta))-(map5_EEp->GetBinContent(iPhi,iEta)-map6_EEp->GetBinContent(iPhi,iEta)))/2);
   diffmap_EEp->SetBinContent(ix,iy,map1_EEp->GetBinContent(ix,iy)-map2_EEp->GetBinContent(ix,iy));
   diffHistEEp->Fill(map1_EEp->GetBinContent(ix,iy)-map2_EEp->GetBinContent(ix,iy));
@@ -496,21 +433,12 @@ for(int ix =1; ix<map1_EEp->GetNbinsX()+1; ix++){
 
  }
 }
-   std::cout<<"outside "<<std::endl;
 
 //fit the eta histograms for EE+
  TGraphErrors *etaTrendEEp = new TGraphErrors();
  etaTrendEEp->SetMarkerStyle(20);
  etaTrendEEp->SetMarkerSize(1);
  etaTrendEEp->SetMarkerColor(kBlue);
- TGraphErrors *phiTrendEEp = new TGraphErrors();
- phiTrendEEp->SetMarkerStyle(20);
- phiTrendEEp->SetMarkerSize(1);
- phiTrendEEp->SetMarkerColor(kBlue);
-
- for (int iPhiBin=0; iPhiBin<360; iPhiBin++){
-  phiTrendEEp->SetPoint(iPhiBin, iPhiBin, (phiHistEEp[iPhiBin]->GetMean()));
- }
 
 for(int iEta=1; iEta<35; iEta++){
 
@@ -530,13 +458,11 @@ for(int iEta=1; iEta<35; iEta++){
   etaStatHistEEp[iEta-1]->Fit("fgausStat","QRME");
 
   //  etaTrendEEp->SetPoint(iEta-1, iEta, sqrt(fgaus->GetParameter(2)*fgaus->GetParameter(2)-fgausStat->GetParameter(2)*fgausStat->GetParameter(2)));
-  etaTrendEEp->SetPoint(iEta-1, iEta, fgaus->GetParameter(2));
-  //etaTrendEEp->SetPoint(iEta-1, iEta, etaHistEEp[iEta-1]->GetMean());
+    etaTrendEEp->SetPoint(iEta-1, iEta, fgaus->GetParameter(2));
   //  etaTrendEEp->SetPoint(iEta-1, iEta, sqrt(fgaus->GetParameter(2)*fgaus->GetParameter(2)-0.0056*0.0056));
-    //  std::cout<<iEta<<" diff: "<<fgaus->GetParameter(2)<<" stat: "<<fgausStat->GetParameter(2)<<" entries: "<<etaHistEEp[iEta-1]->GetEntries()<<std::endl;
+  std::cout<<iEta<<" diff: "<<fgaus->GetParameter(2)<<" stat: "<<fgausStat->GetParameter(2)<<" entries: "<<etaHistEEp[iEta-1]->GetEntries()<<std::endl;
  }
 
-   std::cout<<"outside "<<std::endl;
 
 for(int ix =1; ix<map1_EEm->GetNbinsX()+1; ix++){
  for(int iy=1; iy<map1_EEm->GetNbinsY()+1; iy++){
@@ -552,11 +478,7 @@ for(int ix =1; ix<map1_EEm->GetNbinsX()+1; ix++){
  continue;}
 
  int iEta = int(eRings->GetEndcapRing(ix,iy,1));
- int iPhi = int(eRings->GetEndcapIphi(ix,iy,1));
- std::cout<<"debug: "<<iPhi<<std::endl;
-
  etaHistEEm[iEta]->Fill(map1_EEm->GetBinContent(ix,iy)-map2_EEm->GetBinContent(ix,iy));
- phiHistEEm[iPhi-1]->Fill(map1_EEm->GetBinContent(ix,iy)-map2_EEm->GetBinContent(ix,iy));
    etaStatHistEEm[iEta]->Fill(((map3_EEm->GetBinContent(iPhi,iEta)-map4_EEm->GetBinContent(iPhi,iEta))-(map5_EEm->GetBinContent(iPhi,iEta)-map6_EEm->GetBinContent(iPhi,iEta)))/2);
  diffmap_EEm->SetBinContent(ix,iy,map1_EEm->GetBinContent(ix,iy)-map2_EEm->GetBinContent(ix,iy));
  diffHistEEm->Fill(map1_EEm->GetBinContent(ix,iy)-map2_EEm->GetBinContent(ix,iy));
@@ -573,16 +495,6 @@ for(int ix =1; ix<map1_EEm->GetNbinsX()+1; ix++){
  etaTrendEEm->SetMarkerStyle(20);
  etaTrendEEm->SetMarkerSize(1);
  etaTrendEEm->SetMarkerColor(kBlue);
- TGraphErrors *phiTrendEEm = new TGraphErrors();
- phiTrendEEm->SetMarkerStyle(20);
- phiTrendEEm->SetMarkerSize(1);
- phiTrendEEm->SetMarkerColor(kBlue);
-
- for (int iPhiBin=0; iPhiBin<360; iPhiBin++){
-   std::cout<<"mah "<<iPhiBin<<std::endl;
-  phiTrendEEm->SetPoint(iPhiBin, iPhiBin, (phiHistEEm[iPhiBin]->GetMean()));
-   std::cout<<"mah2 "<<iPhiBin<<std::endl;
- }
 
 for(int iEta=1; iEta<35; iEta++){
 
@@ -602,13 +514,11 @@ for(int iEta=1; iEta<35; iEta++){
   etaStatHistEEm[iEta-1]->Fit("fgausStat","QRME");
 
   //  etaTrendEEm->SetPoint(iEta-1, iEta, sqrt(fgaus->GetParameter(2)*fgaus->GetParameter(2)-fgausStat->GetParameter(2)*fgausStat->GetParameter(2)));
-  etaTrendEEm->SetPoint(iEta-1, iEta, fgaus->GetParameter(2));
-  //etaTrendEEm->SetPoint(iEta-1, iEta, etaHistEEm[iEta-1]->GetMean());
+    etaTrendEEm->SetPoint(iEta-1, iEta, fgaus->GetParameter(2));
   //  etaTrendEEm->SetPoint(iEta-1, iEta, sqrt(fgaus->GetParameter(2)*fgaus->GetParameter(2)-0.0059*0.0059));
   //  std::cout<<iEta<<" "<<fgaus->GetParameter(2)<<std::endl;
  }
 
-   std::cout<<"outside "<<std::endl;
 
 /// Profile along phi  for EB:
 
@@ -1128,8 +1038,6 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
  ///-----------------------------------------------------------------
  ///--- Draw plots
  ///-----------------------------------------------------------------
-
- output->cd();
  
  TCanvas *c[30];
 
@@ -1144,7 +1052,6 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
  diffmap_EB->GetYaxis() ->SetTitle("i#eta");
  diffmap_EB->GetZaxis() ->SetRangeUser(-0.06,0.06);
  diffmap_EB->Draw("COLZ");
- diffmap_EB->Write();
 
  c[1] = new TCanvas("histdiffEB","histdiffEB");
  c[1]->SetLeftMargin(0.1); 
@@ -1153,7 +1060,7 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
 
  diffHistEB->GetXaxis()->SetTitle("c_{1}-c_{2}"); 
  diffHistEB->Draw();
- diffHistEB->Write();
+
  
  c[2] = new TCanvas("hratioEB","hratioEB");
  c[2]->SetLeftMargin(0.1); 
@@ -1166,7 +1073,6 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
  ratiomap_EB->GetYaxis() ->SetTitle("i#eta");
  ratiomap_EB->GetZaxis() ->SetRangeUser(0.95,1.05);
  ratiomap_EB->Draw("COLZ");
- ratiomap_EB->Write();
 
  c[3] = new TCanvas("correlationEB","correlationEB");
  c[3]->SetLeftMargin(0.1); 
@@ -1179,8 +1085,7 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
  correlationEB->GetXaxis() ->SetTitle("c_{1}");
  correlationEB->GetYaxis() ->SetTitle("c_{2}");
  correlationEB->Draw("COLZ");
- correlationEB->Write();
- // std::cout<<"correlation: "<<correlationEB->GetCorrelationFactor()<<std::endl;
+ std::cout<<"correlation: "<<correlationEB->GetCorrelationFactor()<<std::endl;
 
  
  c[4] = new TCanvas("hdiffEEp","hdiffEEp");
@@ -1194,7 +1099,6 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
  diffmap_EEp->GetYaxis() ->SetTitle("iy");
  diffmap_EEp->GetZaxis() ->SetRangeUser(-0.06,0.06);
  diffmap_EEp->Draw("COLZ");
- diffmap_EEp->Write();
 
  c[5] = new TCanvas("histdiffEEp","histdiffEEp");
  c[5]->SetLeftMargin(0.1); 
@@ -1203,7 +1107,6 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
 
  diffHistEEp->GetXaxis()->SetTitle("c_{1}-c_{2}"); 
  diffHistEEp->Draw();
- diffHistEEp->Write();
  
  c[6] = new TCanvas("hratioEEp","hratioEEp");
  c[6]->SetLeftMargin(0.1); 
@@ -1216,7 +1119,6 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
  ratiomap_EEp->GetYaxis() ->SetTitle("iy");
  ratiomap_EEp->GetZaxis() ->SetRangeUser(0.9,1.1);
  ratiomap_EEp->Draw("COLZ");
- ratiomap_EEp->Write();
 
  c[7] = new TCanvas("correlationEEp","correlationEEp");
  c[7]->SetLeftMargin(0.1); 
@@ -1229,7 +1131,6 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
  correlationEEp->GetXaxis() ->SetTitle("c_{#pi}");
  correlationEEp->GetYaxis() ->SetTitle("c_{ele}");
  correlationEEp->Draw("COLZ");
- correlationEEp->Write();
 
  c[8] = new TCanvas("hdiffEEm","hdiffEEm");
  c[8]->SetLeftMargin(0.1); 
@@ -1242,7 +1143,6 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
  diffmap_EEm->GetYaxis() ->SetTitle("iy");
  diffmap_EEm->GetZaxis() ->SetRangeUser(-0.06,0.06);
  diffmap_EEm->Draw("COLZ");
- diffmap_EEm->Write();
 
  c[9] = new TCanvas("histdiffEEm","histdiffEEm");
  c[9]->SetLeftMargin(0.1); 
@@ -1251,7 +1151,7 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
 
  diffHistEEm->GetXaxis()->SetTitle("c_{1}-c_{2}"); 
  diffHistEEm->Draw();
- diffHistEEm->Write();
+ 
 
 
  c[10] = new TCanvas("hratioEEm","hratioEEm");
@@ -1265,7 +1165,6 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
  ratiomap_EEm->GetYaxis() ->SetTitle("iy");
  ratiomap_EEm->GetZaxis() ->SetRangeUser(0.9,1.1);
  ratiomap_EEm->Draw("COLZ");
- ratiomap_EEm->Write();
  
  c[11] = new TCanvas("correlationEEm","correlationEEm");
  c[11]->SetLeftMargin(0.1); 
@@ -1278,7 +1177,7 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
  correlationEEm->GetXaxis() ->SetTitle("c_{#pi}");
  correlationEEm->GetYaxis() ->SetTitle("c_{ele}");
  correlationEEm->Draw("COLZ");
- correlationEEm->Write();
+
 
  c[12] = new TCanvas("phiProjectionEB","phiProjectionEB");
  c[12]->SetGridx();
@@ -1289,7 +1188,7 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
  phiProjectionEB1->GetHistogram()->GetXaxis()-> SetTitle("i#phi");
  phiProjectionEB1->Draw("apl");
  phiProjectionEB2->Draw("plsame");
-  
+ 
  TLegend * leg1 = new TLegend(0.75,0.75,0.89, 0.89);
  leg1->AddEntry(phiProjectionEB1,"IC set 1","LP");
  leg1->AddEntry(phiProjectionEB2,"IC set 2","LP");
@@ -1500,11 +1399,10 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
 
  correlationEB_EvenOdd->GetXaxis()->SetNdivisions(1020);
  correlationEB_EvenOdd->GetXaxis() -> SetLabelSize(0.03);
- correlationEB_EvenOdd->GetXaxis() ->SetTitle("(D-ABC)_{multif}");
- correlationEB_EvenOdd->GetYaxis() ->SetTitle("(D-ABC)_{weight}");
+ correlationEB_EvenOdd->GetXaxis() ->SetTitle("(C1-C2)_{runD}");
+ correlationEB_EvenOdd->GetYaxis() ->SetTitle("(C1-C2)_{runABC}");
  correlationEB_EvenOdd->Draw("COLZ");
- correlationEB_EvenOdd->Write();
- // std::cout<<"correlation: "<<correlationEB_EvenOdd->GetCorrelationFactor()<<std::endl;
+ std::cout<<"correlation: "<<correlationEB_EvenOdd->GetCorrelationFactor()<<std::endl;
 
  c[25] = new TCanvas("histratioEB","histratioEB");
  c[25]->SetLeftMargin(0.1); 
@@ -1513,7 +1411,6 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
 
  ratioHistEB->GetXaxis()->SetTitle("c_{#pi}/c_{ele}"); 
  ratioHistEB->Draw();
- ratioHistEB->Write();
 
  c[26] = new TCanvas("histratioEEp","histratioEEp");
  c[26]->SetLeftMargin(0.1); 
@@ -1522,7 +1419,6 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
 
  ratioHistEEp->GetXaxis()->SetTitle("c_{#pi}/c_{ele}"); 
  ratioHistEEp->Draw();
- ratioHistEEp->Write();
 
  c[27] = new TCanvas("histratioEEm","histratioEEm");
  c[27]->SetLeftMargin(0.1); 
@@ -1530,9 +1426,8 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
  c[27]->SetLogy();
 
 
- ratioHistEEm->GetXaxis()->SetTitle("c_{#pi}/c_{ele}"); 
- ratioHistEEm->Draw();
- ratioHistEEm->Write();
+ ratioHistEEp->GetXaxis()->SetTitle("c_{#pi}/c_{ele}"); 
+ ratioHistEEp->Draw();
 
  c[28] = new TCanvas("histstatEB","histstatEB");
  c[28]->SetLeftMargin(0.1); 
@@ -1541,7 +1436,6 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
 
  statHistEB->GetXaxis()->SetTitle("((C_{1}-C_{2})_{even}-(C_{1}-C_{2})_{odd})/2"); 
  statHistEB->Draw();
- statHistEB->Write();
 
  c[29] = new TCanvas("histstatEEp","histstatEEp");
  c[29]->SetLeftMargin(0.1); 
@@ -1550,7 +1444,6 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
 
  statHistEEp->GetXaxis()->SetTitle("((C_{1}-C_{2})_{even}-(C_{1}-C_{2})_{odd})/2");
  statHistEEp->Draw();
- statHistEEp->Write();
 
  c[30] = new TCanvas("histstatEEm","histstatEEm");
  c[30]->SetLeftMargin(0.1); 
@@ -1559,7 +1452,6 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
 
  statHistEEm->GetXaxis()->SetTitle("((C_{1}-C_{2})_{even}-(C_{1}-C_{2})_{odd})/2");
  statHistEEm->Draw();
- statHistEEm->Write();
 
 
  c[31] = new TCanvas("etaTrendEB","etaTrendEB");
@@ -1568,11 +1460,10 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
  // c[31]->SetLogy();
 
  etaTrendEB->GetXaxis()->SetTitle("i#eta");
- etaTrendEB->GetXaxis()->SetRangeUser(-90,90);
- // etaTrendEB->GetYaxis()->SetTitle("#sigma");
- etaTrendEB->GetYaxis()->SetTitle("Mean diff");
+ etaTrendEB->GetXaxis()->SetRangeUser(0,185);
+ etaTrendEB->GetYaxis()->SetTitle("#sigma");
  etaTrendEB->Draw("AP");
- etaTrendEB->Write();
+
 
  c[32] = new TCanvas("etaTrendEEp","etaTrendEEp");
  c[32]->SetLeftMargin(0.1); 
@@ -1581,9 +1472,8 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
 
  etaTrendEEp->GetXaxis()->SetTitle("iring");
  etaTrendEEp->GetXaxis()->SetRangeUser(0,185);
- etaTrendEEp->GetYaxis()->SetTitle("Mean diff");
+ etaTrendEEp->GetYaxis()->SetTitle("#sigma");
  etaTrendEEp->Draw("AP");
- etaTrendEEp->Write();
 
  c[33] = new TCanvas("etaTrendEEm","etaTrendEEm");
  c[33]->SetLeftMargin(0.1); 
@@ -1592,44 +1482,9 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
 
  etaTrendEEm->GetXaxis()->SetTitle("iring");
  etaTrendEEm->GetXaxis()->SetRangeUser(0,185);
- etaTrendEEm->GetYaxis()->SetTitle("Mean diff");
+ etaTrendEEm->GetYaxis()->SetTitle("#sigma");
  etaTrendEEm->Draw("AP");
- etaTrendEEm->Write();
 
- c[36] = new TCanvas("phiTrendEB","phiTrendEB");
- c[36]->SetLeftMargin(0.1); 
- c[36]->SetRightMargin(0.13); 
- // c[36]->SetLogy();
-
- phiTrendEB->GetXaxis()->SetTitle("i#phi");
- phiTrendEB->GetXaxis()->SetRangeUser(0,360);
- // phiTrendEB->GetYaxis()->SetTitle("#sigma");
- phiTrendEB->GetYaxis()->SetTitle("Mean diff");
- phiTrendEB->Draw("AP");
- phiTrendEB->Write();
-
- c[37] = new TCanvas("phiTrendEEp","phiTrendEEp");
- c[37]->SetLeftMargin(0.1); 
- c[37]->SetRightMargin(0.13); 
- // c[37]->SetLogy();
-
- phiTrendEEp->GetXaxis()->SetTitle("iring");
- phiTrendEEp->GetXaxis()->SetRangeUser(0,360);
- phiTrendEEp->GetYaxis()->SetTitle("Mean diff");
- phiTrendEEp->Draw("AP");
- phiTrendEEp->Write();
-
- c[38] = new TCanvas("phiTrendEEm","phiTrendEEm");
- c[38]->SetLeftMargin(0.1); 
- c[38]->SetRightMargin(0.13); 
- // c[38]->SetLogy();
-
-
- phiTrendEEm->GetXaxis()->SetTitle("iring");
- phiTrendEEm->GetXaxis()->SetRangeUser(0,360);
- phiTrendEEm->GetYaxis()->SetTitle("Mean diff");
- phiTrendEEm->Draw("AP");
- phiTrendEEm->Write();
 
  c[34] = new TCanvas("etaStatHistEB","etaStatHistEB");
  c[34]->SetLeftMargin(0.1); 
@@ -1639,8 +1494,8 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
  // etaStatHistEEp[0]->GetXaxis()->SetTitle("iring");
  // etaStatHistEEp[0]->GetXaxis()->SetRangeUser(0,185);
  // etaStatHistEEp[0]->GetYaxis()->SetTitle("#sigma");
- etaStatHistEB[0]->Draw("");
- etaStatHistEB[0]->Write();
+ etaStatHistEEp[1]->Draw("");
+
 
  c[35] = new TCanvas("etaHistEB","etaHistEB");
  c[35]->SetLeftMargin(0.1); 
@@ -1650,12 +1505,10 @@ cout<<" Second Set : Mean dist = "<<etaProfileEEm2->GetMean()<<" RMS dist "<<eta
  // etaStatHistEEp[0]->GetXaxis()->SetTitle("iring");
  // etaStatHistEEp[0]->GetXaxis()->SetRangeUser(0,185);
  // etaStatHistEEp[0]->GetYaxis()->SetTitle("#sigma");
- etaHistEB[86]->Draw("");
- etaHistEB[86]->Write();
+ etaHistEEp[1]->Draw("");
 
- output->Close();
 
- //theApp->Run();
+theApp->Run();
 
 return 0;
 

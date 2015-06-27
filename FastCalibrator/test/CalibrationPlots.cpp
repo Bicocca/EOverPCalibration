@@ -186,6 +186,8 @@ int main(int argc, char **argv)
   std::map<int, TH2F*> h2_IC_raw_phiNorm;
   std::map<int, TH2F*> h2_IC_crackCorr;
   std::map<int, TH2F*> h2_IC_crackCorr_phiNorm;
+
+  std::map<int, TH2F*> h2_occupancy;
   
   std::map<int, TH2F*> h2_ICEven_raw;
   std::map<int, TH2F*> h2_IC_raw_phiNorm_even;
@@ -198,6 +200,7 @@ int main(int argc, char **argv)
   if( isEB == true )
   {
     h2_IC_raw[0] = (TH2F*)( inFile->Get("h_scale_EB") );
+    h2_occupancy[0] = (TH2F*)( inFile->Get("h_occupancy") );
     
     h2_IC_raw_phiNorm[0] = (TH2F*)( h2_IC_raw[0]->Clone("h2_IC_raw_phiNorm_EB") );
     h2_IC_raw_phiNorm[0] -> Reset("ICEMS");
@@ -237,6 +240,9 @@ int main(int argc, char **argv)
   {
     h2_IC_raw[-1] = (TH2F*)( inFile->Get("h_scale_EEM") );
     h2_IC_raw[1]  = (TH2F*)( inFile->Get("h_scale_EEP") );  
+
+    h2_occupancy[-1] = (TH2F*)( inFile->Get("h_occupancy_EEM") );
+    h2_occupancy[1] = (TH2F*)( inFile->Get("h_occupancy_EEP") );
     
     h2_IC_raw_phiNorm[-1] = (TH2F*)( h2_IC_raw[-1]->Clone("h2_IC_raw_phiNorm_EEM") );
     h2_IC_raw_phiNorm[1]  = (TH2F*)( h2_IC_raw[1] ->Clone("h2_IC_raw_phiNorm_EEP") );
@@ -322,7 +328,9 @@ int main(int argc, char **argv)
     
   std::map<int,TH1F*> h_spread;
   std::map<int,std::vector<TH1F*> > h_spread_vsEta;
+  std::map<int,std::vector<TH1F*> > h_number_vsEta;
   std::map<int,TGraphErrors*> g_spread_vsEta;
+  std::map<int,TGraphErrors*> g_number_vsEta;
   
   if( isEB == true )
   {
@@ -332,11 +340,18 @@ int main(int argc, char **argv)
     BookSpreadHistos_EB(h_spread[0], h_spread_vsEta[0], g_spread_vsEta[0], etaRingWidth,
                         "EB_spread_vsEta",nBins_spread,spreadMin,spreadMax,
                         h2_IC_raw_phiNorm[0]);
+
+    g_number_vsEta[0] = new TGraphErrors();
+    NumberEventsvsEta_EB(h_number_vsEta[0], g_number_vsEta[0], etaRingWidth,
+                        "EB_number_vsEta", h2_occupancy[0]);
+
+    h2_IC_raw_phiNorm[0]->Write();
     
     h_spread[0] -> Write();
     //for(unsigned int i = 0; i < h_spread_vsEta[0].size(); ++i)
     //  h_spread_vsEta[0].at(i) -> Write();
     g_spread_vsEta[0] -> Write("g_spread_vsEta_EB");
+    g_number_vsEta[0] -> Write("g_number_vsEta_EB");
   }
   else
   {
@@ -352,19 +367,32 @@ int main(int argc, char **argv)
                         eRings,etaRingWidth,
                         "EE_spread_vsEta",nBins_spread,spreadMin,spreadMax,
                         h2_IC_raw_phiNorm,dummy);
+
+    h2_IC_raw_phiNorm[-1]->Write();
+    h2_IC_raw_phiNorm[1]->Write();
+
+    g_number_vsEta[-1] = new TGraphErrors();
+    g_number_vsEta[0] = new TGraphErrors();
+    g_number_vsEta[1] = new TGraphErrors();
+    NumberEventsvsEta_EE(h_number_vsEta, g_number_vsEta, etaRingWidth,
+			 "EE_number_vsEta", h2_occupancy,eRings);
     
     h_spread[-1] -> Write();
     h_spread[0]  -> Write();
     h_spread[+1] -> Write();
-    //for(unsigned int i = 0; i < h_spread_vsEta[0].size(); ++i)
-    //{
-    //  h_spread_vsEta[-1].at(i) -> Write();
-    //  h_spread_vsEta[0].at(i)  -> Write();
-    //  h_spread_vsEta[+1].at(i) -> Write();
-    //}
+    for(unsigned int i = 0; i < h_spread_vsEta[0].size(); ++i)
+    {
+      h_spread_vsEta[-1].at(i) -> Write();
+      h_spread_vsEta[0].at(i)  -> Write();
+      h_spread_vsEta[+1].at(i) -> Write();
+    }
     g_spread_vsEta[-1] -> Write("g_spread_vsEta_EEM");
     g_spread_vsEta[0]  -> Write("g_spread_vsEta_EE");
     g_spread_vsEta[+1] -> Write("g_spread_vsEta_EEP");
+
+    g_number_vsEta[1] -> Write("g_number_vsEta_EEP");
+    g_number_vsEta[0] -> Write("g_number_vsEta_EE");
+    g_number_vsEta[-1] -> Write("g_number_vsEta_EEM");
   }
   
   
