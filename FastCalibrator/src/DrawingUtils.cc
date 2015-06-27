@@ -100,7 +100,7 @@ void DrawSpreadGraph(TGraphErrors* g, const std::string& fileName, const std::st
     g_stat -> GetYaxis() -> SetRangeUser(0.00,0.05);
     g_stat -> GetXaxis() -> SetTitle("|i#eta|");
     g_stat -> GetYaxis() -> SetTitle("#sigma");
-    g_stat -> Draw("AP");
+    g -> Draw("AP");
   }
   else
   {
@@ -112,14 +112,14 @@ void DrawSpreadGraph(TGraphErrors* g, const std::string& fileName, const std::st
     g_stat -> GetYaxis() -> SetRangeUser(0.00,0.30);
     g_stat -> GetXaxis() -> SetTitle("iRing");
     g_stat -> GetYaxis() -> SetTitle("#sigma");
-    g_stat -> Draw("AP");
+    g -> Draw("AP");
   }
   
   TLegend* leg = new TLegend(0.15,0.74,0.43,0.89);
   leg -> SetFillColor(0);
   leg -> SetTextFont(42);
   leg -> SetTextSize(0.05);
-  //  leg -> AddEntry(g_stat,"IC spread","P");
+  leg -> AddEntry(g,"IC spread","P");
   
   if( g_stat != NULL )
   {
@@ -129,7 +129,7 @@ void DrawSpreadGraph(TGraphErrors* g, const std::string& fileName, const std::st
   
   leg -> Draw("same");
   
-  c -> Print((fileName+".C").c_str(),"cxx");
+  c -> Print((fileName+".png").c_str(),"png");
   
   delete c;
 }

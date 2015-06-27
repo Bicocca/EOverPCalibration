@@ -113,6 +113,7 @@ void FastCalibratorEB::Init(TTree *tree){
   fChain->SetBranchStatus("ele1_charge", 1);         fChain->SetBranchAddress("ele1_charge", &ele1_charge, &b_ele1_charge);
   fChain->SetBranchStatus("ele1_eta", 1);            fChain->SetBranchAddress("ele1_eta", &ele1_eta, &b_ele1_eta);
   fChain->SetBranchStatus("ele1_pt", 1);             fChain->SetBranchAddress("ele1_pt", &ele1_pt, &b_ele1_pt);
+  fChain->SetBranchStatus("ele1_sigmaP", 1);             fChain->SetBranchAddress("ele1_sigmaP", &ele1_sigmaP, &b_ele1_sigmaP);
   fChain->SetBranchStatus("ele1_phi", 1);            fChain->SetBranchAddress("ele1_phi", &ele1_phi, &b_ele1_phi);
   fChain->SetBranchStatus("ele1_scERaw", 1);         fChain->SetBranchAddress("ele1_scERaw", &ele1_scERaw, &b_ele1_scERaw);
   fChain->SetBranchStatus("ele1_scE", 1);            fChain->SetBranchAddress("ele1_scE", &ele1_scE, &b_ele1_scE);
@@ -143,10 +144,11 @@ void FastCalibratorEB::Init(TTree *tree){
   fChain->SetBranchStatus("ele2_charge", 1);         fChain->SetBranchAddress("ele2_charge", &ele2_charge, &b_ele2_charge);
   fChain->SetBranchStatus("ele2_eta", 1);            fChain->SetBranchAddress("ele2_eta", &ele2_eta, &b_ele2_eta);
   fChain->SetBranchStatus("ele2_pt", 1);            fChain->SetBranchAddress("ele2_pt", &ele2_pt, &b_ele2_pt);
+  fChain->SetBranchStatus("ele2_sigmaP", 1);             fChain->SetBranchAddress("ele2_sigmaP", &ele2_sigmaP, &b_ele2_sigmaP);
   fChain->SetBranchStatus("ele2_phi", 1);            fChain->SetBranchAddress("ele2_phi", &ele2_phi, &b_ele2_phi);
   fChain->SetBranchStatus("ele2_scERaw", 1);         fChain->SetBranchAddress("ele2_scERaw", &ele2_scERaw, &b_ele2_scERaw);
   fChain->SetBranchStatus("ele2_scE", 1);            fChain->SetBranchAddress("ele2_scE", &ele2_scE, &b_ele2_scE);
-  fChain->SetBranchStatus("ele1_scE_regression", 1); fChain->SetBranchAddress("ele1_scE_regression", &ele1_scE_regression, &b_ele1_scE_regression);
+  fChain->SetBranchStatus("ele2_scE_regression", 1); fChain->SetBranchAddress("ele2_scE_regression", &ele2_scE_regression, &b_ele2_scE_regression);
   
   fChain->SetBranchStatus("ele2_e3x3", 1);        fChain->SetBranchAddress("ele2_e3x3", &ele2_e3x3, &b_ele2_e3x3);
   fChain->SetBranchStatus("ele2_tkP", 1);         fChain->SetBranchAddress("ele2_tkP", &ele2_tkP, &b_ele2_tkP);
@@ -208,7 +210,7 @@ void FastCalibratorEB::bookHistos(int nLoops){
 //! Build E/p distribution for both ele1 and ele2 
 
 void FastCalibratorEB::BuildEoPeta_ele(int iLoop, int nentries , int useW, int useZ, std::vector<float> theScalibration, bool isSaveEPDistribution, bool isR9selection, 
-                                       float R9Min, bool isfbrem, float fbremMax, bool isPtCut, float PtMin, bool isMCTruth){
+                                       float R9Min, bool isfbrem, float fbremMax, bool isPtCut, float PtMin, bool isMCTruth, bool isEPselection, float EPmin){
 
   if(iLoop ==0){
    TString name = Form ("hC_EoP_eta_%d",iLoop);
@@ -238,7 +240,8 @@ void FastCalibratorEB::BuildEoPeta_ele(int iLoop, int nentries , int useW, int u
    
    if ( ele1_isEB == 1 && (( useW == 1 && isW == 1 ) ||  ( useZ== 1 && isZ == 1 ))) {
 
-    FdiEta = ele1_scE/ele1_scERaw; /// FEta approximation
+     FdiEta = ele1_scE_regression/ele1_scERaw; /// FEta approximation
+     //     FdiEta = ele1_scE/ele1_scERaw; /// FEta approximation
     
     float thisE = 0;
     int   iseed = 0 ;
@@ -296,7 +299,11 @@ void FastCalibratorEB::BuildEoPeta_ele(int iLoop, int nentries , int useW, int u
            pIn = ele1_E_true;
            if(fabs(ele1_DR)>0.1) skipElectron = true; /// No macthing beetween gen ele and reco ele
     }
-         
+
+    //E/P selection
+    //    if( fabs(thisE/pIn  - 1) > EPmin && isEPselection == true ) skipElectron = true;
+    if( fabs(1/ele1_scE_regression-1/pIn) > EPmin && isEPselection == true ) skipElectron = true;
+
     /// R9 Selection    
     if( fabs(thisE3x3/thisE) < R9Min && isR9selection == true ) skipElectron = true;
 
@@ -308,6 +315,7 @@ void FastCalibratorEB::BuildEoPeta_ele(int iLoop, int nentries , int useW, int u
      
     /// Save electron E/p in a chain of histogramm each for eta bin
     if(!skipElectron)    hC_EoP_eta_ele -> Fill(eta_seed+85,thisE/pIn);
+    //    if(!skipElectron)    hC_EoP_eta_ele -> Fill(eta_seed+85,ele1_sigmaP/pIn);
      
   
   }
@@ -315,7 +323,8 @@ void FastCalibratorEB::BuildEoPeta_ele(int iLoop, int nentries , int useW, int u
   
   if ( ele2_isEB == 1 && (( useW == 1 && isW == 1 ) || ( useZ == 1 && isZ == 1 )) ){
 
-    FdiEta = ele2_scE/ele2_scERaw; /// FEta approximation
+    //    FdiEta = ele2_scE/ele2_scERaw; /// FEta approximation
+    FdiEta = ele2_scE_regression/ele2_scERaw; /// FEta approximation
  
     float thisE = 0;
     int   iseed = 0 ;
@@ -374,6 +383,9 @@ void FastCalibratorEB::BuildEoPeta_ele(int iLoop, int nentries , int useW, int u
        pIn = ele2_E_true;
        if(fabs(ele2_DR)>0.1) skipElectron = true; /// No macthing beetween gen ele and reco ele
     }
+
+    //    if( fabs(thisE/pIn  - 1) > EPmin && isEPselection == true ) skipElectron = true;
+    if( fabs(1/ele2_scE_regression-1/pIn) > EPmin && isEPselection == true ) skipElectron = true;
      
     ///R9 Selection
     if( fabs(thisE3x3/thisE) < R9Min && isR9selection==true ) skipElectron = true;
@@ -386,12 +398,13 @@ void FastCalibratorEB::BuildEoPeta_ele(int iLoop, int nentries , int useW, int u
 
     /// Save E/p electron information
     if(!skipElectron) hC_EoP_eta_ele -> Fill(eta_seed+85,thisE/pIn);
+    //    if(!skipElectron) hC_EoP_eta_ele -> Fill(eta_seed+85,ele2_sigmaP/pIn);
   
   }    
  }
  
  /// Histogramm Normalization
- for(unsigned int ieta=0 ; ieta < hC_EoP_eta_ele->Size() ; ieta++) hC_EoP_eta_ele->Normalize(ieta);
+   for(unsigned int ieta=0 ; ieta < hC_EoP_eta_ele->Size() ; ieta++) hC_EoP_eta_ele->Normalize(ieta);
  
  /// Save E/p pdf if it is required
  if(isSaveEPDistribution == true) {
@@ -405,7 +418,7 @@ void FastCalibratorEB::BuildEoPeta_ele(int iLoop, int nentries , int useW, int u
 /// Calibration Loop over the ntu events
 void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, int nLoops, bool isMiscalib,bool isSaveEPDistribution,
                              bool isEPselection,bool isR9selection, float R9Min, bool isfbrem, float fbremMax, bool isPtCut, float PtMin,
-                             bool isMCTruth, std::map<int, std::vector<std::pair<int, int> > > jsonMap){
+                             bool isMCTruth, std::map<int, std::vector<std::pair<int, int> > > jsonMap, float EPmin){
    if (fChain == 0) return;
    
    /// Define the number of crystal you want to calibrate
@@ -468,7 +481,7 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
     std::cout << "Number of analyzed events = " << nentries << std::endl;
     
     ///==== build E/p distribution ele 1 and 2
-    BuildEoPeta_ele(iLoop,nentries,useW,useZ,theScalibration,isSaveEPDistribution,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth); 
+    BuildEoPeta_ele(iLoop,nentries,useW,useZ,theScalibration,isSaveEPDistribution,isR9selection,R9Min,isfbrem,fbremMax,isPtCut,PtMin,isMCTruth,isEPselection,EPmin); 
     
     // define map with events
     std::map<std::pair<int,std::pair<int,int> >,int> eventsMap;
@@ -512,7 +525,8 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
         if ( ele1_isEB == 1 && (( useW == 1 && isW == 1 ) || ( useZ == 1 && isZ == 1 )) ) {
                   
          /// SCL energy containment correction
-          FdiEta = ele1_scE/ele1_scERaw;
+	  //	  FdiEta = ele1_scE/ele1_scERaw;
+          FdiEta = ele1_scE_regression/ele1_scERaw;
          
 	  float thisE = 0;
           int iseed = 0 ;
@@ -574,7 +588,9 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
           TH1F* EoPHisto = hC_EoP_eta_ele->GetHisto(eta_seed+85);
           
 	  /// Basic selection on E/p or R9 if you want to apply
-          if( fabs(thisE/pIn  - 1) > 0.3 && isEPselection == true ) skipElectron = true;
+	  //	  if( fabs(thisE/pIn  - 1) > EPmin && isEPselection == true ) skipElectron = true;
+	  if( fabs(1/ele1_scE_regression-1/pIn) > EPmin && isEPselection == true ) skipElectron = true;
+
           if( fabs(thisE3x3/thisE) < R9Min && isR9selection == true ) skipElectron = true;
           if( fabs(ele1_fbrem) > fbremMax  && isfbrem == true ) skipElectron = true;
           if( ele1_pt < PtMin  && isPtCut == true ) skipElectron = true;
@@ -601,20 +617,29 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
               /// use full statistics
               if ( splitStat == 0 ) {
                 
-                int EoPbin = EoPHisto->FindBin(thisE/pIn); /// factor use to reweight the evemts
+		int EoPbin = EoPHisto->FindBin(thisE/pIn); /// factor use to reweight the evemts
+		//                EoPbin = EoPHisto->FindBin(ele1_sigmaP/pIn); /// factor use to reweight the evemts
+		if (fabs(thisE/pIn-1)<0.15)  EoPbin=EoPHisto->FindBin(1);
+		else EoPbin=EoPHisto->FindBin(0);
                 theNumerator[thisIndex] += theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
                 theDenominator[thisIndex] += theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
                 
               }
               /// Use Half Statistic only even   
               else if ( splitStat == 1 && jentry%2 == 0 ) {
-                int EoPbin = EoPHisto->FindBin(thisE/pIn);
+		int EoPbin = EoPHisto->FindBin(thisE/pIn);
+		if (fabs(thisE/pIn-1)<0.15)  EoPbin=EoPHisto->FindBin(1);
+		else EoPbin=EoPHisto->FindBin(0);
+		//                EoPbin = EoPHisto->FindBin(ele1_sigmaP/pIn); /// factor use to reweight the evemts
                 theNumerator[thisIndex] += theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
                 theDenominator[thisIndex] += theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
               }  
               /// use odd event
               else if ( splitStat == -1 && jentry%2 != 0 ) {
-                int EoPbin = EoPHisto->FindBin(thisE/pIn);
+		int EoPbin = EoPHisto->FindBin(thisE/pIn);
+		if (fabs(thisE/pIn-1)<0.15)  EoPbin=EoPHisto->FindBin(1);
+		else EoPbin=EoPHisto->FindBin(0);
+		//                EoPbin = EoPHisto->FindBin(ele1_sigmaP/pIn); /// factor use to reweight the evemts
                 theNumerator[thisIndex] += theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
                 theDenominator[thisIndex] += theScalibration[thisIndex]*ele1_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
               }
@@ -625,7 +650,10 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
 
           
           //Fill EoP
-          hC_EoP -> Fill(iLoop, thisE/pIn);
+	  if (!skipElectron)
+	    hC_EoP -> Fill(iLoop, thisE/pIn);
+	    //	    hC_EoP -> Fill(iLoop, ele1_sigmaP/pIn);
+	    //	    hC_EoP -> Fill(iLoop, 1);
         
         }  
               
@@ -634,7 +662,8 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
         /// Ele2 medium from Z only Barrel
         if ( ele2_isEB == 1 && (( useW == 1 && isW == 1 ) || ( useZ == 1 && isZ == 1 )) ) {
   
-          FdiEta = ele2_scE/ele2_scERaw;
+	  //	  FdiEta = ele2_scE/ele2_scERaw;
+          FdiEta = ele2_scE_regression/ele2_scERaw;
           // Electron energy
           float thisE = 0;
           int iseed = 0 ;
@@ -695,7 +724,8 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
           
           /// discard electrons with bad E/P or R9
           if( thisE/pIn  < EoPHisto->GetXaxis()->GetXmin() || thisE/pIn  > EoPHisto->GetXaxis()->GetXmax()) skipElectron=true;
-          if( fabs(thisE/pIn  - 1) > 0.3 && isEPselection == true ) skipElectron = true;
+	  //if( fabs(thisE/pIn  - 1) > EPmin && isEPselection == true ) skipElectron = true;
+	  if( fabs(1/ele2_scE_regression-1/pIn) > EPmin && isEPselection == true ) skipElectron = true;
           if( fabs(thisE3x3/thisE) < R9Min && isR9selection == true ) skipElectron = true;
           if( fabs(ele2_fbrem) > fbremMax  && isfbrem == true ) skipElectron = true;
           if( ele2_pt < PtMin  && isPtCut == true ) skipElectron = true;
@@ -721,19 +751,28 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
               /// use full statistics
               if ( splitStat == 0 ) {
                 
-                int EoPbin = EoPHisto->FindBin(thisE/pIn);
+		int EoPbin = EoPHisto->FindBin(thisE/pIn);
+		if (fabs(thisE/pIn-1)<0.15)  EoPbin=EoPHisto->FindBin(1);
+		else EoPbin=EoPHisto->FindBin(0);
+		//		EoPbin = EoPHisto->FindBin(ele2_sigmaP/pIn);
                 theNumerator[thisIndex] += theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
                 theDenominator[thisIndex] += theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
               }
               /// use evens    
               else if ( splitStat == 1 && jentry%2 == 0 ) {
-                int EoPbin = EoPHisto->FindBin(thisE/pIn);
+		int EoPbin = EoPHisto->FindBin(thisE/pIn);
+		if (fabs(thisE/pIn-1)<0.15)  EoPbin=EoPHisto->FindBin(1);
+		else EoPbin=EoPHisto->FindBin(0);
+		//		EoPbin = EoPHisto->FindBin(ele2_sigmaP/pIn);
                 theNumerator[thisIndex] += theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
                 theDenominator[thisIndex] += theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
               }  
              /// use odds
               else if ( splitStat == -1 && jentry%2 != 0 ) {
-                int EoPbin = EoPHisto->FindBin(thisE/pIn);
+		int EoPbin = EoPHisto->FindBin(thisE/pIn);
+		if (fabs(thisE/pIn-1)<0.15)  EoPbin=EoPHisto->FindBin(1);
+		else EoPbin=EoPHisto->FindBin(0);
+		//		EoPbin = EoPHisto->FindBin(ele2_sigmaP/pIn);
                 theNumerator[thisIndex] += theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*(thisIC/thisE)*pIn/thisE*EoPHisto->GetBinContent(EoPbin);
                 theDenominator[thisIndex] += theScalibration[thisIndex]*ele2_recHit_E -> at(iRecHit)*FdiEta*thisIC/thisE*EoPHisto->GetBinContent(EoPbin);
               }
@@ -744,7 +783,10 @@ void FastCalibratorEB::Loop( int nentries, int useZ, int useW, int splitStat, in
 
           
           //Fill EoP
-          hC_EoP -> Fill(iLoop, thisE/pIn);
+	  if (!skipElectron)
+	    hC_EoP -> Fill(iLoop, thisE/pIn);
+	    //	    hC_EoP -> Fill(iLoop, ele2_sigmaP/pIn);
+	    //	    hC_EoP -> Fill(iLoop, 1);
         
        
         }
