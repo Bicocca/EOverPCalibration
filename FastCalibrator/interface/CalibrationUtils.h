@@ -47,6 +47,12 @@ void BookSpreadHistos_EB(TH1F* h_spread, std::vector<TH1F*>& h_spread_vsEtaFold,
                          const std::string& name, const int& nBins_spread, const float& spreadMin, const float& spreadMax,
                          TH2F* hcmap, TH2F* hcmap2 = NULL);
 
+void NumberEventsvsEta_EB(std::vector<TH1F*>& h_numbers_vsEta, TGraphErrors* g_numbers_vsEta, const int& etaRingWidth,
+                          const std::string& name, TH2F* hcmap);
+
+void NumberEventsvsEta_EE(std::map<int,std::vector<TH1F*> >& h_numbers_vsEta, std::map<int,TGraphErrors*>& g_numbers_vsEta, const int& etaRingWidth,
+			  const std::string& name, std::map<int,TH2F*>& hcmap, TEndcapRings* eRings);
+
 /// Phi Projection EB
 void PhiProfile(TH1F* h_phiAvgICSpread, TGraphErrors* g_avgIC_vsPhi, const int& phiRegionWidth,
                 TH2F* hcmap, std::vector<std::vector<TGraphErrors*> > & correctionMomentum, TEndcapRings* eRings = NULL, int zside=0, int nEtaBinsEE=5, float etaMin=1.4, float etaMax=2.5);
@@ -93,6 +99,12 @@ void DrawICCorrFit_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP,
 		      const std::vector< std::pair<int,int> >& TT_centre_EEM,
 		      const std::vector< std::pair<int,int> >& TT_centre_EEP,
 		      TEndcapRings* eRings, bool skip);
+
+void DrawICSmear_EE(TH2F* h_scale_EEM, TH2F* h_scale_EEP,
+                    TH2F* hcmap_EEM, TH2F* hcmap_EEP,
+                    const std::vector< std::pair<int,int> >& TT_centre_EEM,
+		    const std::vector< std::pair<int,int> >& TT_centre_EEP,
+                    TEndcapRings* eRings, bool skip=true, int shift=0);
 
 /// Book spread  Histos
 void BookSpreadHistos_EE(std::map<int,TH1F*>& h_spread, std::map<int,std::vector<TH1F*> >& h_spread_vsEtaFold, std::map<int,TGraphErrors*>& g_spread_vsEtaFold,

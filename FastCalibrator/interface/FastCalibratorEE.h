@@ -32,7 +32,7 @@ class FastCalibratorEE{
   public :
 
     ///! Class methods
-    FastCalibratorEE(TTree *tree, std::vector<TGraphErrors*> & inputMomentumScale, std::vector<TGraphErrors*> & correctionMomentum, const std::string& typeEE, TString outEPDistribution="NULL");
+    FastCalibratorEE(TTree *tree, std::vector<TGraphErrors*> & inputMomentumScale, std::vector<TGraphErrors*> & correctionMomentum, const std::string& typeEE, TString outEPDistribution="EP_dist_eta.root");
 
     virtual ~FastCalibratorEE();
 
@@ -46,8 +46,8 @@ class FastCalibratorEE{
     
     virtual void     Init(TTree *tree);
 
-    virtual void     Loop(int, int, int, int, int, bool,bool,bool,bool,float,bool,float,bool,float,bool,std::map<int, std::vector<std::pair<int, int> > >);
-    virtual void     BuildEoPeta_ele(int,int,int,int,std::vector<float> ,bool,bool,float,bool,float,bool,float,bool);
+    virtual void     Loop(int, int, int, int, int, bool,bool,bool,bool,float,bool,float,bool,float,bool,std::map<int, std::vector<std::pair<int, int> > >,float);
+    virtual void     BuildEoPeta_ele(int,int,int,int,std::vector<float> ,bool,bool,float,bool,float,bool,float,bool,bool,float);
     
     virtual void     saveEoPeta(TFile * f2);
     
@@ -81,6 +81,7 @@ class FastCalibratorEE{
     Float_t         ele1_charge;
     Float_t         ele1_eta;
     Float_t         ele1_pt;
+    Float_t         ele1_sigmaP;
     Float_t         ele1_phi;
     Float_t         ele1_scERaw;
     Float_t         ele1_scE;
@@ -111,6 +112,7 @@ class FastCalibratorEE{
     Float_t         ele2_charge;
     Float_t         ele2_eta;
     Float_t         ele2_pt;
+    Float_t         ele2_sigmaP;
     Float_t         ele2_phi;
     Float_t         ele2_scERaw;
     Float_t         ele2_scE;
@@ -147,6 +149,7 @@ class FastCalibratorEE{
     TBranch        *b_ele1_charge;   //!
     TBranch        *b_ele1_eta;   //!
     TBranch        *b_ele1_pt;   //!
+    TBranch        *b_ele1_sigmaP;   //!
     TBranch        *b_ele1_phi;   //!
     TBranch        *b_ele1_scERaw;   //!
     TBranch        *b_ele1_scE;   //!
@@ -177,6 +180,7 @@ class FastCalibratorEE{
     TBranch        *b_ele2_charge;   //!
     TBranch        *b_ele2_eta;   //!
     TBranch        *b_ele2_pt;   //!
+    TBranch        *b_ele2_sigmaP;   //!
     TBranch        *b_ele2_phi;   //!
     TBranch        *b_ele2_scERaw;   //!
     TBranch        *b_ele2_scE;   //!
@@ -199,6 +203,13 @@ class FastCalibratorEE{
 
 
     /// Output informations
+    TGraph *gP_EEP;
+    TGraph *gP_EEM;
+    float EEPvalue[360];
+    float EEMvalue[360];
+    int EEPcount[360];
+    int EEMcount[360];
+
     hChain     *hC_EoP_ir_ele;
    
     TH1F       *h_scale_hashedIndex_EE;

@@ -32,7 +32,7 @@ class FastCalibratorEB {
 
    ///! List of class methods
    
-    FastCalibratorEB(TTree *tree, std::vector<TGraphErrors*> & inputMomentumScale, const std::string& typeEB, TString outEPDistribution="NULL");
+    FastCalibratorEB(TTree *tree, std::vector<TGraphErrors*> & inputMomentumScale, const std::string& typeEB, TString outEPDistribution="EoP_dist_eta.root");
    
     virtual ~FastCalibratorEB();
     
@@ -46,9 +46,9 @@ class FastCalibratorEB {
     
     virtual void     Init(TTree *tree);
     
-    virtual void     Loop(int, int, int, int, int,bool,bool,bool,bool,float,bool,float,bool,float,bool,std::map<int, std::vector<std::pair<int, int> > >);
+    virtual void     Loop(int, int, int, int, int,bool,bool,bool,bool,float,bool,float,bool,float,bool,std::map<int, std::vector<std::pair<int, int> > >, float);
         
-    virtual void     BuildEoPeta_ele(int,int,int,int,std::vector<float>,bool,bool,float,bool,float,bool,float,bool);
+    virtual void     BuildEoPeta_ele(int,int,int,int,std::vector<float>,bool,bool,float,bool,float,bool,float,bool,bool,float);
 
     virtual void     saveEoPeta(TFile * f2);
     
@@ -84,6 +84,7 @@ class FastCalibratorEB {
     Float_t         ele1_charge;
     Float_t         ele1_eta;
     Float_t         ele1_pt;
+    Float_t         ele1_sigmaP;
     Float_t         ele1_phi;
     Float_t         ele1_scERaw;
     Float_t         ele1_scE;
@@ -114,6 +115,7 @@ class FastCalibratorEB {
     Float_t         ele2_charge;
     Float_t         ele2_eta;
     Float_t         ele2_pt;
+    Float_t         ele2_sigmaP;
     Float_t         ele2_phi;
     Float_t         ele2_scERaw;
     Float_t         ele2_scE;
@@ -151,6 +153,7 @@ class FastCalibratorEB {
     
     TBranch        *b_ele1_eta;   //!
     TBranch        *b_ele1_pt;   //!
+    TBranch        *b_ele1_sigmaP;   //!
     TBranch        *b_ele1_phi;   //!
     TBranch        *b_ele1_scERaw;   //!
     TBranch        *b_ele1_scE;   //!
@@ -179,6 +182,7 @@ class FastCalibratorEB {
     TBranch        *b_ele2_eta;   //!
     TBranch        *b_ele2_phi;   //!
     TBranch        *b_ele2_pt;   //!
+    TBranch        *b_ele2_sigmaP;   //!
     TBranch        *b_ele2_scERaw;   //!
     TBranch        *b_ele2_scE;   //!
     TBranch        *b_ele2_es;   //!
